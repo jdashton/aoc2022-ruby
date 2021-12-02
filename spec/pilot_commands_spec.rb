@@ -5,19 +5,18 @@ require "aoc2021/pilot_commands"
 RSpec.describe AoC2021::PilotCommands do
   describe "#exec_commands" do
     context "with 'forward 10/down 1' it reaches 10" do
-      test_data = StringIO.new(<<~COMMANDS)
+      subject { AoC2021::PilotCommands.new StringIO.new(<<~COMMANDS) }
         forward 10
         down 1
       COMMANDS
 
-      subject { AoC2021::PilotCommands.new file: test_data }
       it "reaches 10" do
         expect(subject.exec_commands).to eq 10
       end
     end
 
     context "with provided test data" do
-      test_data = StringIO.new(<<~COMMANDS)
+      subject { AoC2021::PilotCommands.new StringIO.new(<<~COMMANDS) }
         forward 5
         down 5
         forward 8
@@ -26,7 +25,6 @@ RSpec.describe AoC2021::PilotCommands do
         forward 2
       COMMANDS
 
-      subject { AoC2021::PilotCommands.new file: test_data }
       it "reaches 150" do
         expect(subject.exec_commands).to eq 150
       end
@@ -35,7 +33,7 @@ RSpec.describe AoC2021::PilotCommands do
 
   describe "#exec_with_aim" do
     context "with provided test data" do
-      test_data = StringIO.new(<<~COMMANDS)
+      subject { AoC2021::PilotCommands.new StringIO.new(<<~COMMANDS) }
         forward 5
         down 5
         forward 8
@@ -44,7 +42,6 @@ RSpec.describe AoC2021::PilotCommands do
         forward 2
       COMMANDS
 
-      subject { AoC2021::PilotCommands.new file: test_data }
       it "reaches 900" do
         expect(subject.exec_with_aim).to eq 900
       end
