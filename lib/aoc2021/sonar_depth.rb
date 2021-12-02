@@ -3,8 +3,8 @@
 module AoC2021
   # For Day 1, the first task is to count the number of times a depth measurement increases from the previous measurement.
   class SonarDepth
-    def initialize(numbers)
-      @numbers = numbers
+    def initialize(numbers: [], file: nil)
+      @numbers = numbers.empty? ? file.readlines.map(&:to_i) : numbers
     end
 
     def count_increases
