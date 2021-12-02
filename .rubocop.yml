@@ -3,6 +3,15 @@ AllCops:
   TargetRubyVersion: 3.1
   Exclude:
     - bin/bundle
+    - vendor
+  Include:
+    - Gemfile
+    - Rakefile
+    - aoc2021.gemspec
+    - bin
+    - exe
+    - lib/**/*.rb
+    - spec/*.rb
 
 Style/StringLiterals:
   Enabled: true
