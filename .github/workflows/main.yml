@@ -26,6 +26,6 @@ jobs:
       - name: Run Rspec
         run: bin/rspec
       - name: Run Rubocop
-        run: bin/rubocop -L
+        run: bundle exec rubocop -L
       - name: Run Reek
         run: bin/reek
