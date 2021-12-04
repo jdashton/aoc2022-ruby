@@ -1,5 +1,84 @@
 # frozen_string_literal: true
 
+require "forwardable"
+
+# Class LinesOfDigits holds the zeros and ones on each line of input.
+class LineOfDigits
+  extend Forwardable
+  def_instance_delegators :@line, :length, :[], :map
+
+  def initialize(bits_string)
+    @line = bits_string.strip.chars.map(&:to_i)
+  end
+
+  def add_to_acc(acc) = acc.each_with_index { |zoo, idx| zoo.count @line[idx] }
+end
+
+# Encapsulates operations on the collection of input lines.
+class LinesArray
+  def initialize(ary)
+    @ary = ary
+  end
+
+  def acc_array = Array.new(@ary[0].length) { ZeroOrOne.new }
+
+  def each_line(&block)
+    @ary.reduce(acc_array, &block)
+  end
+
+  def find_common_lines(lines, most_common, index)
+    # Review the bit in position `index`, seeking the `most_or_least` common.
+    # Filter lines to keep only lines that have that value in the `index` position.
+    # If the results.length == 1, convert to an integer and return it.
+    # Else find_common_lines(results, most_or_least, index + 1)
+    zoo_result   = lines.reduce(ZeroOrOne.new) { |zoo, line| zoo.count line[index] }
+    desired_val  = most_common ? zoo_result.more_common : zoo_result.less_common
+    result_lines = lines.filter { |line| line[index] == desired_val }
+    if result_lines.length > 1
+      find_common_lines(result_lines, most_common, index + 1)
+    else
+      result_lines[0].map(&:to_s).join.to_i(2)
+    end
+  end
+
+  def oxygen_generator = find_common_lines(@ary, true, 0)
+
+  def co2_scrubber = find_common_lines(@ary, false, 0)
+end
+
+# Accumulates the number of zeros and ones seen.
+class ZeroOrOne
+  def initialize
+    @zero = @one = 0
+  end
+
+  def count(val)
+    if val.zero?
+      @zero += 1
+    else
+      @one += 1
+    end
+    self
+  end
+
+  def more_common = @zero > @one ? 0 : 1
+
+  def less_common = @zero > @one ? 1 : 0
+end
+
+# Encapsulates operations on the collection of frequency distributions.
+class ValuesArray
+  def initialize(lines_of_digits)
+    @values = lines_of_digits.each_line { |acc, ary| ary.add_to_acc(acc) }
+  end
+
+  def find_common_bits(&block) = @values.map(&block).map(&:to_s).join.to_i(2)
+
+  def gamma = find_common_bits(&:more_common)
+
+  def epsilon = find_common_bits(&:less_common)
+end
+
 module AoC2021
   # For Day 3, we run a diagnostic on the submarine's computer.
   class DiagnosticBits
@@ -13,25 +92,16 @@ module AoC2021
       # in position one we observed two 0s and one 1,
       # in position two we observed no 0s and three 1s,
       # etc
-      @lines_of_digits = file.readlines.map(&:strip).map(&:chars)
-      acc_array        = Array.new(@lines_of_digits[0].length) { Array.new(2, 0) }
-      @values          = @lines_of_digits.each_with_object(acc_array) do |ary, acc|
-        ary.map(&:to_i).each_with_index { |digit, idx| acc[idx][digit] += 1 }
-      end
+      @lines_of_digits = LinesArray.new(file.readlines.map { |line| LineOfDigits.new(line) })
+      @values          = ValuesArray.new(@lines_of_digits)
     end
 
     def power_consumption
-      @values.map { |zeros, ones| zeros > ones ? 0 : 1 }.map(&:to_s).join.to_i(2) *
-        @values.map { |zeros, ones| zeros < ones ? 0 : 1 }.map(&:to_s).join.to_i(2)
+      @values.gamma * @values.epsilon
     end
 
     def life_support_rating
-      oxygen_generator = 1
-
-      # og_bit_criteria
-
-      co2_scrubber = 230
-      oxygen_generator * co2_scrubber
+      @lines_of_digits.oxygen_generator * @lines_of_digits.co2_scrubber
     end
   end
 end

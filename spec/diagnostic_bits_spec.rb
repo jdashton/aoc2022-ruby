@@ -49,16 +49,6 @@ RSpec.describe AoC2021::DiagnosticBits do
   end
 
   describe "#life_support_rating" do
-    context "with one number" do
-      subject { AoC2021::DiagnosticBits.new StringIO.new(<<~BITS) }
-        00100
-      BITS
-
-      it "reaches 230" do
-        expect(subject.life_support_rating).to eq 230
-      end
-    end
-
     context "with three numbers" do
       subject { AoC2021::DiagnosticBits.new StringIO.new(<<~BITS) }
         00100
@@ -66,8 +56,8 @@ RSpec.describe AoC2021::DiagnosticBits do
         10110
       BITS
 
-      it "reaches 198" do
-        expect(subject.life_support_rating).to eq 198
+      it "reaches 120" do
+        expect(subject.life_support_rating).to eq 120
       end
     end
 

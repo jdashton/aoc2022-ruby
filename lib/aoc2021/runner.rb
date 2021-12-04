@@ -28,9 +28,9 @@ module AoC2021
     end
 
     def self.day03
-      commands = File.open("input/day03a.txt") { |file| DiagnosticBits.new file }
-      puts "Day 3, part A: #{commands.power_consumption} product of horizontal position and depth"
-      # puts "Day 2, part B: #{commands.exec_with_aim} product of horizontal position and depth\n\n"
+      diag_bits = File.open("input/day03a.txt") { |file| DiagnosticBits.new file }
+      puts "Day 3, part A: #{diag_bits.power_consumption} product of gamma and epsilon"
+      puts "Day 3, part B: #{diag_bits.life_support_rating} product of oxygen generator and CO2 scrubber ratings\n\n"
     end
   end
 end
