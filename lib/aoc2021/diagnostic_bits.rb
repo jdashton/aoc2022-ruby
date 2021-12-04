@@ -12,6 +12,8 @@ class LineOfDigits
   end
 
   def add_to_acc(acc) = acc.each_with_index { |zoo, idx| zoo.count @line[idx] }
+
+  def to_i = map(&:to_s).join.to_i(2)
 end
 
 # Encapsulates operations on the collection of input lines.
@@ -34,11 +36,9 @@ class LinesArray
     zoo_result   = lines.reduce(ZeroOrOne.new) { |zoo, line| zoo.count line[index] }
     desired_val  = most_common ? zoo_result.more_common : zoo_result.less_common
     result_lines = lines.filter { |line| line[index] == desired_val }
-    if result_lines.length > 1
-      find_common_lines(result_lines, most_common, index + 1)
-    else
-      result_lines[0].map(&:to_s).join.to_i(2)
-    end
+    return result_lines[0].to_i if result_lines.length == 1
+
+    find_common_lines(result_lines, most_common, index + 1)
   end
 
   def oxygen_generator = find_common_lines(@ary, true, 0)
