@@ -3,6 +3,7 @@
 require_relative "sonar_depth"
 require_relative "pilot_commands"
 require_relative "diagnostic_bits"
+require_relative "bingo"
 
 module AoC2021
   # The Runner class provides file loading services around the solution for each day.
@@ -31,6 +32,16 @@ module AoC2021
       diag_bits = File.open("input/day03a.txt") { |file| DiagnosticBits.new file }
       puts "Day 3, part A: #{diag_bits.power_consumption} product of gamma and epsilon"
       puts "Day 3, part B: #{diag_bits.life_support_rating} product of oxygen generator and CO2 scrubber ratings\n\n"
+
+      day04
+    end
+
+    def self.day04
+      bingo = File.open("input/day04a.txt") { |file| Bingo.new file }
+      puts "Day 4, part A: #{bingo.victory} predicted score at victory"
+      # puts "Day 4, part B: #{bingo.whatever} product of oxygen generator and CO2 scrubber ratings\n\n"
+
+      # day05
     end
   end
 end
