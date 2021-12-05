@@ -13,7 +13,7 @@ class Board
 
   def play(number)
     idx         = @cells.index(number)
-    @cells[idx] = nil unless idx.nil?
+    @cells[idx] = nil if idx
   end
 
   def win?
@@ -56,38 +56,48 @@ module AoC2021
   # Calculates conditions of victory for given plays and boards
   class Bingo
     def initialize(file)
-      @plays  = Plays.new(file)
-      @boards = BoardsArray.new(file)
+      @plays       = Plays.new(file)
+      @boards      = BoardsArray.new(file)
+      @last_board  = nil
+      @last_number = nil
+    end
+
+    def play_loop
+      @plays.each do |number|
+        play_each_board number
+        yield
+      end
     end
 
     def victory
-      winning_boards = []
-      last_number    = 0
-      @plays.each do |number|
-        last_number = number
-        @boards.each { |board| board.play number }
+      play_loop do
         winning_boards = @boards.filter(&:win?)
-        break unless winning_boards.empty?
+        unless winning_boards.empty?
+          @last_board = winning_boards.first
+          break
+        end
       end
-      score winning_boards.first, last_number
+      score
     end
 
     def last_win
-      last_board = last_number = nil
-      @plays.each do |number|
-        last_number = number
-        @boards.each { |board| board.play number }
+      play_loop do
         losing_boards = @boards.reject(&:win?)
-        last_board    = losing_boards.first if losing_boards.length == 1
         break if losing_boards.empty?
+
+        @last_board = losing_boards.first if losing_boards.length <= 1
       end
-      score last_board, last_number
+      score
     end
 
     private
 
-    def score(board, last_number)
-      board.reduce(0) { |acc, int| acc + (int || 0) } * last_number
+    def play_each_board(number)
+      @boards.each { |board| board.play @last_number = number }
+    end
+
+    def score
+      @last_board.reduce(0) { |acc, int| acc + (int || 0) } * @last_number
     end
   end
 end
