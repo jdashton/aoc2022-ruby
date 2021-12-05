@@ -28,22 +28,27 @@ class LinesArray
     @ary.reduce(acc_array, &block)
   end
 
-  def find_common_lines(lines, most_common, index)
+  def find_common_lines(commonality, index)
     # Review the bit in position `index`, seeking the `most_or_least` common.
     # Filter lines to keep only lines that have that value in the `index` position.
     # If the results.length == 1, convert to an integer and return it.
     # Else find_common_lines(results, most_or_least, index + 1)
-    zoo_result   = lines.reduce(ZeroOrOne.new) { |zoo, line| zoo.count line[index] }
-    desired_val  = most_common ? zoo_result.more_common : zoo_result.less_common
-    result_lines = lines.filter { |line| line[index] == desired_val }
+    desired_val  = desired_val(commonality, index)
+    result_lines = @ary.filter { |line| line[index] == desired_val }
     return result_lines.first.to_i if result_lines.length == 1
 
-    find_common_lines(result_lines, most_common, index + 1)
+    LinesArray.new(result_lines).find_common_lines(commonality, index + 1)
   end
 
-  def oxygen_generator = find_common_lines(@ary, true, 0)
+  def oxygen_generator = find_common_lines(:more_common, 0)
 
-  def co2_scrubber = find_common_lines(@ary, false, 0)
+  def co2_scrubber = find_common_lines(:less_common, 0)
+
+  private
+
+  def desired_val(commonality, index)
+    @ary.reduce(ZeroOrOne.new) { |zoo, line| zoo.count line[index] }.send(commonality)
+  end
 end
 
 # Accumulates the number of zeros and ones seen.
