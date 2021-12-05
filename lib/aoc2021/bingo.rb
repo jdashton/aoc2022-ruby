@@ -18,15 +18,7 @@ class Board
 
   def win?
     @cells.each_slice(5) { |ary| return true if ary.all?(&:nil?) }
-
-    return true if (0..4).any? do |idx|
-      @cells[idx].nil? &&
-      @cells[idx + 5].nil? &&
-      @cells[idx + 10].nil? &&
-      @cells[idx + 15].nil? &&
-      @cells[idx + 20].nil?
-    end
-
+    (0..4).each { |idx| return true if @cells[(idx..).step(5)].all?(&:nil?) }
     false
   end
 end
@@ -34,7 +26,7 @@ end
 # Holds a list of the Bingo boards we're considering.
 class BoardsArray
   extend Forwardable
-  def_instance_delegators :@boards, :[], :each, :any?, :filter
+  def_instance_delegators :@boards, :[], :each, :any?, :filter, :reject
 
   def initialize(file)
     @boards = read_boards(file, [])
@@ -72,12 +64,30 @@ module AoC2021
       winning_boards = []
       last_number    = 0
       @plays.each do |number|
-        puts "Playing #{last_number = number}"
+        last_number = number
         @boards.each { |board| board.play number }
         winning_boards = @boards.filter(&:win?)
         break unless winning_boards.empty?
       end
-      winning_boards[0].reduce(0) { |acc, int| acc + (int || 0) } * last_number
+      score winning_boards.first, last_number
+    end
+
+    def last_win
+      last_board = last_number = nil
+      @plays.each do |number|
+        last_number = number
+        @boards.each { |board| board.play number }
+        losing_boards = @boards.reject(&:win?)
+        last_board    = losing_boards.first if losing_boards.length == 1
+        break if losing_boards.empty?
+      end
+      score last_board, last_number
+    end
+
+    private
+
+    def score(board, last_number)
+      board.reduce(0) { |acc, int| acc + (int || 0) } * last_number
     end
   end
 end

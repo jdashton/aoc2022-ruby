@@ -39,7 +39,7 @@ module AoC2021
     def self.day04
       bingo = File.open("input/day04a.txt") { |file| Bingo.new file }
       puts "Day 4, part A: #{bingo.victory} predicted score at victory"
-      # puts "Day 4, part B: #{bingo.whatever} product of oxygen generator and CO2 scrubber ratings\n\n"
+      puts "Day 4, part B: #{bingo.last_win} predicted score on board that 'wins' last\n\n"
 
       # day05
     end

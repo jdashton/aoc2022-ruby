@@ -38,6 +38,10 @@ RSpec.describe AoC2021::Bingo do
       it "scores 4512" do
         expect(subject.victory).to eq 4512
       end
+
+      it "scores 1924 on the last board to win" do
+        expect(subject.last_win).to eq 1924
+      end
     end
   end
 end

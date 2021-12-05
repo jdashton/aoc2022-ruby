@@ -22,7 +22,7 @@ class LinesArray
     @ary = ary
   end
 
-  def acc_array = Array.new(@ary[0].length) { ZeroOrOne.new }
+  def acc_array = Array.new(@ary.first.length) { ZeroOrOne.new }
 
   def each_line(&block)
     @ary.reduce(acc_array, &block)
@@ -36,7 +36,7 @@ class LinesArray
     zoo_result   = lines.reduce(ZeroOrOne.new) { |zoo, line| zoo.count line[index] }
     desired_val  = most_common ? zoo_result.more_common : zoo_result.less_common
     result_lines = lines.filter { |line| line[index] == desired_val }
-    return result_lines[0].to_i if result_lines.length == 1
+    return result_lines.first.to_i if result_lines.length == 1
 
     find_common_lines(result_lines, most_common, index + 1)
   end
