@@ -13,7 +13,6 @@ module AoC2021
       # end
       parse_horizontal
       parse_vertical
-      # pp @board
     end
 
     def parse_horizontal
@@ -26,7 +25,7 @@ module AoC2021
     end
 
     def parse_vertical
-      @lines.filter { |line| line[0] == line[2] }.each do |line|
+      @lines.filter { |line| line[0] == line[2] && line[1] != line[3] }.each do |line|
         ([line[1], line[3]].min..[line[1], line[3]].max).each do |y_index|
           @board[y_index]          = [] unless @board[y_index]
           @board[y_index][line[0]] = 1 + (@board[y_index][line[0]] || 0)
@@ -34,8 +33,37 @@ module AoC2021
       end
     end
 
+    def offset_and_slope(line)
+      # 6,4 -> 2, 0  == [2, 0], [3, 1], [4, 2], [5, 3], [6, 4]
+      if line[0] < line[2]
+        [line[1], line[1] < line[3] ? 1 : -1]
+      else
+        [line[3], line[3] < line[1] ? 1 : -1]
+      end
+      #  [8, -1]
+    end
+
+    def parse_diagonal
+      @lines.filter { |line| line[0] != line[2] && line[1] != line[3] }.each do |line|
+        offset, slope = offset_and_slope(line)
+        ([line[0], line[2]].min..[line[0], line[2]].max).each_with_index do |x_index, idx|
+          # pp x_index, offset, slope, idx
+          y_index = offset + (slope * idx)
+          # puts "Marking #{x_index}, #{y_index}"
+          @board[y_index] = [] unless @board[y_index]
+          @board[y_index][x_index] = 1 + (@board[y_index][x_index] || 0)
+        end
+      end
+    end
+
     def overlaps
       @board.flatten.filter { |val| val }.count { |int| int > 1 }
+    end
+
+    def overlaps_with_diagonals
+      parse_diagonal
+      # pp @board
+      overlaps
     end
   end
 end

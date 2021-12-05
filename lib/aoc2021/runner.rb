@@ -48,7 +48,7 @@ module AoC2021
     def self.day05
       vents = File.open("input/day05a.txt") { |file| Vents.new file }
       puts "Day 5, part A: #{vents.overlaps} vents that are in two or more lines (horizontal or vertical)"
-      # puts "Day 4, part B: #{bingo.last_win} predicted score on board that 'wins' last\n\n"
+      puts "Day 5, part B: #{vents.overlaps_with_diagonals} vents in any two or more lines (including diagonal)\n\n"
 
       # day05
     end

@@ -29,6 +29,10 @@ RSpec.describe AoC2021::Vents do
       it "scores 5" do
         expect(subject.overlaps).to eq 5
       end
+
+      it "scores 12 with diagonals" do
+        expect(subject.overlaps_with_diagonals).to eq 12
+      end
     end
   end
 end
