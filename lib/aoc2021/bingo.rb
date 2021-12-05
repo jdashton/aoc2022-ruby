@@ -29,16 +29,15 @@ class BoardsArray
   def_instance_delegators :@boards, :[], :each, :any?, :filter, :reject
 
   def initialize(file)
-    @boards = read_boards(file, [])
+    @boards = []
+    read_boards(file)
   end
 
-  def read_boards(file, boards)
-    return boards if file.eof?
-
-    # Expect an empty line
-    file.readline
-    boards << Board.new((0..4).reduce([]) { |acc, _| acc + file.readline.split.map(&:to_i) })
-    read_boards(file, boards)
+  def read_boards(file)
+    # Discard an empty line
+    lines = (0..5).map { |_| file.readline }
+    @boards << Board.new(lines[1..5].reduce([]) { |acc, line| acc + line.split.map(&:to_i) })
+    read_boards(file) unless file.eof?
   end
 end
 
