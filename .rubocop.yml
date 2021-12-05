@@ -19,3 +19,8 @@ Layout/LineLength:
 Metrics/BlockLength:
   Exclude:
     - spec/*
+
+Naming/MethodParameterName:
+  AllowedNames:
+    - x
+    - y

@@ -8,3 +8,14 @@ detectors:
   UncommunicativeMethodName:
     exclude:
       - /day\d\d/
+
+  UncommunicativeParameterName:
+    accept:
+      - x
+      - y
+
+  UncommunicativeVariableName:
+    accept:
+      - x
+      - y
+      - _
