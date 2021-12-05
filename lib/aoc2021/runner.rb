@@ -4,6 +4,7 @@ require_relative "sonar_depth"
 require_relative "pilot_commands"
 require_relative "diagnostic_bits"
 require_relative "bingo"
+require_relative "vents"
 
 module AoC2021
   # The Runner class provides file loading services around the solution for each day.
@@ -40,6 +41,14 @@ module AoC2021
       bingo = File.open("input/day04a.txt") { |file| Bingo.new file }
       puts "Day 4, part A: #{bingo.victory} predicted score at victory"
       puts "Day 4, part B: #{bingo.last_win} predicted score on board that 'wins' last\n\n"
+
+      day05
+    end
+
+    def self.day05
+      vents = File.open("input/day05a.txt") { |file| Vents.new file }
+      puts "Day 5, part A: #{vents.overlaps} vents that are in two or more lines (horizontal or vertical)"
+      # puts "Day 4, part B: #{bingo.last_win} predicted score on board that 'wins' last\n\n"
 
       # day05
     end
