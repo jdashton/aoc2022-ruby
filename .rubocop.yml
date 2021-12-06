@@ -16,9 +16,12 @@ Style/StringLiteralsInInterpolation:
 Layout/LineLength:
   Max: 128
 
+Layout/SpaceInsideStringInterpolation:
+  EnforcedStyle: space
+  
 Metrics/BlockLength:
   Exclude:
-    - spec/*
+    - spec/**/*
 
 Naming/MethodParameterName:
   AllowedNames:
