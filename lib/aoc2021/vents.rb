@@ -20,6 +20,61 @@ class Point
       [other_y, other_y < @y ? 1 : -1]
     end
   end
+
+  def same_x(other) = @x == other.x
+
+  def same_y(other) = @y == other.y
+end
+
+# Line handles calculations for a start and end point
+class Line
+  def initialize(start_point, end_point)
+    @start = start_point
+    @end   = end_point
+  end
+
+  def horizontal? = @start.y == @end.y
+
+  def vertical? = @start.x == @end.x
+
+  def parse_horizontal(vents)
+    Range.new(*[@start.x, @end.x].sort).each do |x_index|
+      vents.count_vent x_index, @start.y
+    end
+  end
+
+  def parse_vertical(vents)
+    Range.new(*[@start.y, @end.y].sort).each do |y_index|
+      vents.count_vent @start.x, y_index
+    end
+  end
+
+  def parse_diagonal(vents)
+    offset, slope = @start.offset_and_slope(@end)
+    Range.new(*[@start.x, @end.x].sort).each_with_index do |x_index, idx|
+      vents.count_vent x_index, offset + (slope * idx)
+    end
+  end
+end
+
+# VentLines manages a collection of lines of vents.
+class VentLines
+  extend Forwardable
+  def_instance_delegators :@lines, :filter, :each
+
+  def initialize(file)
+    @lines             = file.readlines(chomp: true)
+                             .map { |line| line.split(/\D/).reject(&:empty?).map(&:to_i) }
+                             .map { |p1x, p1y, p2x, p2y| Line.new(Point.new(p1x, p1y), Point.new(p2x, p2y)) }
+    @h_lines, other    = @lines.partition(&:horizontal?)
+    @v_lines, @d_lines = other.partition(&:vertical?)
+  end
+
+  def horizontal_lines = @h_lines
+
+  def vertical_lines = @v_lines
+
+  def diagonal_lines = @d_lines
 end
 
 module AoC2021
@@ -27,38 +82,25 @@ module AoC2021
   class Vents
     def initialize(file)
       @board = []
-      @lines = file.readlines(chomp: true).map { |line| line.split(/\D/).reject(&:empty?).map(&:to_i) }
-      parse_horizontal { |_, y_one, _, y_two| y_one == y_two }
-      parse_vertical { |x_one, y_one, x_two, y_two| x_one == x_two && y_one != y_two }
+      @lines = VentLines.new(file)
+      parse_horizontal
+      parse_vertical
     end
 
     def line_loop(filter_criteria, &block)
       @lines.filter(&filter_criteria).each(&block)
     end
 
-    def parse_horizontal(&filter_criteria)
-      line_loop(filter_criteria) do |x_one, y_index, x_two, _|
-        ([x_one, x_two].min..[x_one, x_two].max).each do |x_index|
-          count_vent x_index, y_index
-        end
-      end
+    def parse_horizontal
+      @lines.horizontal_lines.each { |line| line.parse_horizontal self }
     end
 
-    def parse_vertical(&filter_criteria)
-      line_loop(filter_criteria) do |x_index, y_one, _, y_two|
-        ([y_one, y_two].min..[y_one, y_two].max).each do |y_index|
-          count_vent x_index, y_index
-        end
-      end
+    def parse_vertical
+      @lines.vertical_lines.each { |line| line.parse_vertical self }
     end
 
-    def parse_diagonal(&filter_criteria)
-      line_loop(filter_criteria) do |x_one, y_one, x_two, y_two|
-        offset, slope = Point.new(x_one, y_one).offset_and_slope(Point.new(x_two, y_two))
-        ([x_one, x_two].min..[x_one, x_two].max).each_with_index do |x_index, idx|
-          count_vent x_index, offset + (slope * idx)
-        end
-      end
+    def parse_diagonal
+      @lines.diagonal_lines.each { |line| line.parse_diagonal self }
     end
 
     def overlaps
@@ -66,11 +108,9 @@ module AoC2021
     end
 
     def overlaps_with_diagonals
-      parse_diagonal { |x_one, y_one, x_two, y_two| x_one != x_two && y_one != y_two }
+      parse_diagonal
       overlaps
     end
-
-    private
 
     def count_vent(x_index, y_index)
       row             = @board[y_index] || []
