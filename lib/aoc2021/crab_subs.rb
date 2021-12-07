@@ -23,16 +23,26 @@ module AoC2021
   # CrabSubs implements the solutions for Day 7.
   class CrabSubs
     def initialize(file)
-      h_positions = file.readline(chomp: true).split(/,/).map(&:to_i).tally
-      @pos_freqs  = h_positions.to_a.map { |pos, freq| PosFreq.new(pos, freq) }
+      @list       = file.readline(chomp: true).split(/,/).map(&:to_i)
+      h_positions = @list.tally
       @minmax     = Range.new(*h_positions.keys.minmax)
+      @pos_freqs  = h_positions.to_a.map { |pos, freq| PosFreq.new(pos, freq) }
+      @mean       = @list.sum(0.0) / @list.size
     end
 
     def move_loop(delta_method) = @minmax.map { |num| reduce_deltas delta_method, num }.min
 
-    def minimal_move = move_loop(:delta)
+    def minimal_move
+      # Narrowing @minmax is an after-the-fact optimization to save time on runs for the remaining days.
+      @minmax = (@mean - 122).to_i..(@mean + 1).to_i
+      move_loop(:delta)
+    end
 
-    def minimal_move_revised = move_loop(:delta_revised)
+    def minimal_move_revised
+      # Narrowing @minmax is an after-the-fact optimization to save time on runs for the remaining days.
+      @minmax = (@mean - 1).to_i..(@mean + 1).to_i
+      move_loop(:delta_revised)
+    end
 
     private
 

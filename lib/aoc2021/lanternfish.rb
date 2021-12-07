@@ -11,8 +11,8 @@ class FishCalendar
   def next_day
     spawning_fish = @fish_list[0]
     @fish_list    = @fish_list
-                    .transform_keys { |key| key.zero? ? 8 : key - 1 }
-                    .merge(6 => (spawning_fish || 0)) { |_, old, new| old + new }
+                      .transform_keys { |key| key.zero? ? 8 : key - 1 }
+                      .merge(6 => (spawning_fish || 0)) { |_, old, new| old + new }
   end
 end
 

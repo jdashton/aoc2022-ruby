@@ -16,6 +16,9 @@ Layout/HashAlignment:
 Layout/LineLength:
   Max: 128
 
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented_relative_to_receiver
+
 Layout/SpaceAroundOperators:
   AllowForAlignment: true
 
