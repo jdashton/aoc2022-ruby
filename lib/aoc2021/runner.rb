@@ -7,6 +7,7 @@ require_relative "bingo"
 require_relative "vents"
 require_relative "lanternfish"
 require_relative "crab_subs"
+require_relative "segments"
 
 module AoC2021
   # The Runner class provides file loading services around the solution for each day.
@@ -66,9 +67,17 @@ module AoC2021
     def self.day07
       crab_subs = File.open("input/day07a.txt") { |file| CrabSubs.new file }
       puts "Day 7, part A: #{ crab_subs.minimal_move } fuel used in moving to a common position"
-      puts "Day 7, part B: #{ crab_subs.minimal_move_revised } fuel used in moving to a common position (revised)"
+      puts "Day 7, part B: #{ crab_subs.minimal_move_revised } fuel used in moving to a common position (revised)\n\n"
 
-      # day08
+      day08
+    end
+
+    def self.day08
+      segments = File.open("input/day08a.txt") { |file| Segments.new file }
+      puts "Day 8, part A: #{ segments.easy_digits } display chunks with identifiable patterns"
+      puts "Day 8, part B: #{ segments.sum_of_all_outputs } sum of all of the output values\n\n"
+
+      # day09
     end
   end
 end

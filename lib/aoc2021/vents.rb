@@ -63,10 +63,9 @@ class VentLines
   def_instance_delegators :@lines, :filter, :each
 
   def initialize(file)
-    @lines             = file
-                           .readlines(chomp: true)
-                           .map { |line| line.split(/\D/).reject(&:empty?).map(&:to_i) }
-                           .map { |p1x, p1y, p2x, p2y| Line.new(Point.new(p1x, p1y), Point.new(p2x, p2y)) }
+    @lines             = file.readlines(chomp: true)
+                             .map { |line| line.split(/\D/).reject(&:empty?).map(&:to_i) }
+                             .map { |p1x, p1y, p2x, p2y| Line.new(Point.new(p1x, p1y), Point.new(p2x, p2y)) }
     @h_lines, other    = @lines.partition(&:horizontal?)
     @v_lines, @d_lines = other.partition(&:vertical?)
   end
