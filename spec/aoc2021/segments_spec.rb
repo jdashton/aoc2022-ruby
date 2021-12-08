@@ -5,7 +5,9 @@ require "rspec"
 require "aoc2021/segments"
 
 RSpec.describe DigitLine do
-  subject { DigitLine.new *["bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd", "ed bcgafe cdgba cbgef"].map(&:split) }
+  subject do
+    DigitLine.new(*["bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd", "ed bcgafe cdgba cbgef"].map(&:split))
+  end
 
   it "assigns 2 for the set bdacg" do
     expect(subject.dictionary[Set.new("bdacg".chars)]).to eq 2
