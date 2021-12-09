@@ -8,6 +8,7 @@ require_relative "vents"
 require_relative "lanternfish"
 require_relative "crab_subs"
 require_relative "segments"
+require_relative "smoke_points"
 
 module AoC2021
   # The Runner class provides file loading services around the solution for each day.
@@ -77,7 +78,15 @@ module AoC2021
       puts "Day 8, part A: #{ segments.easy_digits } display chunks with identifiable patterns"
       puts "Day 8, part B: #{ segments.sum_of_all_outputs } sum of all of the output values\n\n"
 
-      # day09
+      day09
+    end
+
+    def self.day09
+      smoke_points = File.open("input/day09a.txt") { |file| SmokePoints.new file }
+      puts "Day 9, part A: #{ smoke_points.risk_levels } sum of the risk levels of all low points"
+      puts "Day 9, part B: #{ smoke_points.multiply_basins } product of three largest basin sizes\n\n"
+
+      # day10
     end
   end
 end
