@@ -1,52 +1,57 @@
 # frozen_string_literal: true
 
 # Encapsulates operations on each line (input and output pairings)
+class SmokePointLines
+  def initialize(lines)
+    @lines  = lines
+    @border = Array.new(lines[0].length + 2, ":")
+  end
+
+  def make_heightmap
+    [@border, *@lines.map { |line| ":#{ line }:" }.map(&:chars), @border]
+  end
+end
+
 module AoC2021
   # Segments implements the solutions for Day 8.
   class SmokePoints
     def initialize(file)
-      lines      = file.readlines(chomp: true)
-      border     = Array.new(lines[0].length + 2, ":")
-      @heightmap = [border, *lines.map { |line| ":#{ line }:" }.map(&:chars), border]
-      # pp @heightmap
+      @heightmap = SmokePointLines.new(file.readlines(chomp: true)).make_heightmap
     end
 
     def risk_levels
-      @heightmap.each_with_index.reduce(0) do |acc, (line, y_index)|
-        # pp line, y_index
-        acc + line.each_with_index.reduce(0) do |acm, (char, x_index)|
-          next acm if char > "9"
-
-          # pp neighbours if neighbours.all? { |neighbour| neighbour > char }
-          acm + (neighbours(x_index, y_index).all? { |neighbour| neighbour[0] > char } ? char.to_i + 1 : 0)
-        end
-      end
+      reduce_line(0) { |char, _, _| char.to_i + 1 }
     end
 
-    def low_point_coords
-      @heightmap.each_with_index.reduce([]) do |acc, (line, y_index)|
-        # pp line, y_index
-        acc + line.each_with_index.reduce([]) do |acm, (char, x_index)|
-          next acm if char > "9"
+    def multiply_basins = basins.sort[-3..].reduce(1) { |acc, num| acc * (num || 1) }
 
-          # pp neighbours if neighbours.all? { |neighbour| neighbour > char }
-          acm + (neighbours(x_index, y_index).all? { |neighbour| neighbour[0] > char } ? [[char, x_index, y_index]] : [])
-        end
-      end
+    private
+
+    def low_point_coords
+      reduce_line([]) { |_, x_idx, y_idx| [[x_idx, y_idx]] }
     end
 
     def basins
-      # basins_with_edges = @heightmap.map { |row|
-      #   row.map { |height| height > "8" ? ":" : height }
-      # }
-      # pp basins_with_edges
-      lpcs = low_point_coords
-      walk_basins(lpcs)
+      walk_basins low_point_coords
     end
 
-    def multiply_basins = basins.sort[-3..-1].reduce(1) { |acc, i| acc * (i || 1) }
+    def reduce_line(init_val, &block)
+      @heightmap.each_with_index.reduce(init_val) do |acc, (line, y_index)|
+        acc + reduce_row(init_val, line, y_index, &block)
+      end
+    end
 
-    private
+    def reduce_row(init_val, line, y_idx)
+      line.each_with_index.reduce(init_val) do |acm, (char, x_idx)|
+        next acm if char > "9"
+
+        acm + (lowest_among_neighbours?(char, x_idx, y_idx) ? yield(char, x_idx, y_idx) : init_val)
+      end
+    end
+
+    def lowest_among_neighbours?(char, x_idx, y_idx)
+      neighbours(x_idx, y_idx).all?(&->(neighbour) { neighbour[0] > char })
+    end
 
     def neighbours(x_index, y_index)
       this_row = @heightmap[y_index]
@@ -59,31 +64,19 @@ module AoC2021
     end
 
     def walk_basins(starting_points)
-      puts "walk_basins with #{starting_points}"
-      starting_points.reduce([]) do |acc, (char, x, y)|
-        # pp @heightmap
-        puts "\nacc is now #{acc}"
-        puts "------------------------ Beginning to visit [#{x},#{y}]"
+      starting_points.reduce([]) do |acc, (x, y)|
         @heightmap[y][x] = "v"
-        this_pool_size   = 1 + visit(neighbours(x, y))
-        puts "This pool has size #{this_pool_size}."
-        acc + [this_pool_size]
+        acc + [1 + visit(neighbours(x, y))]
       end
     end
 
     def visit(queue)
-      queue.reduce(0) do |acc, (val, x, y)|
-        puts "Visiting #{ @heightmap[y][x] } at [#{ x },#{ y }]"
-        next acc unless @heightmap[y][x] < "9"
+      queue.reduce(0) do |acc, (_, x, y)|
+        this_row = @heightmap[y]
+        next acc unless this_row[x] < "9"
 
-        acc              += 1
-        @heightmap[y][x] = "v"
-        puts "  -- member of a pool"
-        puts "  -- going to visit neighbours of [#{x},#{y}]"
-        size = visit(neighbours(x, y))
-        puts "  -- [#{x},#{y}] had #{size} new neighbours in the pool"
-        puts "  -- total seen now #{ acc + size }"
-        acc + size
+        this_row[x] = "v"
+        acc + 1 + visit(neighbours(x, y))
       end
     end
   end

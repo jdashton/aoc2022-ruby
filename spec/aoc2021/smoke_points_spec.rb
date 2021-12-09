@@ -21,7 +21,7 @@ RSpec.describe AoC2021::SmokePoints do
       BITS
 
       it "finds one pool of size 3" do
-        expect(subject.basins).to eq [3]
+        expect(subject.send(:basins)).to eq [3]
       end
     end
 
@@ -32,7 +32,7 @@ RSpec.describe AoC2021::SmokePoints do
       BITS
 
       it "finds one pool of size 3" do
-        expect(subject.basins).to eq [3, 8]
+        expect(subject.send(:basins)).to eq [3, 8]
       end
     end
   end
