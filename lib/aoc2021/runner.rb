@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "sonar_depth"
-require_relative "pilot_commands"
-require_relative "diagnostic_bits"
-require_relative "bingo"
-require_relative "vents"
-require_relative "lanternfish"
-require_relative "crab_subs"
-require_relative "segments"
-require_relative "smoke_points"
+Dir["#{ File.dirname(__FILE__) }/puzzles/*.rb"].each { |file| require file }
 
 module AoC2021
   # The Runner class provides file loading services around the solution for each day.
@@ -86,7 +78,15 @@ module AoC2021
       puts "Day 9, part A: #{ smoke_points.risk_levels } sum of the risk levels of all low points"
       puts "Day 9, part B: #{ smoke_points.multiply_basins } product of three largest basin sizes\n\n"
 
-      # day10
+      day10
+    end
+
+    def self.day10
+      syntax = File.open("input/day10a.txt") { |file| Syntax.new file }
+      puts "Day 10, part A: #{ syntax.illegal_points } sum of points for illegal closing brackets"
+      # puts "Day 9, part B: #{ smoke_points.multiply_basins } product of three largest basin sizes\n\n"
+
+      # day11
     end
   end
 end
