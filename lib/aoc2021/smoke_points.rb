@@ -23,16 +23,12 @@ module AoC2021
       search_heightmap(0) { |char, _, _| char.to_i + 1 }
     end
 
-    def multiply_basins = basins.sort[-3..].reduce(&:*)
+    def multiply_basins = basin_loop([], low_point_coords).sort[-3..].reduce(&:*)
 
     private
 
     def low_point_coords
-      search_heightmap([]) { |_, x_idx, y_idx| [[x_idx, y_idx]] }
-    end
-
-    def basins
-      walk_basins low_point_coords
+      search_heightmap([]) { |_, x_idx, y_idx| [[nil, x_idx, y_idx]] }
     end
 
     def search_heightmap(init_val, &block)
@@ -63,21 +59,18 @@ module AoC2021
       ]
     end
 
-    def walk_basins(starting_points)
-      starting_points.reduce([]) do |acc, (x, y)|
-        @heightmap[y][x] = "v"
-        acc + [1 + visit(neighbours(x, y))]
+    def basin_loop(init_val, starting_points)
+      starting_points.reduce(init_val) do |acc, (_, x, y)|
+        basin_block acc, x, y
       end
     end
 
-    def visit(queue)
-      queue.reduce(0) do |acc, (_, x, y)|
-        this_row = @heightmap[y]
-        next acc unless this_row[x] < "9"
+    def basin_block(acc, x, y)
+      return acc if (this_row = @heightmap[y])[x] >= "9"
 
-        this_row[x] = "v"
-        acc + 1 + visit(neighbours(x, y))
-      end
+      this_row[x]   = "v"
+      visit_results = 1 + basin_loop(0, neighbours(x, y))
+      acc + (acc.is_a?(Array) ? [visit_results] : visit_results)
     end
   end
 end

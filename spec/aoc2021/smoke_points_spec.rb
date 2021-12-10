@@ -13,29 +13,29 @@ RSpec.describe AoC2021::SmokePoints do
     # Do nothing
   end
 
-  describe "#basins" do
-    context "with tiny input" do
-      subject { AoC2021::SmokePoints.new StringIO.new(<<~BITS) }
-        219
-        399
-      BITS
-
-      it "finds one pool of size 3" do
-        expect(subject.send(:basins)).to eq [3]
-      end
-    end
-
-    context "with small input" do
-      subject { AoC2021::SmokePoints.new StringIO.new(<<~BITS) }
-        2199943210
-        3999994921
-      BITS
-
-      it "finds one pool of size 3" do
-        expect(subject.send(:basins)).to eq [3, 8]
-      end
-    end
-  end
+  # describe "#basins" do
+  #   context "with tiny input" do
+  #     subject { AoC2021::SmokePoints.new StringIO.new(<<~BITS) }
+  #       219
+  #       399
+  #     BITS
+  #
+  #     it "finds one pool of size 3" do
+  #       expect(subject.send(:basins)).to eq [3]
+  #     end
+  #   end
+  #
+  #   context "with small input" do
+  #     subject { AoC2021::SmokePoints.new StringIO.new(<<~BITS) }
+  #       2199943210
+  #       3999994921
+  #     BITS
+  #
+  #     it "finds one pool of size 3" do
+  #       expect(subject.send(:basins)).to eq [3, 8]
+  #     end
+  #   end
+  # end
 
   describe "#easy_digits" do
     context "with provided input" do
