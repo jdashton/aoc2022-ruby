@@ -84,7 +84,7 @@ module AoC2021
     def self.day10
       syntax = File.open("input/day10a.txt") { |file| Syntax.new file }
       puts "Day 10, part A: #{ syntax.illegal_points } sum of points for illegal closing brackets"
-      # puts "Day 9, part B: #{ smoke_points.multiply_basins } product of three largest basin sizes\n\n"
+      puts "Day 10, part B: #{ syntax.autocomplete } middle score for completing incomplete strings"
 
       # day11
     end

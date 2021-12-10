@@ -36,9 +36,7 @@ RSpec.describe AoC2021::Syntax do
         expect(subject.autocomplete).to eq 288_957
       end
     end
-  end
 
-  describe "#illegal_points" do
     context "with tiny input" do
       subject { AoC2021::Syntax.new StringIO.new(<<~BITS) }
         []
