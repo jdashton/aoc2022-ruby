@@ -2,7 +2,7 @@
 
 require "rspec"
 
-require "aoc2021/syntax"
+require "aoc2021/puzzles/syntax"
 
 RSpec.describe AoC2021::Syntax do
   before do

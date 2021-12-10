@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "aoc2021/pilot_commands"
+require "aoc2021/puzzles/pilot_commands"
 
 RSpec.describe AoC2021::PilotCommands do
   describe "#exec_commands" do

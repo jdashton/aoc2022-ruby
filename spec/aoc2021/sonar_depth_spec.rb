@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "aoc2021/sonar_depth"
+require "aoc2021/puzzles/sonar_depth"
 
 RSpec.describe AoC2021::SonarDepth do
   describe "#count_increases" do

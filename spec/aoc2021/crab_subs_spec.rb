@@ -2,7 +2,7 @@
 
 require "rspec"
 
-require "aoc2021/crab_subs"
+require "aoc2021/puzzles/crab_subs"
 
 RSpec.describe AoC2021::CrabSubs do
   before do

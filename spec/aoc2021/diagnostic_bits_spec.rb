@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "aoc2021/diagnostic_bits"
+require "aoc2021/puzzles/diagnostic_bits"
 
 RSpec.describe AoC2021::DiagnosticBits do
   describe "#power_consumption" do

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "aoc2021/lanternfish"
+require "aoc2021/puzzles/lanternfish"
 
 RSpec.describe AoC2021::Lanternfish do
   before do

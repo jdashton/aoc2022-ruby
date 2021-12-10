@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "aoc2021/bingo"
+require "aoc2021/puzzles/bingo"
 
 RSpec.describe AoC2021::Bingo do
   before do

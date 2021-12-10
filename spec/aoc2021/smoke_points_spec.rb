@@ -2,7 +2,7 @@
 
 require "rspec"
 
-require "aoc2021/smoke_points"
+require "aoc2021/puzzles/smoke_points"
 
 RSpec.describe AoC2021::SmokePoints do
   before do

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "aoc2021/vents"
+require "aoc2021/puzzles/vents"
 
 RSpec.describe AoC2021::Vents do
   before do

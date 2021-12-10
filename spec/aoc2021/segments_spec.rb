@@ -2,7 +2,7 @@
 
 require "rspec"
 
-require "aoc2021/segments"
+require "aoc2021/puzzles/segments"
 
 RSpec.describe DigitLine do
   subject do
