@@ -20,32 +20,32 @@ module AoC2021
     end
 
     def risk_levels
-      reduce_line(0) { |char, _, _| char.to_i + 1 }
+      search_heightmap(0) { |char, _, _| char.to_i + 1 }
     end
 
-    def multiply_basins = basins.sort[-3..].reduce(1) { |acc, num| acc * (num || 1) }
+    def multiply_basins = basins.sort[-3..].reduce(&:*)
 
     private
 
     def low_point_coords
-      reduce_line([]) { |_, x_idx, y_idx| [[x_idx, y_idx]] }
+      search_heightmap([]) { |_, x_idx, y_idx| [[x_idx, y_idx]] }
     end
 
     def basins
       walk_basins low_point_coords
     end
 
-    def reduce_line(init_val, &block)
+    def search_heightmap(init_val, &block)
       @heightmap.each_with_index.reduce(init_val) do |acc, (line, y_index)|
-        acc + reduce_row(init_val, line, y_index, &block)
+        acc + search_row(init_val, line, y_index, &block)
       end
     end
 
-    def reduce_row(init_val, line, y_idx)
-      line.each_with_index.reduce(init_val) do |acm, (char, x_idx)|
-        next acm if char > "9"
+    def search_row(init_val, line, y_idx)
+      line.each_with_index.reduce(init_val) do |acc, (char, x_idx)|
+        next acc if char > "9"
 
-        acm + (lowest_among_neighbours?(char, x_idx, y_idx) ? yield(char, x_idx, y_idx) : init_val)
+        acc + (lowest_among_neighbours?(char, x_idx, y_idx) ? yield(char, x_idx, y_idx) : init_val)
       end
     end
 
