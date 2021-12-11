@@ -8,6 +8,21 @@ module AoC2021
       @illegal_lines = []
     end
 
+    def illegal_points
+      @lines.reduce(0, &method(:find_illegal_syntax))
+    end
+
+    def autocomplete
+      illegal_points
+      scores = (@lines - @illegal_lines).map { |line| PartialString.new line }
+                                        .map(&:complete_string)
+                                        .map(&:score_string)
+                                        .sort
+      scores[scores.size / 2]
+    end
+
+    private
+
     POINTS = {
       ")" => 3,
       "]" => 57,
@@ -15,86 +30,86 @@ module AoC2021
       ">" => 25_137
     }.freeze
 
-    COMPLETION_POINTS = {
-      ")" => 1,
-      "]" => 2,
-      "}" => 3,
-      ">" => 4
-    }.freeze
-
     MATCHING_BRACKET = {
       ")" => "(",
       "]" => "[",
       "}" => "{",
       ">" => "<"
-    }
+    }.freeze
 
     CLOSING_BRACKET = MATCHING_BRACKET.invert
 
-    OPENERS = Set["(", "[", "{", "<"]
-    CLOSERS = Set[*POINTS.keys]
+    OPENERS = Set.new(MATCHING_BRACKET.values)
 
-    def illegal_points
-      @lines.reduce(0) do |acc, char_string|
-        # puts "Start processing ---------- #{char_string}"
-        stack        = []
-        illegal_char = nil
-        char_string.chars.each { |char|
-          # puts "Processing #{char}"
-          if char in OPENERS
-            stack.push char
-            # puts "Pushed #{char}, yielding #{stack}"
-            next
-          end
+    # Encapsulates operations on a stack of bracket characters
+    class BracketStack
+      extend Forwardable
+      def_instance_delegators :@stack, :push, :pop
 
-          last_char = stack.pop
-          # puts " -- POPPED #{last_char}, yielding #{stack}"
-          if last_char == MATCHING_BRACKET[char]
-            # puts " -- found a valid match"
-            next
-          end
-
-          # puts " -- MISMATCH #{last_char} #{char}"
-          illegal_char = char
-          break
-        }
-        @illegal_lines.push(char_string) if illegal_char
-        # puts "Returning points for #{illegal_char}"
-        acc + (POINTS[illegal_char] || 0)
+      def initialize
+        @stack = []
       end
     end
 
-    def complete_string(str)
-      stack         = str.chars
-      valid_segment = 0
-      answer        = []
-      stack.reverse.each do |char|
-        if OPENERS.include?(char)
-          if valid_segment.zero?
-            answer.push(CLOSING_BRACKET[char])
-          else
-            valid_segment -= 1
-          end
-        else
-          valid_segment += 1
+    def find_illegal_syntax(acc, char_string, buffer = [])
+      char_string.chars.each do |char|
+        next buffer.push(char) if char in OPENERS
+
+        next if buffer.pop == MATCHING_BRACKET[char]
+
+        break acc = save_and_score(acc, char, char_string)
+      end
+      acc
+    end
+
+    def save_and_score(acc, char, char_string)
+      @illegal_lines.push(char_string)
+      acc + POINTS[char]
+    end
+
+    # Encapsulates finding brackets to close an incomplete string
+    class PartialString
+      attr_reader :str
+
+      def initialize(str)
+        @str = str
+      end
+
+      CLOSERS = Set.new(MATCHING_BRACKET.keys)
+
+      def complete_string(valid_closers = 0, missing_closers = [])
+        @str.chars.reverse.each do |char|
+          next valid_closers += 1 if char in CLOSERS
+
+          next valid_closers -= 1 if valid_closers.positive?
+
+          missing_closers.push(CLOSING_BRACKET[char])
         end
-      end
-      answer.join
-    end
-
-    def score_string(str)
-      str.chars.reduce(0) do |acc, char|
-        acc * 5 + COMPLETION_POINTS[char]
+        CompletionString.new(missing_closers.join)
       end
     end
 
-    def autocomplete
-      illegal_points
-      scores = (@lines - @illegal_lines)
-                 .map { |line| complete_string(line) }
-                 .map { |answer| score_string(answer) }
-                 .sort
-      scores[scores.size / 2]
+    # Encapsulates scoring of a completion string
+    class CompletionString
+      attr_reader :str
+
+      def initialize(str)
+        @str = str
+      end
+
+      COMPLETION_POINTS = {
+        ")" => 1,
+        "]" => 2,
+        "}" => 3,
+        ">" => 4
+      }.freeze
+
+      def score_string
+        @str.chars.reduce(0) { |acc, char| (acc * 5) + COMPLETION_POINTS[char] }
+      end
+
+      private
+
     end
   end
 end

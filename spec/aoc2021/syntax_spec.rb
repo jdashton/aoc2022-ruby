@@ -51,29 +51,24 @@ RSpec.describe AoC2021::Syntax do
 
   describe "score_string" do
     context "with tiny input" do
-      subject { AoC2021::Syntax.new StringIO.new(<<~BITS) }
-        []
-        []]
-      BITS
-
       it "gets example 1" do
-        expect(subject.score_string("}}]])})]")).to eq 288957
+        expect(AoC2021::Syntax::CompletionString.new("}}]])})]").score_string).to eq 288_957
       end
 
       it "gets example 2" do
-        expect(subject.score_string(")}>]})")).to eq 5566
+        expect(AoC2021::Syntax::CompletionString.new(")}>]})").score_string).to eq 5566
       end
 
       it "gets example 3" do
-        expect(subject.score_string("}}>}>))))")).to eq 1480781
+        expect(AoC2021::Syntax::CompletionString.new("}}>}>))))").score_string).to eq 1_480_781
       end
 
       it "gets example 4" do
-        expect(subject.score_string("]]}}]}]}>")).to eq 995444
+        expect(AoC2021::Syntax::CompletionString.new("]]}}]}]}>").score_string).to eq 995_444
       end
 
       it "gets example 5" do
-        expect(subject.score_string("])}>")).to eq 294
+        expect(AoC2021::Syntax::CompletionString.new("])}>").score_string).to eq 294
       end
     end
   end
@@ -86,31 +81,31 @@ RSpec.describe AoC2021::Syntax do
       BITS
 
       it "finds ']]]' as string enders for '[[['" do
-        expect(subject.complete_string('[[[')).to eq ']]]'
+        expect(AoC2021::Syntax::PartialString.new("[[[").complete_string.str).to eq "]]]"
       end
 
       it "finds ']' as the ender for '[<>]" do
-        expect(subject.complete_string('[<>')).to eq "]"
+        expect(AoC2021::Syntax::PartialString.new("[<>").complete_string.str).to eq "]"
       end
 
       it "gets example 1" do
-        expect(subject.complete_string('[({(<(())[]>[[{[]{<()<>>')).to eq "}}]])})]"
+        expect(AoC2021::Syntax::PartialString.new("[({(<(())[]>[[{[]{<()<>>").complete_string.str).to eq "}}]])})]"
       end
 
       it "gets example 2" do
-        expect(subject.complete_string('[(()[<>])]({[<{<<[]>>(')).to eq ")}>]})"
+        expect(AoC2021::Syntax::PartialString.new("[(()[<>])]({[<{<<[]>>(").complete_string.str).to eq ")}>]})"
       end
 
       it "gets example 3" do
-        expect(subject.complete_string('(((({<>}<{<{<>}{[]{[]{}')).to eq "}}>}>))))"
+        expect(AoC2021::Syntax::PartialString.new("(((({<>}<{<{<>}{[]{[]{}").complete_string.str).to eq "}}>}>))))"
       end
 
       it "gets example 4" do
-        expect(subject.complete_string('{<[[]]>}<{[{[{[]{()[[[]')).to eq "]]}}]}]}>"
+        expect(AoC2021::Syntax::PartialString.new("{<[[]]>}<{[{[{[]{()[[[]").complete_string.str).to eq "]]}}]}]}>"
       end
 
       it "gets example 5" do
-        expect(subject.complete_string('<{([{{}}[<[[[<>{}]]]>[]]')).to eq "])}>"
+        expect(AoC2021::Syntax::PartialString.new("<{([{{}}[<[[[<>{}]]]>[]]").complete_string.str).to eq "])}>"
       end
     end
   end
