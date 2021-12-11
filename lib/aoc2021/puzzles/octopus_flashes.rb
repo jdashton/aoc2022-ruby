@@ -44,17 +44,13 @@ module AoC2021
         Board.new(@board.map { |row| row.map { |dumbo| dumbo&.+ 1 } }, @flashes)
       end
 
-      def calculate_flashes
-        flashed_this_round = false
+      def calculate_flashes(flashed_this_round: false)
         @board.each_with_index do |row, y_index|
           row.each_with_index do |dumbo, x_index|
-            next if dumbo&.>(20)
+            next if dumbo&.>(20) || !dumbo&.>(9)
 
-            next unless dumbo&.>(9)
-
-            flashed_this_round       = true
-            @board[y_index][x_index] = Float::INFINITY
-            inc_neighbours(x_index, y_index)
+            do_flash x_index, y_index
+            flashed_this_round = true
           end
         end
         return Board.new(@board, @flashes) unless flashed_this_round
@@ -86,6 +82,13 @@ module AoC2021
       def count_flashes
         @flashes += 1
         0
+      end
+
+      private
+
+      def do_flash(x_index, y_index)
+        @board[y_index][x_index] = Float::INFINITY
+        inc_neighbours(x_index, y_index)
       end
     end
 

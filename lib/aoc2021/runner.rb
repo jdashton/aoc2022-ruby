@@ -92,7 +92,7 @@ module AoC2021
     def self.day11
       flashes = File.open("input/day11a.txt") { |file| OctopusFlashes.new file }
       puts "Day 11, part A: #{ flashes.total(100) } total flashes after 100 steps"
-      puts "Day 11, part B: #{ flashes.synchronized_at } steps until all octopuses flash together"
+      puts "Day 11, part B: #{ flashes.synchronized_at } steps until all octopuses flash together\n\n"
 
       # day12
     end
