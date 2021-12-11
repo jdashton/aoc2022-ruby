@@ -84,9 +84,17 @@ module AoC2021
     def self.day10
       syntax = File.open("input/day10a.txt") { |file| Syntax.new file }
       puts "Day 10, part A: #{ syntax.illegal_points } sum of points for illegal closing brackets"
-      puts "Day 10, part B: #{ syntax.autocomplete } middle score for completing incomplete strings"
+      puts "Day 10, part B: #{ syntax.autocomplete } middle score for completing incomplete strings\n\n"
 
-      # day11
+      day11
+    end
+
+    def self.day11
+      flashes = File.open("input/day11a.txt") { |file| OctopusFlashes.new file }
+      puts "Day 11, part A: #{ flashes.total(100) } total flashes after 100 steps"
+      puts "Day 11, part B: #{ flashes.synchronized_at } steps until all octopuses flash together"
+
+      # day12
     end
   end
 end
