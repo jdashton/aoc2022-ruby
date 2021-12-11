@@ -8,8 +8,51 @@ module AoC2021
       @illegal_lines = []
     end
 
+    MATCHING_BRACKET = {
+      ")" => "(",
+      "]" => "[",
+      "}" => "{",
+      ">" => "<"
+    }.freeze
+
+    # Encapsulates operations on lines that might be incomplete or illegal
+    class UnknownLine
+      extend Forwardable
+      def_instance_delegators :@lines, :chars
+
+      def initialize(line)
+        @line   = line
+        @buffer = []
+      end
+
+      OPENERS = Set.new(MATCHING_BRACKET.values)
+
+      def find_illegal_syntax(acc, illegal_lines)
+        @line.chars.each do |char|
+          next @buffer.push(char) if char in OPENERS
+
+          next if @buffer.pop == MATCHING_BRACKET[char]
+
+          break acc = save_and_score(acc, char, illegal_lines)
+        end
+        acc
+      end
+
+      POINTS = {
+        ")" => 3,
+        "]" => 57,
+        "}" => 1197,
+        ">" => 25_137
+      }.freeze
+
+      def save_and_score(acc, char, illegal_lines)
+        illegal_lines.push(@line)
+        acc + POINTS[char]
+      end
+    end
+
     def illegal_points
-      @lines.reduce(0, &method(:find_illegal_syntax))
+      @lines.map { |line| UnknownLine.new line }.reduce(0) { |acc, line| line.find_illegal_syntax(acc, @illegal_lines) }
     end
 
     def autocomplete
@@ -21,71 +64,41 @@ module AoC2021
       scores[scores.size / 2]
     end
 
-    private
-
-    POINTS = {
-      ")" => 3,
-      "]" => 57,
-      "}" => 1197,
-      ">" => 25_137
-    }.freeze
-
-    MATCHING_BRACKET = {
-      ")" => "(",
-      "]" => "[",
-      "}" => "{",
-      ">" => "<"
-    }.freeze
-
-    CLOSING_BRACKET = MATCHING_BRACKET.invert
-
-    OPENERS = Set.new(MATCHING_BRACKET.values)
-
-    # Encapsulates operations on a stack of bracket characters
-    class BracketStack
-      extend Forwardable
-      def_instance_delegators :@stack, :push, :pop
-
-      def initialize
-        @stack = []
-      end
-    end
-
-    def find_illegal_syntax(acc, char_string, buffer = [])
-      char_string.chars.each do |char|
-        next buffer.push(char) if char in OPENERS
-
-        next if buffer.pop == MATCHING_BRACKET[char]
-
-        break acc = save_and_score(acc, char, char_string)
-      end
-      acc
-    end
-
-    def save_and_score(acc, char, char_string)
-      @illegal_lines.push(char_string)
-      acc + POINTS[char]
-    end
-
     # Encapsulates finding brackets to close an incomplete string
     class PartialString
       attr_reader :str
 
       def initialize(str)
-        @str = str
+        @str           = str
+        @valid_closers = 0
       end
 
-      CLOSERS = Set.new(MATCHING_BRACKET.keys)
+      CLOSERS         = Set.new(MATCHING_BRACKET.keys)
+      CLOSING_BRACKET = MATCHING_BRACKET.invert
 
-      def complete_string(valid_closers = 0, missing_closers = [])
-        @str.chars.reverse.each do |char|
-          next valid_closers += 1 if char in CLOSERS
+      def complete_string
+        @valid_closers = 0
+        CompletionString.new(
+          @str.chars.reverse.reduce([]) { |acc, char|
+            next inc_closers(acc) if char in CLOSERS
 
-          next valid_closers -= 1 if valid_closers.positive?
+            next dec_closers(acc) if @valid_closers.positive?
 
-          missing_closers.push(CLOSING_BRACKET[char])
-        end
-        CompletionString.new(missing_closers.join)
+            acc + [CLOSING_BRACKET[char]]
+          }.join
+        )
+      end
+
+      private
+
+      def dec_closers(acc)
+        @valid_closers -= 1
+        acc
+      end
+
+      def inc_closers(acc)
+        @valid_closers += 1
+        acc
       end
     end
 
@@ -107,9 +120,6 @@ module AoC2021
       def score_string
         @str.chars.reduce(0) { |acc, char| (acc * 5) + COMPLETION_POINTS[char] }
       end
-
-      private
-
     end
   end
 end
