@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module AoC2021
-  # OctopusFlashes implements the solutions for Day 11.
+  # CavePaths implements the solutions for Day 12.
   class CavePaths
     extend Forwardable
-    def_instance_delegators :@successes, :count
-    attr_reader :successes
+    def_instance_delegators :@successes, :size
 
     def initialize(file)
       @edges = Hash.new { |hash, key| hash[key] = Set.new }
@@ -15,24 +14,28 @@ module AoC2021
         @edges[node_a].add node_b
         @edges[node_b].add node_a
       end
-      pp @edges
+      # pp @edges
       @successes = Set.new
       explore(:start)
     end
 
-    def explore(first_node, visited = Set.new)
-      puts "At #{ first_node }"
-      return [:end] if first_node == :end
+    def successes
+      @successes.map { |path| path.map(&:to_s).join(",") }.sort.join("\n") << "\n"
+    end
 
-      edges_from_here = @edges[first_node] - visited
-      pp edges_from_here
+    def explore(first_node, visited = [])
+      # puts "At #{ first_node } after #{visited}"
+      if first_node == :end
+        @successes += [visited << :end]
+        return
+      end
+
+      edges_from_here = @edges[first_node] - visited.reject { |node| node.to_s.chars.first >= 'A' && node.to_s.chars.first <= 'Z' }
+      # pp edges_from_here
       return :failure if edges_from_here.empty?
 
       edges_from_here.each do |edge|
-        new_path = explore edge, visited + [first_node]
-        puts " -- tried #{edge}, found #{new_path}"
-        return :failure if new_path == :failure
-        return new_path << visited # if new_path.first == :end
+        explore edge, visited + [first_node]
       end
     end
   end

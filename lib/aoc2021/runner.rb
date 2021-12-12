@@ -99,8 +99,8 @@ module AoC2021
 
     def self.day12
       paths = File.open("input/day12a.txt") { |file| CavePaths.new file }
-      puts "Day 12, part A: #{ paths.count } paths through this cave system that visit small caves at most once"
-      # puts "Day 12, part B: #{ paths.synchronized_at } steps until all octopuses flash together\n\n"
+      puts "Day 12, part A: #{ paths.size } paths through this cave system that visit small caves at most once"
+      puts "Day 12, part B: #{ paths.double_visit.size } steps until all octopuses flash together\n\n"
 
       # day13
     end
