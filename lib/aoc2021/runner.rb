@@ -94,7 +94,15 @@ module AoC2021
       puts "Day 11, part A: #{ flashes.total(100) } total flashes after 100 steps"
       puts "Day 11, part B: #{ flashes.synchronized_at } steps until all octopuses flash together\n\n"
 
-      # day12
+      day12
+    end
+
+    def self.day12
+      paths = File.open("input/day12a.txt") { |file| CavePaths.new file }
+      puts "Day 12, part A: #{ paths.count } paths through this cave system that visit small caves at most once"
+      # puts "Day 12, part B: #{ paths.synchronized_at } steps until all octopuses flash together\n\n"
+
+      # day13
     end
   end
 end
