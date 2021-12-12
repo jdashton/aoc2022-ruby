@@ -30,18 +30,19 @@ RSpec.describe AoC2021::CavePaths do
         expect(subject.successes.count).to eq 10
       end
 
-      # start,A,b,A,c,A,end
-      # start,A,b,A,end
-      # start,A,b,end
-      # start,A,c,A,b,A,end
-      # start,A,c,A,b,end
-      # start,A,c,A,end
-      # start,A,end
-      # start,b,A,c,A,end
-      # start,b,A,end
-      # start,b,end
-
-      describe "#next_board" do
+      it "finds the 10 expected paths" do
+        expect(subject.successes).to eq <<~BITS
+          start,A,b,A,c,A,end
+          start,A,b,A,end
+          start,A,b,end
+          start,A,c,A,b,A,end
+          start,A,c,A,b,end
+          start,A,c,A,end
+          start,A,end
+          start,b,A,c,A,end
+          start,b,A,end
+          start,b,end
+        BITS
       end
     end
 
@@ -111,7 +112,6 @@ RSpec.describe AoC2021::CavePaths do
         4846848554
         5283751526
       BITS
-
     end
   end
 end
