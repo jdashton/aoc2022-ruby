@@ -119,7 +119,7 @@ module AoC2021
 
     def self.day13
       folds_and_points = File.open("input/day13a.txt") { |file| Origami.new file }
-      puts "Day 13, part A: #{ folds_and_points.first_fold.visible_dots } dots visible after completing the first fold instruction"
+      puts "Day 13, part A: #{ folds_and_points.first_fold.visible_dots } dots visible after completing first fold instruction"
       puts "Day 13, part B: \n#{ folds_and_points.final_shape }"
       puts
 
@@ -127,4 +127,3 @@ module AoC2021
     end
   end
 end
-

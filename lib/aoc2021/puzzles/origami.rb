@@ -15,11 +15,11 @@ module AoC2021
         @y = y
       end
 
-      def to_str = "(#{x}, #{y})"
+      def to_str = "(#{ x }, #{ y })"
 
       def to_s = to_str
 
-      def inspect = "x: #{x}, y: #{y}"
+      def inspect = "x: #{ x }, y: #{ y }"
 
       def ==(other)
         @x == other.x && @y == other.y
@@ -40,7 +40,7 @@ module AoC2021
       end
 
       def should_fold?(fold)
-        self.send(fold.axis) > fold.value
+        send(fold.axis) > fold.value
       end
     end
 
@@ -92,7 +92,7 @@ module AoC2021
       string = ""
       (@y_vals.min..@y_vals.max).each do |y_index|
         (@x_vals.min..@x_vals.max).each do |x_index|
-          string += @hash[[x_index, y_index]] || ' '
+          string += @hash[[x_index, y_index]] || " "
         end
         string += "\n"
       end
