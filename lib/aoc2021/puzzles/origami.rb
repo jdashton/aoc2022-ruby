@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 module AoC2021
-  # Origami implements the solutions for Day 12.
+  # Origami implements the solutions for Day 13.
   class Origami
-    # extend Forwardable
-    # def_instance_delegators :@successes, :size
 
     # Encapsulates operations on a point
     class Point
@@ -117,7 +115,6 @@ module AoC2021
         @y_vals << y
         acc.merge [x, y] => "#"
       end
-      # [new_hash, Range.new(*x_vals.to_a.sort.minmax), Range.new(*y_vals.to_a.sort.minmax)]
     end
   end
 end
