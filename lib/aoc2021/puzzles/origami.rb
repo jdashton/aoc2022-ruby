@@ -30,6 +30,8 @@ module AoC2021
       end
 
       def hash = [@x, @y].hash
+
+      def to_ary = [@x, @y]
     end
 
     # Encapsulates operations on a fold instruction
@@ -58,16 +60,10 @@ module AoC2021
 
     def initialize(file)
       @points = Set.new
+      @x_vals = Set.new
+      @y_vals = Set.new
       @folds  = []
-      file.readlines(chomp: true).each do |line|
-        next if line.empty?
-
-        if line.start_with? "fold along"
-          @folds << Fold.new(*line[11..].split("="))
-        else
-          @points << Point.new(*line.split(",").map(&:to_i))
-        end
-      end
+      parse_file(file)
     end
 
     def first_fold = fold([@folds.first])
@@ -81,6 +77,19 @@ module AoC2021
 
     private
 
+    def parse_file(file)
+      file.readlines(chomp: true).each do |line|
+        case line
+          in ""
+            next
+          in /fold along /
+            @folds << Fold.new(*line[11..].split("="))
+          else
+            @points << Point.new(*line.split(",").map(&:to_i))
+        end
+      end
+    end
+
     def fold(fold_list)
       fold_list.each(&method(:do_fold))
       self
@@ -91,20 +100,24 @@ module AoC2021
     end
 
     def shape
-      points_hash, x_range, y_range = convert_to_hash
-      x_max                         = x_range.end
+      points_hash = convert_to_hash
+      x_max       = x_range.end
       y_range.to_a.product(x_range.to_a).reduce("") do |string, coord_pair|
         string + (points_hash[coord_pair.reverse] || " ") + (coord_pair[1] == x_max ? "\n" : "")
       end
     end
 
-    def convert_to_hash(x_vals = Set.new, y_vals = Set.new)
-      new_hash = @points.reduce({}) do |acc, point|
-        x_vals << x = point.x
-        y_vals << y = point.y
+    def y_range = Range.new(*@y_vals.to_a.sort.minmax)
+
+    def x_range = Range.new(*@x_vals.to_a.sort.minmax)
+
+    def convert_to_hash
+      @points.reduce({}) do |acc, (x, y)|
+        @x_vals << x
+        @y_vals << y
         acc.merge [x, y] => "#"
       end
-      [new_hash, x_vals.min..x_vals.max, y_vals.min..y_vals.max]
+      # [new_hash, Range.new(*x_vals.to_a.sort.minmax), Range.new(*y_vals.to_a.sort.minmax)]
     end
   end
 end
