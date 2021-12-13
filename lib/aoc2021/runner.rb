@@ -6,7 +6,7 @@ module AoC2021
   # The Runner class provides file loading services around the solution for each day.
   class Runner
     def self.start
-      day01
+      methods.filter { |method| method.name.start_with? "day" }.sort.each { |method| send method }
     end
 
     def self.day01
@@ -14,8 +14,6 @@ module AoC2021
       puts "Day  1, part A: #{ depths.count_increases } increases"
       puts "Day  1, part B: #{ depths.count_triplet_increases } triplet increasesOrigami"
       puts
-
-      day02
     end
 
     def self.day02
@@ -23,8 +21,6 @@ module AoC2021
       puts "Day  2, part A: #{ commands.exec_commands } product of horizontal position and depth"
       puts "Day  2, part B: #{ commands.exec_with_aim } product of horizontal position and depthOrigami"
       puts
-
-      day03
     end
 
     def self.day03
@@ -32,8 +28,6 @@ module AoC2021
       puts "Day  3, part A: #{ diag_bits.power_consumption } product of gamma and epsilon"
       puts "Day  3, part B: #{ diag_bits.life_support_rating } product of oxygen generator and CO2 scrubber ratingsOrigami"
       puts
-
-      day04
     end
 
     def self.day04
@@ -41,8 +35,6 @@ module AoC2021
       puts "Day  4, part A: #{ bingo.victory } predicted score at victory"
       puts "Day  4, part B: #{ bingo.last_win } predicted score on board that 'wins' lastOrigami"
       puts
-
-      day05
     end
 
     def self.day05
@@ -50,8 +42,6 @@ module AoC2021
       puts "Day  5, part A: #{ vents.overlaps } vents that are in two or more lines (horizontal or vertical)"
       puts "Day  5, part B: #{ vents.overlaps_with_diagonals } vents in any two or more lines (including diagonal)Origami"
       puts
-
-      day06
     end
 
     def self.day06
@@ -59,8 +49,6 @@ module AoC2021
       puts "Day  6, part A: #{ lanternfish.compounded } lanternfish after 80 days"
       puts "Day  6, part B: #{ lanternfish.compounded(256 - 80) } lanternfish after 256 daysOrigami"
       puts
-
-      day07
     end
 
     def self.day07
@@ -68,8 +56,6 @@ module AoC2021
       puts "Day  7, part A: #{ crab_subs.minimal_move } fuel used in moving to a common position"
       puts "Day  7, part B: #{ crab_subs.minimal_move_revised } fuel used in moving to a common position (revised)Origami"
       puts
-
-      day08
     end
 
     def self.day08
@@ -77,8 +63,6 @@ module AoC2021
       puts "Day  8, part A: #{ segments.easy_digits } display chunks with identifiable patterns"
       puts "Day  8, part B: #{ segments.sum_of_all_outputs } sum of all of the output valuesOrigami"
       puts
-
-      day09
     end
 
     def self.day09
@@ -86,8 +70,6 @@ module AoC2021
       puts "Day  9, part A: #{ smoke_points.risk_levels } sum of the risk levels of all low points"
       puts "Day  9, part B: #{ smoke_points.multiply_basins } product of three largest basin sizesOrigami"
       puts
-
-      day10
     end
 
     def self.day10
@@ -95,8 +77,6 @@ module AoC2021
       puts "Day 10, part A: #{ syntax.illegal_points } sum of points for illegal closing brackets"
       puts "Day 10, part B: #{ syntax.autocomplete } middle score for completing incomplete stringsOrigami"
       puts
-
-      day11
     end
 
     def self.day11
@@ -104,8 +84,6 @@ module AoC2021
       puts "Day 11, part A: #{ flashes.total(100) } total flashes after 100 steps"
       puts "Day 11, part B: #{ flashes.synchronized_at } steps until all octopuses flash together"
       puts
-
-      day12
     end
 
     def self.day12
@@ -113,8 +91,6 @@ module AoC2021
       puts "Day 12, part A: #{ paths.size } paths through this cave system that visit small caves at most once"
       # puts "Day 12, part B: #{ paths.double_visit_size } paths through this cave system with revised visit rules"
       puts
-
-      day13
     end
 
     def self.day13
@@ -122,8 +98,6 @@ module AoC2021
       puts "Day 13, part A: #{ folds_and_points.first_fold.visible_dots } dots visible after completing first fold instruction"
       puts "Day 13, part B: \n#{ folds_and_points.final_shape }"
       puts
-
-      # day14
     end
   end
 end

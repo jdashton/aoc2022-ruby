@@ -30,18 +30,6 @@ module AoC2021
       end
 
       def hash = [@x, @y].hash
-
-      def fold(fold)
-        if fold.axis == :x
-          Point.new(fold.value - (@x - fold.value), @y)
-        else
-          Point.new(@x, fold.value - (@y - fold.value))
-        end
-      end
-
-      def should_fold?(fold)
-        send(fold.axis) > fold.value
-      end
     end
 
     # Encapsulates operations on a fold instruction
@@ -52,10 +40,24 @@ module AoC2021
         @axis  = axis.to_sym
         @value = value.to_i
       end
+
+      def should_fold?(point)
+        point.send(@axis) > @value
+      end
+
+      def fold_point(point)
+        x = point.x
+        y = point.y
+        if @axis == :x
+          Point.new(@value - (x - @value), y)
+        else
+          Point.new(x, @value - (y - @value))
+        end
+      end
     end
 
     def initialize(file)
-      @points = Set[]
+      @points = Set.new
       @folds  = []
       file.readlines(chomp: true).each do |line|
         next if line.empty?
@@ -66,7 +68,6 @@ module AoC2021
           @points << Point.new(*line.split(",").map(&:to_i))
         end
       end
-      # pp self
     end
 
     def first_fold = fold([@folds.first])
@@ -81,32 +82,29 @@ module AoC2021
     private
 
     def fold(fold_list)
-      fold_list.each do |fold|
-        @points = @points.reduce(Set.new) { |acc, point| acc << (point.should_fold?(fold) ? point.fold(fold) : point) }
-      end
+      fold_list.each(&method(:do_fold))
       self
     end
 
-    def shape
-      to_hash
-      string = ""
-      (@y_vals.min..@y_vals.max).each do |y_index|
-        (@x_vals.min..@x_vals.max).each do |x_index|
-          string += @hash[[x_index, y_index]] || " "
-        end
-        string += "\n"
-      end
-      string
+    def do_fold(fold)
+      @points = @points.reduce(Set[]) { |acc, point| acc << (fold.should_fold?(point) ? fold.fold_point(point) : point) }
     end
 
-    def to_hash
-      @x_vals = Set.new
-      @y_vals = Set.new
-      @hash   = @points.reduce({}) do |acc, point|
-        @x_vals << point.x
-        @y_vals << point.y
-        acc.merge [point.x, point.y] => "#"
+    def shape
+      points_hash, x_range, y_range = convert_to_hash
+      x_max                         = x_range.end
+      y_range.to_a.product(x_range.to_a).reduce("") do |string, coord_pair|
+        string + (points_hash[coord_pair.reverse] || " ") + (coord_pair[1] == x_max ? "\n" : "")
       end
+    end
+
+    def convert_to_hash(x_vals = Set.new, y_vals = Set.new)
+      new_hash = @points.reduce({}) do |acc, point|
+        x_vals << x = point.x
+        y_vals << y = point.y
+        acc.merge [x, y] => "#"
+      end
+      [new_hash, x_vals.min..x_vals.max, y_vals.min..y_vals.max]
     end
   end
 end
