@@ -54,12 +54,10 @@ RSpec.describe AoC2021::Origami do
       it "displays a square" do
         expect(subject.final_shape).to eq <<~BITS
           #####
-          #...#
-          #...#
-          #...#
+          #   #
+          #   #
+          #   #
           #####
-          .....
-          .....
         BITS
       end
     end
