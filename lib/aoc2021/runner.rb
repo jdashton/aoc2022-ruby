@@ -99,5 +99,12 @@ module AoC2021
       puts "Day 13, part B: \n#{ folds_and_points.final_shape }"
       puts
     end
+
+    def self.day14
+      polymers = File.open("input/day14a.txt") { |file| Polymers.new file }
+      puts "Day 14, part A: #{ Polymers.difference(polymers.insert(10)) } difference between the most and least common elements"
+      # puts "Day 14, part B: #{ polymers.final_shape }"
+      puts
+    end
   end
 end
