@@ -8,4 +8,9 @@ module AoC2021
   def self.start
     Runner.start
   end
+
+  def self.day14b
+    polymers = File.open("input/day14a.txt") { |file| Polymers.new file }
+    puts "#{ polymers.process(40) } difference between the most and least common elements after 40 iterations"
+  end
 end
