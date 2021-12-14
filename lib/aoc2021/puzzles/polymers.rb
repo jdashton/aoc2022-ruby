@@ -20,7 +20,7 @@ module AoC2021
                .each_cons(2)
                .map(&:join)
                .reduce(current[0]) do |acc, pair|
-          acc + (@instructions[pair] || "")
+          acc + (@instructions[pair])
         end
       end
     end
