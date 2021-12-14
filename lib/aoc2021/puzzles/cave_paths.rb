@@ -68,12 +68,12 @@ module AoC2021
     end
 
     def double_visit
-      explore(:start) { |visited| visited&.reject { |node| node == node.upcase }&.tally&.any? { |_, tal| tal > 1 } }
+      explore(:start) { |visited| visited.reject { |node| node == node.upcase }&.tally&.any? { |_, tal| tal > 1 } }
       @successes.map { |path| path.map(&:to_s).join(",") }.sort.join("\n") << "\n"
     end
 
     def double_visit_size
-      explore(:start) { |visited| visited&.reject { |node| node == node.upcase }&.tally&.any? { |_, tal| tal > 1 } }
+      explore(:start) { |visited| visited.reject { |node| node == node.upcase }&.tally&.any? { |_, tal| tal > 1 } }
       # pp @successes
       @successes.size
     end

@@ -13,4 +13,9 @@ module AoC2021
     polymers = File.open("input/day14a.txt") { |file| Polymers.new file }
     puts "#{ polymers.process(40) } difference between the most and least common elements after 40 iterations"
   end
+
+  def self.day12b
+    paths = File.open("input/day12a.txt") { |file| CavePaths.new file }
+    puts "Day 12, part B: #{ paths.double_visit_size } paths through this cave system with revised visit rules"
+  end
 end

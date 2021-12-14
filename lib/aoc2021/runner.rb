@@ -89,7 +89,7 @@ module AoC2021
     def self.day12
       paths = File.open("input/day12a.txt") { |file| CavePaths.new file }
       puts "Day 12, part A: #{ paths.size } paths through this cave system that visit small caves at most once"
-      # puts "Day 12, part B: #{ paths.double_visit_size } paths through this cave system with revised visit rules"
+      puts "Day 12, part B: #{ paths.double_visit_size } paths through this cave system with revised visit rules"
       puts
     end
 
