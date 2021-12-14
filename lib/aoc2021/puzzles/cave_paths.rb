@@ -23,11 +23,21 @@ module AoC2021
     end
 
     def explore(this_node, visited = [], &block)
-      return :failure if visited&.reject { |node| node == node.upcase }.tally.values.tally[2]&.>(1)
+      # puts "---------- VISITING #{ this_node }"
+      # return if visited&.reject { |node| node == node.upcase }.tally.values.tally[2]&.>(1)
+
+      if visited.reject { |node| node == node.upcase }.tally.values.tally[2]&.>(1)
+        puts "\n!!!!!!!!!! Got here with at least two duplicate lower-case visits !!!!!!!!!!"
+        pp visited
+        exit
+      end
+
+      visited = visited << this_node
 
       # puts "At #{ this_node } after #{ visited }"
       if this_node == :end
-        @successes += [visited << :end]
+        @successes += [visited]
+        # puts "Found an :end. @successes is now #{ @successes }"
         return
       end
 
@@ -39,21 +49,21 @@ module AoC2021
         # pp edges_from_here
         # puts
       end
-      return :failure if edges_from_here.empty?
+      return if edges_from_here.empty?
 
       # puts
       # puts " .. Thinking about these edges: #{edges_from_here}"
 
       edges_from_here.each do |node|
-        # puts "About to visit #{node}. visited is #{visited}"
-        name_is_lowercase = (node == node.downcase)
-        node_already_visited = visited.include?(node)
-        visited_contains_a_duplicate = visited.reject { |name| name == name.upcase }.tally.values.any? { |num| num > 1 }
-        # visited
-        next if name_is_lowercase && node_already_visited && visited_contains_a_duplicate
+        # puts "About to visit #{ node }. visited is #{ visited }"
+        # name_is_lowercase = (node == node.downcase)
+        # node_already_visited = visited.include?(node)
+        # visited_contains_a_duplicate = visited.reject { |name| name == name.upcase }.tally.values.any? { |num| num > 1 }
+        # # visited
+        # next if name_is_lowercase && node_already_visited && visited_contains_a_duplicate
 
         # puts " .. passed .. visiting #{node}"
-        explore node, visited + [this_node], &block
+        explore node, visited.dup, &block
       end
     end
 

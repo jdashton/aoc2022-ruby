@@ -3,7 +3,6 @@
 module AoC2021
   # Origami implements the solutions for Day 13.
   class Origami
-
     # Encapsulates operations on a point
     class Point
       attr_reader :x, :y
