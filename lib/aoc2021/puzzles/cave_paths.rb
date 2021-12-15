@@ -4,7 +4,6 @@ module AoC2021
   # CavePaths implements the solutions for Day 12.
   class CavePaths
     extend Forwardable
-    def_instance_delegators "self.class", :two_or_more
 
     def initialize(file)
       @edges = Hash.new { |hash, key| hash[key] = Set.new }
@@ -17,33 +16,44 @@ module AoC2021
 
     def single_visit_size
       @successes = 0
-      explore("start") { |_| true }
+      certain_explore("start")
       @successes
     end
 
     def double_visit_size
       @successes = 0
-      explore("start") { |visited| visited.tally.any?(&method(:two_or_more)) }
+      uncertain_explore("start")
       @successes
     end
 
-    def explore(node, lower_visited = [], &block)
+    def uncertain_explore(node, lower_visited = [])
       new_lower_visited = (node == node.downcase ? lower_visited + [node] : lower_visited)
-      (@edges[node] - (yield(new_lower_visited) ? new_lower_visited : []))
-        .each { |next_node| process_next_nodes(next_node, new_lower_visited, block) }
+      return certain_explore(node, lower_visited) if new_lower_visited.tally.any? { |_, val| val > 1 }
+
+      (@edges[node])
+        .each { |next_node| process_next_nodes(next_node, new_lower_visited) }
     end
 
-    def self.two_or_more((_, val))
-      val > 1
+    def certain_explore(node, lower_visited = [])
+      (@edges[node] - lower_visited)
+        .each { |next_node| certain_process_next_nodes(next_node, (node == node.downcase ? lower_visited + [node] : lower_visited)) }
     end
 
     private
 
-    def process_next_nodes(next_node, new_lower_visited, block)
+    def process_next_nodes(next_node, new_lower_visited)
       if next_node == "end"
         @successes += 1
       else
-        explore(next_node, new_lower_visited, &block)
+        uncertain_explore(next_node, new_lower_visited)
+      end
+    end
+
+    def certain_process_next_nodes(next_node, new_lower_visited)
+      if next_node == "end"
+        @successes += 1
+      else
+        certain_explore(next_node, new_lower_visited)
       end
     end
   end
