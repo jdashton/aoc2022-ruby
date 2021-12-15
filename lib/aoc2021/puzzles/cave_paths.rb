@@ -28,10 +28,10 @@ module AoC2021
 
     def uncertain_explore(this_node, lower_visited = [])
       # if first letter is larger than 'Z'
-      new_lower_visited = (this_node[0] > 'Z' ? lower_visited + [this_node] : lower_visited)
+      new_lower_visited = (this_node[0] > "Z" ? lower_visited + [this_node] : lower_visited)
       # Try "if this_node is small and is in lower_visited"
-      return certain_explore(this_node, lower_visited) if new_lower_visited.tally.any? { |_, val| val > 1 } # change to hash lookiup,
-      # only check double for the node we are currently visiting
+      # change to hash lookup, only check double for the node we are currently visiting
+      return certain_explore(this_node, lower_visited) if new_lower_visited.tally.any? { |_, val| val > 1 }
 
       (@edges[this_node]).each { |next_node| uncertain_process_next_nodes(next_node, new_lower_visited) }
     end
@@ -39,7 +39,7 @@ module AoC2021
     def certain_explore(this_node, lower_visited = [])
       (@edges[this_node] - lower_visited) # Try to iterate over @edges[this_node], as it is smaller. Can short-circuit if < 'a'.
         .each do |next_node|
-        certain_process_next_nodes(next_node, (this_node[0] > 'Z' ? lower_visited + [this_node] : lower_visited))
+        certain_process_next_nodes(next_node, (this_node[0] > "Z" ? lower_visited + [this_node] : lower_visited))
       end
     end
 
