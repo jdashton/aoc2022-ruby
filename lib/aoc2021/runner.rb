@@ -117,7 +117,7 @@ module AoC2021
     def self.day16
       packet_decoder = File.open("input/day16a.txt") { |file| PacketDecoder.new file }
       puts "Day 16, part A: #{ packet_decoder.sum_version_numbers } when you add up the version numbers in all packets"
-      # puts "Day 16, part B: #{ packet_decoder.process(40) } difference between the most and least common elements after 40 iterations"
+      puts "Day 16, part B: #{ packet_decoder.execute } is the final output"
       puts
     end
   end
