@@ -89,7 +89,7 @@ module AoC2021
     def self.day12
       paths = File.open("input/day12a.txt") { |file| CavePaths.new file }
       puts "Day 12, part A: #{ paths.single_visit_size } paths through this cave system that visit small caves at most once"
-      puts "Day 12, part B: #{ paths.double_visit_size } paths through this cave system with revised visit rules"
+      # puts "Day 12, part B: #{ paths.double_visit_size } paths through this cave system with revised visit rules"
       puts
     end
 
@@ -108,9 +108,16 @@ module AoC2021
     end
 
     def self.day15
-      chitons = File.open("input/day15a.txt") { |file| Chitons.new file }
-      puts "Day 15, part A: #{ chitons.dijkstra } is the lowest total risk of any path from the top left to the bottom right"
-      puts "Day 15, part B: #{ chitons.times_five.dijkstra } is the lowest risk path for the enlarged board"
+      # chitons = File.open("input/day15a.txt") { |file| Chitons.new file }
+      # puts "Day 15, part A: #{ chitons.dijkstra } is the lowest total risk of any path from the top left to the bottom right"
+      # puts "Day 15, part B: #{ chitons.times_five.dijkstra } is the lowest risk path for the enlarged board"
+      puts
+    end
+
+    def self.day16
+      packet_decoder = File.open("input/day16a.txt") { |file| PacketDecoder.new file }
+      puts "Day 16, part A: #{ packet_decoder.sum_version_numbers } when you add up the version numbers in all packets"
+      # puts "Day 16, part B: #{ packet_decoder.process(40) } difference between the most and least common elements after 40 iterations"
       puts
     end
   end

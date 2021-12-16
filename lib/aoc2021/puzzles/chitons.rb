@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AoC2021
-  # Chitons implements the solutions for Day 12.
+  # Chitons implements the solutions for Day 15.
   class Chitons
     extend Forwardable
 
