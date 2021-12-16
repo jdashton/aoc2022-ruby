@@ -109,8 +109,8 @@ module AoC2021
 
     def self.day15
       chitons = File.open("input/day15a.txt") { |file| Chitons.new file }
-      puts "Day 15, part A: #{ chitons.lowest_risk } is the lowest total risk of any path from the top left to the bottom right"
-      # puts "Day 15, part B: #{ chitons } difference between the most and least common elements after 40 iterations"
+      puts "Day 15, part A: #{ chitons.dijkstra } is the lowest total risk of any path from the top left to the bottom right"
+      puts "Day 15, part B: #{ chitons.times_five.dijkstra } is the lowest risk path for the enlarged board"
       puts
     end
   end
