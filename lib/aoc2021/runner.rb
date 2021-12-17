@@ -124,7 +124,7 @@ module AoC2021
     def self.day17
       trick_shot = File.open("input/day17a.txt") { |file| TrickShot.new file }
       puts "Day 17, part A: #{ trick_shot.highest_y } max y reached on the path to the target"
-      # puts "Day 17, part B: #{ trick_shot.execute } is the final output"
+      puts "Day 17, part B: #{ trick_shot.count_valid_pairs } pairs of velocities would reach the target"
       puts
     end
   end
