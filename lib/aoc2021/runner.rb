@@ -120,5 +120,12 @@ module AoC2021
       puts "Day 16, part B: #{ packet_decoder.execute } is the final output"
       puts
     end
+
+    def self.day17
+      trick_shot = File.open("input/day17a.txt") { |file| TrickShot.new file }
+      puts "Day 17, part A: #{ trick_shot.highest_y } max y reached on the path to the target"
+      # puts "Day 17, part B: #{ trick_shot.execute } is the final output"
+      puts
+    end
   end
 end
