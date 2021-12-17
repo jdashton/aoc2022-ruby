@@ -112,12 +112,12 @@ RSpec.describe AoC2021::TrickShot do
 
       it "finds the expected possible values of x" do
         expect(subject.find_possible_xs)
-          .to eq [nil, #  0
-                  nil, #  1
-                  nil, #  2
-                  nil, #  3
-                  nil, #  4
-                  nil, #  5: 5 + 4 + 3 + 2 + 1 + 0 ... never reaches 20
+          .to eq [[], #  0
+                  [], #  1
+                  [], #  2
+                  [], #  3
+                  [], #  4
+                  [], #  5: 5 + 4 + 3 + 2 + 1 + 0 ... never reaches 20
                   [5, 6, 7, Float::INFINITY], #  6: 6 + 5 + 4 + 3 + 2 = 20 + 1 = 21 + 0 = 21 to infinity
                   [4, 5, 6, 7, 8, Float::INFINITY], #  7: 7 + 6 + 5 + 4 = 22 + 3 = 25 + 2 = 27 + 1 = 28 + 0 = 28 to infinity
                   [3, 4, 5], #  8: 8 + 7 + 6 = 21 + 5 = 26 + 4 = 30
@@ -128,10 +128,10 @@ RSpec.describe AoC2021::TrickShot do
                   [2], # 13: 13 + 12 = 25
                   [2], # 14: 14 + 13 = 27
                   [2], # 15: 15 + 14 = 29
-                  nil, # 16
-                  nil, # 17
-                  nil, # 18
-                  nil, # 19
+                  [], # 16
+                  [], # 17
+                  [], # 18
+                  [], # 19
                   [1], # 20
                   [1], # 21
                   [1], # 22
