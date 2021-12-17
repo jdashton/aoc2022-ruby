@@ -40,7 +40,7 @@ module AoC2021
     private
 
     def try_each_x(this_x)
-      this_x.downto(0).each_with_index.each_with_object([]) do |(next_x, idx), acc|
+      this_x.downto(0).each_with_index.reduce([]) do |acc, (next_x, idx)|
         next acc unless @target_x_range.include?((next_x..this_x).sum)
 
         acc.push(*[idx + 1, next_x.zero? ? Float::INFINITY : []].flatten)
