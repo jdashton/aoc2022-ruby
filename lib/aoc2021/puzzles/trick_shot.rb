@@ -30,10 +30,9 @@ module AoC2021
     end
 
     def initialize(file)
-      match_data      = file.readline(chomp: true).match(/target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)/)
+      file.readline(chomp: true).match(/target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)/)
       @target_x_range = Regexp.last_match(1).to_i..Regexp.last_match(2).to_i
       @target_y_range = Regexp.last_match(3).to_i..Regexp.last_match(4).to_i
-      # pp match_data, @target_x_range, @target_y_range
     end
 
     def highest_y
@@ -52,33 +51,17 @@ module AoC2021
 
     def find_possible_pairs(x_steps)
       min_y = @target_y_range.min
-      max_y = @target_y_range.min.abs - 1 # min meaning lowest and farthest from zero
-      x_steps.each_with_index.reduce(Set[]) do |acc, (x_step, x_idx)|
+      x_steps.each_with_index.each_with_object(Set[]) do |(x_step, x_idx), acc|
         next acc unless x_step
 
-        (min_y..max_y).each do |y_idx|
-          # puts "Considering #{ y_idx } with #{ x_step }"
-          (x_step.first..x_step.last).each do |step|
-            y_step = y_step(y_idx, step)
-            break if y_step < min_y
-
-            acc += [[x_idx, y_idx]] if @target_y_range.include?(y_step)
-          end
+        (min_y..@target_y_range.min.abs - 1).each do |y_idx|
+          try_each_y acc, min_y, x_idx, x_step, y_idx
         end
-        acc
       end
     end
 
     def find_possible_xs
-      # pp @target_x_range
       (0..@target_x_range.max).map do |this_x|
-        next nil unless this_x.positive?
-
-        next nil unless (1..this_x).sum >= @target_x_range.min
-
-        next [1] if @target_x_range.include? this_x
-
-        # 15 + 14 = 29
         steps = this_x.downto(0).each_with_index.each_with_object([]) do |(next_x, idx), acc|
           @target_x_range.include?((next_x..this_x).sum) ? acc << (idx + 1) : acc
           acc << Float::INFINITY if next_x.zero? && @target_x_range.include?((next_x..this_x).sum)
@@ -86,6 +69,16 @@ module AoC2021
         next steps unless steps.empty?
 
         nil
+      end
+    end
+
+    private
+
+    def try_each_y(acc, min_y, x_idx, x_step, y_idx)
+      (x_step.first..x_step.last).each do |step|
+        break if (y_step = y_step(y_idx, step)) < min_y
+
+        acc << [x_idx, y_idx] if @target_y_range.include?(y_step)
       end
     end
   end
