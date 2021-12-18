@@ -54,6 +54,13 @@ end
 module AoC2021
   # Calculates conditions of victory for given plays and boards
   class Bingo
+    def self.day04
+      bingo = File.open("input/day04a.txt") { |file| Bingo.new file }
+      puts "Day  4, part A: #{ bingo.victory } predicted score at victory"
+      puts "Day  4, part B: #{ bingo.last_win } predicted score on board that 'wins' last"
+      puts
+    end
+
     def initialize(file)
       @plays       = Plays.new(file)
       @boards      = BoardsArray.new(file)

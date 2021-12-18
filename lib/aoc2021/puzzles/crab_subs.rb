@@ -22,6 +22,13 @@ end
 module AoC2021
   # CrabSubs implements the solutions for Day 7.
   class CrabSubs
+    def self.day07
+      crab_subs = File.open("input/day07a.txt") { |file| CrabSubs.new file }
+      puts "Day  7, part A: #{ crab_subs.minimal_move } fuel used in moving to a common position"
+      puts "Day  7, part B: #{ crab_subs.minimal_move_revised } fuel used in moving to a common position (revised)"
+      puts
+    end
+
     def initialize(file)
       @list       = file.readline(chomp: true).split(/,/).map(&:to_i)
       h_positions = @list.tally

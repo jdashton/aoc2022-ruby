@@ -3,6 +3,13 @@
 module AoC2021
   # Origami implements the solutions for Day 13.
   class Origami
+    def self.day13
+      folds_and_points = File.open("input/day13a.txt") { |file| Origami.new file }
+      puts "Day 13, part A: #{ folds_and_points.first_fold.visible_dots } dots visible after completing first fold instruction"
+      puts "Day 13, part B: \n#{ folds_and_points.final_shape }"
+      puts
+    end
+
     # Encapsulates operations on a point
     class Point
       attr_reader :x, :y

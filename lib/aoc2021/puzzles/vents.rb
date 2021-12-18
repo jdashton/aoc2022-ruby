@@ -80,6 +80,13 @@ end
 module AoC2021
   # Calculates conditions of victory for given plays and boards
   class Vents
+    def self.day05
+      vents = File.open("input/day05a.txt") { |file| Vents.new file }
+      puts "Day  5, part A: #{ vents.overlaps } vents that are in two or more lines (horizontal or vertical)"
+      puts "Day  5, part B: #{ vents.overlaps_with_diagonals } vents in any two or more lines (including diagonal)"
+      puts
+    end
+
     def initialize(file)
       @board = []
       @lines = VentLines.new(file)

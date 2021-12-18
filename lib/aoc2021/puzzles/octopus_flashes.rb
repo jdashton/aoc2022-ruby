@@ -6,6 +6,13 @@ module AoC2021
     extend Forwardable
     def_instance_delegators :@board, :next_board, :to_str, :synchronized_at
 
+    def self.day11
+      flashes = File.open("input/day11a.txt") { |file| OctopusFlashes.new file }
+      puts "Day 11, part A: #{ flashes.total(100) } total flashes after 100 steps"
+      puts "Day 11, part B: #{ flashes.synchronized_at } steps until all octopuses flash together"
+      puts
+    end
+
     # Encapsulates operations on a board
     class Board
       extend Forwardable

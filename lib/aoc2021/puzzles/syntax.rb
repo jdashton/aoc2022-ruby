@@ -3,6 +3,13 @@
 module AoC2021
   # Segments implements the solutions for Day 8.
   class Syntax
+    def self.day10
+      syntax = File.open("input/day10a.txt") { |file| Syntax.new file }
+      puts "Day 10, part A: #{ syntax.illegal_points } sum of points for illegal closing brackets"
+      puts "Day 10, part B: #{ syntax.autocomplete } middle score for completing incomplete strings"
+      puts
+    end
+
     def initialize(file)
       @lines         = file.readlines(chomp: true)
       @illegal_lines = []

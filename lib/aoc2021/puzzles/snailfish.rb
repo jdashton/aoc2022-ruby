@@ -3,17 +3,19 @@
 require "forwardable"
 
 module AoC2021
-  # Calculates conditions of victory for given plays and boards
-  class TrickShot
+  # Calculates math operations on Snailfish numbers for Day 18
+  class Snailfish
     extend Forwardable
     def_instance_delegators "self.class", :y_step, :gauss
 
-    def self.day17
-      trick_shot = File.open("input/day17a.txt") { |file| TrickShot.new file }
-      puts "Day 17, part A: #{ trick_shot.highest_y } max y reached on the path to the target"
-      puts "Day 17, part B: #{ trick_shot.count_valid_pairs } pairs of velocities would reach the target"
+    def self.day18
+      snailfish = File.open("input/day18a.txt") { |file| Snailfish.new file }
+      puts "Day 18, part A: #{ snailfish.magnitude_of_sum } is the magnitude of the final sum"
+      # puts "Day 18, part B: #{ snailfish.count_valid_pairs } pairs of velocities would reach the target"
       puts
     end
+
+    def magnitude_of_sum = 42
 
     def initialize(file)
       file.readline(chomp: true).match(/target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)/)

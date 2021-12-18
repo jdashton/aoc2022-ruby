@@ -6,6 +6,13 @@ module AoC2021
     extend Forwardable
     def_instance_delegators "self.class", :score, :string_to_pairs, :difference, :add_vals
 
+    def self.day14
+      polymers = File.open("input/day14a.txt") { |file| Polymers.new file }
+      puts "Day 14, part A: #{ polymers.process(10) } difference between the most and least common elements after 10 iterations"
+      puts "Day 14, part B: #{ polymers.process(40) } difference between the most and least common elements after 40 iterations"
+      puts
+    end
+
     def initialize(file)
       @lines        = file.readlines(chomp: true)
       @template     = @lines[0]

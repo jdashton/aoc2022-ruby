@@ -87,6 +87,13 @@ end
 module AoC2021
   # For Day 3, we run a diagnostic on the submarine's computer.
   class DiagnosticBits
+    def self.day03
+      diag_bits = File.open("input/day03a.txt") { |file| DiagnosticBits.new file }
+      puts "Day  3, part A: #{ diag_bits.power_consumption } product of gamma and epsilon"
+      puts "Day  3, part B: #{ diag_bits.life_support_rating } product of oxygen generator and CO2 scrubber ratings"
+      puts
+    end
+
     def initialize(file)
       #         00100
       #         11110

@@ -3,6 +3,13 @@
 module AoC2021
   # Chitons implements the solutions for Day 16.
   class PacketDecoder
+    def self.day16
+      packet_decoder = File.open("input/day16a.txt") { |file| PacketDecoder.new file }
+      puts "Day 16, part A: #{ packet_decoder.sum_version_numbers } when you add up the version numbers in all packets"
+      puts "Day 16, part B: #{ packet_decoder.execute } is the final output"
+      puts
+    end
+
     # Encapsulates operations on a packet.
     class Packet
       attr_reader :content, :version, :type
@@ -104,7 +111,7 @@ module AoC2021
     def make_packet(hex_string) = Packet.new(to_binary_string(hex_string))
 
     def execute(packet_tree = @top_packet)
-      pp packet_tree
+      # pp packet_tree
       packet_tree[:val] = packet_tree[:val].map do |node|
         next node if node[:type] == :number
 

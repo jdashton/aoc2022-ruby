@@ -15,6 +15,13 @@ end
 module AoC2021
   # Segments implements the solutions for Day 8.
   class SmokePoints
+    def self.day09
+      smoke_points = File.open("input/day09a.txt") { |file| SmokePoints.new file }
+      puts "Day  9, part A: #{ smoke_points.risk_levels } sum of the risk levels of all low points"
+      puts "Day  9, part B: #{ smoke_points.multiply_basins } product of three largest basin sizes"
+      puts
+    end
+
     def initialize(file)
       @heightmap = SmokePointLines.new(file.readlines(chomp: true)).make_heightmap
     end

@@ -18,6 +18,13 @@ end
 module AoC2021
   # Implements solution for Day 6 puzzles
   class Lanternfish
+    def self.day06
+      lanternfish = File.open("input/day06a.txt") { |file| Lanternfish.new file }
+      puts "Day  6, part A: #{ lanternfish.compounded } lanternfish after 80 days"
+      puts "Day  6, part B: #{ lanternfish.compounded(256 - 80) } lanternfish after 256 days"
+      puts
+    end
+
     def initialize(file)
       @calendar = FishCalendar.new(file.readline(chomp: true).split(/,/).map(&:to_i))
     end

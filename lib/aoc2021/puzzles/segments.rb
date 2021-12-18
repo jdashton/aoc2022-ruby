@@ -55,6 +55,13 @@ end
 module AoC2021
   # Segments implements the solutions for Day 8.
   class Segments
+    def self.day08
+      segments = File.open("input/day08a.txt") { |file| Segments.new file }
+      puts "Day  8, part A: #{ segments.easy_digits } display chunks with identifiable patterns"
+      puts "Day  8, part B: #{ segments.sum_of_all_outputs } sum of all of the output values"
+      puts
+    end
+
     def initialize(file)
       @lines          = file.readlines(chomp: true)
                             .map { |line| line.split("|").map(&:strip).map(&:split) }

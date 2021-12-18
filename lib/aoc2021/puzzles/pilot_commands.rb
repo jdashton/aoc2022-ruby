@@ -50,6 +50,13 @@ end
 module AoC2021
   # For Day 2, we need to follow navigation commands to arrive at a new location.
   class PilotCommands
+    def self.day02
+      commands = File.open("input/day02a.txt") { |file| PilotCommands.new file }
+      puts "Day  2, part A: #{ commands.exec_commands } product of horizontal position and depth"
+      puts "Day  2, part B: #{ commands.exec_with_aim } product of horizontal position and depth"
+      puts
+    end
+
     def initialize(file)
       @commands = file.readlines.map(&:split).map { |cmd, amt| [cmd.to_sym, amt.to_i] }
     end

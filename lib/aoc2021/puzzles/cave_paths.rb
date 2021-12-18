@@ -3,7 +3,12 @@
 module AoC2021
   # CavePaths implements the solutions for Day 12.
   class CavePaths
-    extend Forwardable
+    def self.day12
+      paths = File.open("input/day12a.txt") { |file| CavePaths.new file }
+      puts "Day 12, part A: #{ paths.single_visit_size } paths through this cave system that visit small caves at most once"
+      # puts "Day 12, part B: #{ paths.double_visit_size } paths through this cave system with revised visit rules"
+      puts
+    end
 
     def initialize(file)
       @edges = Hash.new { |hash, key| hash[key] = Set.new }

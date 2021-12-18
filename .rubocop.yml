@@ -29,10 +29,6 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*
 
-Metrics/ClassLength:
-  Exclude:
-    - lib/aoc2021/runner.rb
-
 Naming/MethodParameterName:
   AllowedNames:
     - x
