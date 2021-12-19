@@ -69,24 +69,25 @@ module AoC2021
         if level > 4
           # Explode this term
           # puts "number is #{number[index..]}"
-          number[index..] =~ /\A(\d+),(\d+)/
+          num1, num2, termlen = /\A(\d+),(\d+)/.match(number[index..]) { |md| [md[1], md[2], md[1].size + 1 + md[2].size] }
           # pp Regexp.last_match
           # print "Exp: [#{ $1 }, #{ $2 }]"
           # print "exploded:"
-          num1              = Regexp.last_match(1).to_i
-          num2              = Regexp.last_match(2).to_i
-          termlen           = Regexp.last_match(1).length + 1 + Regexp.last_match(2).length
-          lstr, lnum, lrest = number[0..index - 2].rpartition(/\d+/)
-          /\d+$/.match(lstr) do |md|
-            lnum = md[0] + lnum
-            lstr = md.pre_match
-          end
-          # puts "#{ lstr } - #{ lnum } - #{ lrest }"
-          rstr, rnum, rrest = number[index + termlen + 1..].partition(/\d+/)
-          # puts "#{ rstr } - #{ rnum } - #{ rrest }"
+          # num1              = Regexp.last_match(1).to_i
+          # num2              = Regexp.last_match(2).to_i
+          # termlen           = Regexp.last_match(1).length + 1 + Regexp.last_match(2).length
+          # TODO: try limiting the length of string to search back and forward for \d+.
+          lpre, lnum, lpost = number[0..index - 2].rpartition(/(?<=\D)(\d+)(?=\D)/)
+          # /\d+$/.match(lpre) do |md|
+          #   lnum = md[0] + lnum
+          #   lpre = md.pre_match
+          # end
+          # puts "#{ lpre } - #{ lnum } - #{ lpost }"
+          rpre, rnum, rpost = number[index + termlen + 1..].partition(/(?<=\D)(\d+)(?=\D)/)
+          # puts "#{ rpre } - #{ rnum } - #{ rpost }"
           new_number = "#{
-            lnum.empty? ? "" : lstr + (lnum.to_i + num1).to_s }#{ lrest }0#{
-            rnum.empty? ? rstr : rstr + (rnum.to_i + num2).to_s + rrest }"
+            lpre.empty? ? "" : lpre + (lnum.to_i + num1.to_i).to_s }#{ lpost }0#{
+            rpost.empty? ? rpre : rpre + (rnum.to_i + num2.to_i).to_s + rpost }"
           # puts " -- returning #{ new_number }"
           return reduce(new_number)
         else
