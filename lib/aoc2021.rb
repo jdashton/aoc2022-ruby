@@ -28,4 +28,10 @@ module AoC2021
     chitons = File.open("input/day15a.txt") { |file| Chitons.new file }
     puts "Day 15, part B: #{ chitons.times_five.dijkstra } is the lowest risk path for the enlarged board"
   end
+
+  def self.day18
+    snailfish = File.open("input/day18a.txt") { |file| Snailfish.new file }
+    puts "Day 18, part B: #{ snailfish.permutations } is the largest magnitude of any sum of two different snailfish numbers."
+    puts
+  end
 end
