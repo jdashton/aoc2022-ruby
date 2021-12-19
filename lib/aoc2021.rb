@@ -29,7 +29,7 @@ module AoC2021
     puts "Day 15, part B: #{ chitons.times_five.dijkstra } is the lowest risk path for the enlarged board"
   end
 
-  def self.day18
+  def self.day18b
     snailfish = File.open("input/day18a.txt") { |file| Snailfish.new file }
     puts "Day 18, part B: #{ snailfish.permutations } is the largest magnitude of any sum of two different snailfish numbers."
     puts
