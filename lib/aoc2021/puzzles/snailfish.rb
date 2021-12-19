@@ -10,8 +10,8 @@ module AoC2021
 
     def self.day18
       snailfish = File.open("input/day18a.txt") { |file| Snailfish.new file }
-      puts "Day 18, part A: #{ snailfish.magnitude_of_sum } is the magnitude of the final sum"
-      # puts "Day 18, part B: #{ snailfish.count_valid_pairs } pairs of velocities would reach the target"
+      puts "Day 18, part A: #{ snailfish.magnitude_of_sum } is the magnitude of the final sum."
+      puts "Day 18, part B: #{ snailfish.permutations } is the largest magnitude of any sum of two different snailfish numbers."
       puts
     end
 
@@ -20,6 +20,13 @@ module AoC2021
     def initialize(file)
       @lines  = file.readlines(chomp: true)
       @number = @lines.reduce("") { |acc, line| addition(acc, line) }
+    end
+
+    def permutations
+      @lines.permutation(2).map do |line1, line2|
+        # puts "#{ line1} + #{ line2 }"
+        magnitude_of_sum(addition(line1, line2))
+      end.max
     end
 
     def magnitude_of_sum(num_string = @number)
