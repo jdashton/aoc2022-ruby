@@ -15,61 +15,94 @@ module AoC2021
       puts
     end
 
-    def magnitude_of_sum = 42
+    attr_reader :number
 
     def initialize(file)
-      file.readline(chomp: true).match(/target area: x=(-?\d+)..(-?\d+), y=(-?\d+)..(-?\d+)/)
-      @target_x_range = Regexp.last_match(1).to_i..Regexp.last_match(2).to_i
-      @target_y_range = Regexp.last_match(3).to_i..Regexp.last_match(4).to_i
-      @lowest_y       = @target_y_range.min
-      @max_y_range    = @lowest_y..@lowest_y.abs - 1
+      @lines  = file.readlines(chomp: true)
+      @number = @lines.reduce("") { |acc, line| addition(acc, line) }
     end
 
-    def self.gauss(val) = val * (val + 1) / 2
-
-    def highest_y = gauss(@max_y_range.max)
-
-    def count_valid_pairs
-      find_possible_pairs(find_possible_xs).size
+    def magnitude_of_sum(num_string = @number)
+      magnitude_of_term(num_string)[0]
     end
 
-    # Returns the y position the probe will have after `step_number` number of steps.
-    def self.y_step(initial_y_velocity, step_number)
-      (0..(step_number - 1)).reduce(0) { |acc, step| acc + (initial_y_velocity - step) }
-    end
-
-    def find_possible_pairs(x_steps)
-      x_steps.each_with_index.reduce(Set[], &method(:with_each_x))
-    end
-
-    def find_possible_xs
-      (0..@target_x_range.max).map(&method(:try_each_x))
-    end
-
-    private
-
-    def try_each_x(this_x)
-      this_x.downto(0).each_with_index.reduce([]) do |acc, (next_x, idx)|
-        next acc unless @target_x_range.include?((next_x..this_x).sum)
-
-        acc.push(*[idx + 1, next_x.zero? ? Float::INFINITY : []].flatten)
+    def magnitude_of_term(num_string)
+      # pp num_string
+      case num_string
+        when /\A\[(\d),(\d)\]/
+          # puts "whole-term handling"
+          [(3 * Regexp.last_match(1).to_i) + (2 * Regexp.last_match(2).to_i), num_string[5..]]
+        when /\A\[/
+          # puts "term opened"
+          term1, remnant = magnitude_of_term(num_string[1..])
+          term2, remnant = magnitude_of_term(remnant[1..])
+          # puts "returning 3 * #{ term1 } + 2 * #{ term2 } and #{ remnant[1..] }"
+          [(3 * term1) + (2 * term2), remnant[1..]]
+        when /\A(\d)/
+          # puts "single-number handling"
+          [Regexp.last_match(1).to_i, num_string[1..]]
+        else
+          # puts "default handling for #{ num_string[0] }"
+          [0, num_string[1..]]
       end
     end
 
-    def with_each_x(acc, (x_step, x_idx))
-      return acc if x_step.empty?
+    def addition(term1, term2)
+      return term2 if term1.empty?
 
-      @max_y_range.reduce(acc) { |acm, y_idx| acm.merge(try_each_y(x_step, x_idx, y_idx)) }
+      reduce "[#{ term1 },#{ term2 }]"
     end
 
-    def try_each_y(x_step, x_idx, y_idx)
-      pairs = []
-      (x_step.first..x_step.last).each do |step|
-        break if (y_step = y_step(y_idx, step)) < @lowest_y
+    def reduce(number)
+      # "[[[[[9,8],1],2],3],4]" becomes "[[[[0,9],2],3],4]"
+      # raise "malformed number doesn't start with [" if number[0] != "["
 
-        pairs << [x_idx, y_idx] if @target_y_range.include?(y_step)
+      # puts "#{ number }"
+
+      index = 1
+      level = 1
+      while level.positive?
+        if level > 4
+          # Explode this term
+          # puts "number is #{number[index..]}"
+          number[index..] =~ /\A(\d+),(\d+)/
+          # pp Regexp.last_match
+          # print "Exp: [#{ $1 }, #{ $2 }]"
+          # print "exploded:"
+          num1              = $1.to_i
+          num2              = $2.to_i
+          termlen           = $1.length + 1 + $2.length
+          lstr, lnum, lrest = number[0..index - 2].rpartition(/\d+/)
+          /\d+$/.match(lstr) do |md|
+            lnum = md[0] + lnum
+            lstr = md.pre_match
+          end
+          # puts "#{ lstr } - #{ lnum } - #{ lrest }"
+          rstr, rnum, rrest = number[index + termlen + 1..].partition(/\d+/)
+          # puts "#{ rstr } - #{ rnum } - #{ rrest }"
+          new_number = "#{ lnum.empty? ? "" : lstr + (lnum.to_i + num1).to_s }#{lrest }0#{ rnum.empty? ? rstr : rstr + (rnum.to_i + num2).to_s + rrest}"
+          # puts " -- returning #{ new_number }"
+          return reduce(new_number)
+          level -= 1
+        else
+          case number[index]
+            when "["
+              level += 1
+            when "]"
+              level -= 1
+          end
+        end
+        index += 1
       end
-      pairs
+
+      # Look for a split.
+      /[[:digit:]][[:digit:]]+/.match(number) do |md|
+        # print "Split: #{ md[0] }  "
+        # print "splitted:"
+        return reduce("#{md.pre_match}[#{md[0].to_i / 2},#{md[0].to_i.fdiv(2).ceil}]#{md.post_match}")
+      end
+
+      number
     end
   end
 end
