@@ -11,7 +11,7 @@ module AoC2021
     def self.day18
       snailfish = File.open("input/day18a.txt") { |file| Snailfish.new file }
       puts "Day 18, part A: #{ snailfish.magnitude_of_sum } is the magnitude of the final sum."
-      puts "Day 18, part B: #{ snailfish.permutations } is the largest magnitude of any sum of two different snailfish numbers."
+      # puts "Day 18, part B: #{snailfish.permutations} is the largest magnitude of any sum of two different snailfish numbers."
       puts
     end
 
@@ -23,10 +23,7 @@ module AoC2021
     end
 
     def permutations
-      @lines.permutation(2).map do |line1, line2|
-        # puts "#{ line1} + #{ line2 }"
-        magnitude_of_sum(addition(line1, line2))
-      end.max
+      @lines.permutation(2).map { |line1, line2| magnitude_of_sum(addition(line1, line2)) }.max
     end
 
     def magnitude_of_sum(num_string = @number)
@@ -76,9 +73,9 @@ module AoC2021
           # pp Regexp.last_match
           # print "Exp: [#{ $1 }, #{ $2 }]"
           # print "exploded:"
-          num1              = $1.to_i
-          num2              = $2.to_i
-          termlen           = $1.length + 1 + $2.length
+          num1              = Regexp.last_match(1).to_i
+          num2              = Regexp.last_match(2).to_i
+          termlen           = Regexp.last_match(1).length + 1 + Regexp.last_match(2).length
           lstr, lnum, lrest = number[0..index - 2].rpartition(/\d+/)
           /\d+$/.match(lstr) do |md|
             lnum = md[0] + lnum
@@ -87,10 +84,11 @@ module AoC2021
           # puts "#{ lstr } - #{ lnum } - #{ lrest }"
           rstr, rnum, rrest = number[index + termlen + 1..].partition(/\d+/)
           # puts "#{ rstr } - #{ rnum } - #{ rrest }"
-          new_number = "#{ lnum.empty? ? "" : lstr + (lnum.to_i + num1).to_s }#{lrest }0#{ rnum.empty? ? rstr : rstr + (rnum.to_i + num2).to_s + rrest}"
+          new_number = "#{
+            lnum.empty? ? "" : lstr + (lnum.to_i + num1).to_s }#{ lrest }0#{
+            rnum.empty? ? rstr : rstr + (rnum.to_i + num2).to_s + rrest }"
           # puts " -- returning #{ new_number }"
           return reduce(new_number)
-          level -= 1
         else
           case number[index]
             when "["
@@ -106,7 +104,7 @@ module AoC2021
       /[[:digit:]][[:digit:]]+/.match(number) do |md|
         # print "Split: #{ md[0] }  "
         # print "splitted:"
-        return reduce("#{md.pre_match}[#{md[0].to_i / 2},#{md[0].to_i.fdiv(2).ceil}]#{md.post_match}")
+        return reduce("#{ md.pre_match }[#{ md[0].to_i / 2 },#{ md[0].to_i.fdiv(2).ceil }]#{ md.post_match }")
       end
 
       number
