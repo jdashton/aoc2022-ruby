@@ -1,11 +1,42 @@
 
+
+ 1 ->                    ->  7,  1,  3,  3,  1 -> increase by 15 points every 5 moves
+ 2 ->                    ->  8,  2,  4,  4,  2 -> increase by 20 points every 5 moves
+ 3 -> -4, +4, +2, +0, -2 ->  9,  3,  5,  5,  3 -> increase by 25 points every 5 moves
+ 4 -> -4, +4, +2, +0, -2 -> 10,  4,  6,  6,  4 -> increase by 30 points every 5 moves   10, 14, 20, 26, 30, 40, 44, 50, 56, 60
+ 5 ->                    ->  1,  5,  7,  7,  5 -> increase by 25 points every 5 moves
+ 6 ->                    ->  2,  6,  8,  8,  6 -> increase by 30 points every 5 moves
+ 7 ->                    ->  3,  7,  9,  9,  7 -> increase by 35 points every 5 moves
+ 8 ->                    ->  4,  8, 10, 10,  8 -> increase by 40 points every 5 moves
+ 9 ->                    ->  5,  9,  1,  1,  9 -> increase by 25 points every 5 moves
+10 ->                    ->  6, 10,  2,  2, 10 -> increase by 30 points every 5 moves
+
+
+ 1 -> +5, +3, +1, -1, -3 ->  6,  9, 10,  9,  6 -> increase by 40 points every 5 moves
+ 2 ->                    ->  7, 10,  1, 10,  7 -> increase by 35 points every 5 moves
+ 3 ->                    ->  8,  1,  2,  1,  8 -> increase by 20 points every 5 moves
+ 4 ->                    ->  9,  2,  3,  2,  9 -> increase by 25 points every 5 moves
+ 5 ->                    -> 10,  3,  4,  3, 10 -> increase by 30 points every 5 moves
+ 6 ->                    ->  1,  4,  5,  4,  1 -> increase by 15 points every 5 moves
+ 7 ->                    ->  2,  5,  6,  5,  2 -> increase by 20 points every 5 moves
+ 8 ->                    ->  3,  6,  7,  6,  3 -> increase by 25 points every 5 moves
+ 9 ->                    ->  4,  7,  8,  7,  4 -> increase by 30 points every 5 moves
+10 ->                    ->  5,  8,  9,  8,  5 -> increase by 35 points every 5 moves
+
+1000 / 30 = 33.33 * 5 = 166.66 MOVES with an AVERAGE of 6 points per move (so the last move is NOT 6 points)
+
+1000 points / 30 points per SET = 33.33 SETS * 5 MOVES / SET = 166 MOVES = 498 rolls for player 1, 495 rolls for player 2
+
+(166 MOVES + 165 MOVES) * 3 ROLLS / MOVE = 993 ROLLS
+
+167 * 30 / 5 is the number of MOVES that player 1 made to reach or exceed 1000 points
+
 Dice patterns starting at 3 ( 3 + 4 + 5 will be rolled by Player 1 starting at the 103rd roll / his 18th turn )
-
-Sugar -> much better
-White cell -> no blood cancer
-
-
- 5 ->                    
+ 1 ->                    ->  3,  3,  1,  7,  1 -> +15 points after 5 moves
+ 2 ->                    ->  4,  4,  2,  8,  2 -> +20 points after 5 moves
+ 3 ->                    ->  5,  5,  3,  9,  3 -> +25 points after 5 moves
+ 4 ->                    ->  6,  6,  4, 10,  4 -> +30 points after 5 moves
+ 5 ->                    ->  7,  7,  5,  1,  5 -> +25 points after 5 moves
  6 ->                    ->  8,  8,  6,  2,  6 -> +30 points after 5 moves
  7 ->                    ->  9,  9,  7,  3,  7 -> +35 points after 5 moves
  8 ->                    -> 10, 10,  8,  4,  8 -> +40 points after 5 moves
@@ -26,7 +57,7 @@ Dice patterns starting at 100 (0) ( 100 + 1 + 2 will be rolled by Player 2 )
 
 100 +  1 +  2 = 103 -> +3  Player 2
   3 +  4 +  5 =  12 -> +2  Player 1
-  6 +  7 +  8 =  21 -> +1 
+  6 +  7 +  8 =  21 -> +1
   9 + 10 + 11 =  30 -> +0
  12 + 13 + 14 =  39 -> -1
  15 + 16 + 17 =   8    -2
@@ -35,3 +66,12 @@ Dice patterns starting at 100 (0) ( 100 + 1 + 2 will be rolled by Player 2 )
  24   25   26     5    +5
  27   28   29     4    +4
 
+99 + 100 +  1 = 200 -> +0  Player 1
+ 2 +   3 +  4 =   9 -> -1  Player 2
+ 5 +   6 +  7 =  18 -> -2  Player 1
+ 8 +   9 + 10 =  27 -> -3  Player 2
+11 +  12 + 13 =  36 -> -4  Player 1
+14 +  15 + 16 =  45 -> +5  Player 2
+
+Dice patterns starting at 99 (9) ( 99 + 100 + 1 will be rolled by Player 1 at his 34th move)
+ 1 -> +0, -2, -4, +4, +2 ->

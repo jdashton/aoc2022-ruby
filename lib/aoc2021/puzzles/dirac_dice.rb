@@ -8,72 +8,46 @@ module AoC2021
     # extend Forwardable
     # def_instance_delegators "self.class", :y_step, :gauss
 
-    # Encapsulates operations on an image to be refined.
-    class Image
-      def initialize(lines)
-        @lines = lines
-      end
-
-      def to_s
-        @lines.join("\n") + "\n"
-      end
-
-      def process(algorithm, iteration)
-        new_line_length = @lines[0].length + 2
-        border_char = iteration.odd? ? '.' : algorithm[0]
-        border_line = border_char * new_line_length
-        new_lines = [border_line] + lines.map { |line| "#{ border_char }#{ line }#{ border_char }" } + [border_line]
-
-        # (0..new_line_length - 1).map
-      end
-    end
-
-    def self.day20
-      trench_map = File.open("input/day20a.txt") { |file| DiracDice.new file }
-      puts "Day 20, part A: #{ trench_map.lit_pixels_after(2) } pixels are lit in the resulting image."
-      # puts "Day 20, part B: #{trench_map.permutations} is the largest magnitude of any sum of two different snailfish numbers."
+    def self.day21
+      dirac_dice = File.open("input/day21a.txt") { |file| DiracDice.new file }
+      puts "Day 20, part A: #{ dirac_dice.lit_pixels_after(2) } pixels are lit in the resulting image."
+      # puts "Day 20, part B: #{dirac_dice.permutations} "
       puts
     end
 
     def initialize(file = StringIO.new(""))
       @lines = file.readlines(chomp: true)
-      @algorithm = @lines[0]
-      @input_image = Image.new(@lines[2..])
-      @output_image = @input_image
+
+      @roll_num = 0
     end
 
-    def lit_pixels_after(iterations)
-      { 0 => 10, 1 => 24, 2 => 35 }[iterations]
-    end
+    def next_roll = @roll_num += 1
 
-    def enhance(iterations)
-      return @output_image.to_s
+    def first300
+      player1_score = player2_score = 0
 
-      { 0 => <<~PIXELS0, 1 => <<~PIXELS1, 2 => <<~PIXELS2 }[iterations]
-        #..#.
-        #....
-        ##..#
-        ..#..
-        ..###
-      PIXELS0
-        .##.##.
-        #..#.#.
-        ##.#..#
-        ####..#
-        .#..##.
-        ..##..#
-        ...#.#.
-      PIXELS1
-        .......#.
-        .#..#.#..
-        #.#...###
-        #...##.#.
-        #.....#.#
-        .#.#####.
-        ..#.#####
-        ...##.##.
-        ....###..
-      PIXELS2
+      player1_pos  = 9 # 4
+      player2_pos  = 3 # 8
+      turn         = 1
+      while player1_score < 1000 && player2_score < 1000
+        rolls              = (1..3).map { |_| next_roll % 100 }
+        move_total_squares = rolls.sum
+        if turn == 1
+          player1_pos   = (player1_pos + move_total_squares) % 10
+          player1_pos   = 10 if player1_pos.zero?
+          player1_score += player1_pos
+          puts "Player 1 rolls #{ rolls.map(&:to_s).join("+") } and moves to space #{ player1_pos } for a total score of #{ player1_score } after #{ @roll_num } total rolls"
+        else
+          player2_pos   = (player2_pos + move_total_squares) % 10
+          player2_pos   = 10 if player2_pos.zero?
+          player2_score += player2_pos
+          puts "Player 2 rolls #{ rolls.map(&:to_s).join("+") } and moves to space #{ player2_pos } for a total score of #{ player2_score } after #{ @roll_num } total rolls"
+        end
+        turn               = (turn + 1) % 2
+      end
+      losing_score = player2_score >= 1000 ? player1_score : player2_score
+      puts "The losing player had a score of #{ losing_score } when the game ended after #{ @roll_num } rolls."
+      puts "Their poduct is #{ losing_score * @roll_num }."
     end
   end
 end

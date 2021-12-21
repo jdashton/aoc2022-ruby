@@ -15,12 +15,12 @@ module AoC2021
       end
 
       def to_s
-        @lines.join("\n") + "\n"
+        "#{ @lines.join("\n") }\n"
       end
 
       def process(algorithm, iteration)
         new_line_length = @lines[0].length + 2
-        border_char = iteration.odd? ? '.' : algorithm[0]
+        border_char = iteration.odd? ? "." : algorithm[0]
         border_line = border_char * new_line_length
         new_lines = [border_line] + lines.map { |line| "#{ border_char }#{ line }#{ border_char }" } + [border_line]
 

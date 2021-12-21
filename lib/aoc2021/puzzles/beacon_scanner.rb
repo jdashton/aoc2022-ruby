@@ -21,9 +21,9 @@ module AoC2021
         lines.each do |line|
           case line
             when /--- scanner (\d+) ---/
-              @id = $1.to_i
+              @id = Regexp.last_match(1).to_i
             when /(-?\d+),(-?\d+),(-?\d+)/
-              @probes << [$1, $2, $3].map(&:to_i)
+              @probes << [Regexp.last_match(1), Regexp.last_match(2), Regexp.last_match(3)].map(&:to_i)
           end
         end
         puts "#{ @probes.size } probes in set #{ @id }. #{ @probes.to_a.combination(2).to_a.size } combinations"
@@ -59,7 +59,7 @@ module AoC2021
       # puts "Distance from #{ pt1 } to #{ pt2 }"
       delta_vector = [pt1[0] - pt2[0], pt1[1] - pt2[1], pt1[2] - pt2[2]]
       # pp delta_vector
-      Math.sqrt((delta_vector[0] ** 2) + (delta_vector[1] ** 2) + (delta_vector[2] ** 2))
+      Math.sqrt((delta_vector[0]**2) + (delta_vector[1]**2) + (delta_vector[2]**2))
     end
   end
 end
