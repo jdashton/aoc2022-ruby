@@ -5,20 +5,20 @@ require "forwardable"
 module AoC2021
   # Image Enhancement for Day 20
   class DiracDice
-    # extend Forwardable
-    # def_instance_delegators "self.class", :y_step, :gauss
+    extend Forwardable
+    def_instance_delegators "self.class", :parse_position
 
     def self.day21
       dirac_dice = File.open("input/day21a.txt") { |file| DiracDice.new file }
-      puts "Day 21, part A: #{ dirac_dice.first300 }"
-      puts "Day 21, part B: Player 1: #{ (wins = dirac_dice.dirac_to_score(3))[1] } universes, Player 2: #{ wins[2] } universes"
+      puts "Day 21, part A: #{ dirac_dice.deterministic_die }"
+      puts "Day 21, part B: Player 1: #{ (wins = dirac_dice.dirac_to_score(3))[0] } universes, Player 2: #{ wins[1] } universes"
       puts
     end
 
     POS_PAT = /Player \d starting position: (\d+)/
 
     def initialize(file = StringIO.new(""))
-      @start_positions = file.readlines(chomp: true).map { |line| POS_PAT.match(line) { |md| md[1] } }.map(&:to_i)
+      @start_positions = file.readlines(chomp: true).map(&method(:parse_position)).map(&:to_i)
 
       @win_score = 2
       @roll_num  = 0
@@ -29,7 +29,7 @@ module AoC2021
 
     def next_roll = @roll_num += 1
 
-    def first300
+    def deterministic_die
       player1_score = player2_score = 0
 
       player1_pos   = 9 # 4
@@ -42,7 +42,7 @@ module AoC2021
           player1_pos   = (player1_pos + move_total_squares) % 10
           player1_pos   = 10 if player1_pos.zero?
           player1_score += player1_pos
-          # puts "Player 1 rolls #{ rolls.map(&:to_s).join("+") } and moves to space #{ player1_pos } for a total score of #{ active_player_new_score } after #{ @roll_num } total rolls"
+          # puts "Player 1 rolls #{ rolls.map(&:to_s).join("+") } and moves to space #{ active_player_pos } for a total score of #{ active_player_new_score } after #{ @roll_num } total rolls"
         else
           player2_pos   = (player2_pos + move_total_squares) % 10
           player2_pos   = 10 if player2_pos.zero?
@@ -60,38 +60,27 @@ module AoC2021
 
     def dirac_to_score(win_score = 2)
       @win_score = win_score
-      roll_one_move(*@start_positions, 0, 0, true, [nil, 0, 0])
+      roll_one_move(*@start_positions, 0, 0, [0, 0], 1, 0)
     end
 
     private
 
-    def roll_one_move(player1_pos, player2_pos, player1_score, player2_score, player1s_turn, wins, weight_so_far = 1)
-      @all_rolls.each do |roll_sum, weight|
-        if player1s_turn
-          active_player_pos       = player1_pos
-          active_player_score     = player1_score
-          active_player_new_pos   = ((active_player_pos + roll_sum - 1) % 10) + 1
-          active_player_new_score = active_player_score + active_player_new_pos
-          if active_player_new_score >= @win_score
-            wins[1] += weight * weight_so_far
-          else
-            wins = roll_one_move(active_player_new_pos, player2_pos, active_player_new_score, player2_score, false, wins,
-                                 weight * weight_so_far)
-          end
+    def self.parse_position(line)
+      POS_PAT.match(line) { |md| md[1] }
+    end
+
+    def roll_one_move(active_player_pos, other_player_pos, active_player_score, other_player_score, wins, weight_so_far, player_num)
+      @all_rolls.reduce(0) do |_, (roll_sum, weight)|
+        active_player_new_pos   = ((active_player_pos + roll_sum - 1) % 10) + 1
+        active_player_new_score = active_player_score + active_player_new_pos
+        weight_product          = weight * weight_so_far
+        if active_player_new_score >= @win_score
+          wins.fill(wins[player_num] + weight_product, player_num, 1) # A form of assignment that returns self
         else
-          active_player_pos       = player2_pos
-          active_player_score     = player2_score
-          active_player_new_pos   = ((active_player_pos + roll_sum - 1) % 10) + 1
-          active_player_new_score = active_player_score + active_player_new_pos
-          if active_player_new_score >= @win_score
-            wins[2] += weight * weight_so_far
-          else
-            wins = roll_one_move(player1_pos, active_player_new_pos, player1_score, active_player_new_score, true, wins,
-                                 weight * weight_so_far)
-          end
+          wins = roll_one_move(other_player_pos, active_player_new_pos, other_player_score, active_player_new_score, wins,
+                               weight_product, (player_num + 1) % 2)
         end
       end
-      wins
     end
   end
 end
