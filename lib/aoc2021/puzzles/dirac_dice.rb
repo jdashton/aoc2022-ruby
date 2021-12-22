@@ -10,10 +10,8 @@ module AoC2021
 
     def self.day21
       dirac_dice = File.open("input/day21a.txt") { |file| DiracDice.new file }
-      print "Day 21, part A: "
-      dirac_dice.first300
-      print "Day 21, part B: "
-      puts "#{ dirac_dice.dirac_to_score(3) } "
+      puts "Day 21, part A: #{ dirac_dice.first300 }"
+      puts "Day 21, part B: Player 1: #{ (wins = dirac_dice.dirac_to_score(3))[1] } universes, Player 2: #{ wins[2] } universes"
       puts
     end
 
@@ -57,15 +55,12 @@ module AoC2021
 
       losing_score = player2_score >= 1000 ? player1_score : player2_score
       # puts "The losing player had a score of #{ losing_score } when the game ended after #{ @roll_num } rolls."
-      puts "#{ losing_score } * #{ @roll_num } = #{ losing_score * @roll_num }"
+      "#{ losing_score } * #{ @roll_num } = #{ losing_score * @roll_num }"
     end
 
     def dirac_to_score(win_score = 2)
       @win_score = win_score
-      wins       = roll_one_move(*@start_positions, 0, 0, true, [nil, 0, 0]) # with the given example
-      puts "Player 1: #{ wins[1] } universes"
-      puts "Player 2: #{ wins[2] } universes"
-      wins
+      roll_one_move(*@start_positions, 0, 0, true, [nil, 0, 0])
     end
 
     private

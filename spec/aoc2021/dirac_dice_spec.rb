@@ -18,7 +18,7 @@ RSpec.describe AoC2021::DiracDice do
     NUMBERS
 
     it "runs" do
-      expect(subject.first300).to eq nil
+      expect(subject.first300).to be_a(String)
     end
   end
 
