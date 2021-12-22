@@ -12,15 +12,15 @@ module AoC2021
 
     def self.find_day_methods
       AoC2021.constants
-             .map { |c| AoC2021.const_get(c) }
-             .select { |c| c.is_a? Class }
+             .map { |constant| AoC2021.const_get(constant) }
+             .select { |constant| constant.is_a? Class }
              .reduce([], &method(:pick_day_methods))
-             .sort_by { |_, m| m }
-             .each { |c, m| c.send m }
+             .sort_by { |_, method_name| method_name }
+             .each { |class_name, method_name| class_name.send method_name }
     end
 
     def self.pick_day_methods(acc, class_name)
-      acc + class_name.methods.grep(/day\d\d/).map { |m| [class_name, m] }
+      acc + class_name.methods.grep(/day\d\d/).map { |method_name| [class_name, method_name] }
     end
   end
 end

@@ -19,3 +19,11 @@ detectors:
       - x
       - y
       - _
+
+exclude_paths:
+  - lib/aoc2021/puzzles/beacon_scanner.rb
+  - lib/aoc2021/puzzles/cave_paths.rb
+  - lib/aoc2021/puzzles/chitons.rb
+  - lib/aoc2021/puzzles/packet_decoder.rb
+  - lib/aoc2021/puzzles/snailfish.rb
+  - lib/aoc2021/puzzles/trench_map.rb

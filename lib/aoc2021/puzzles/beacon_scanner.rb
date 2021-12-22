@@ -26,7 +26,7 @@ module AoC2021
               @probes << [Regexp.last_match(1), Regexp.last_match(2), Regexp.last_match(3)].map(&:to_i)
           end
         end
-        puts "#{ @probes.size } probes in set #{ @id }. #{ @probes.to_a.combination(2).to_a.size } combinations"
+        # puts "#{ @probes.size } probes in set #{ @id }. #{ @probes.to_a.combination(2).to_a.size } combinations"
         @probes.to_a.combination(2).each { |pb1, pb2| }
       end
     end

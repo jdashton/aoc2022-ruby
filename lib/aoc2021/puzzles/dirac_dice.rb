@@ -12,14 +12,17 @@ module AoC2021
       dirac_dice = File.open("input/day21a.txt") { |file| DiracDice.new file }
       print "Day 21, part A: "
       dirac_dice.first300
-      # print "Day 21, part B: "
-      # puts "#{dirac_dice.dirac_to_score(21)} "
+      print "Day 21, part B: "
+      puts "#{ dirac_dice.dirac_to_score(3) } "
       puts
     end
 
-    def initialize(file = StringIO.new(""))
-      @lines = file.readlines(chomp: true)
+    POS_PAT = /Player \d starting position: (\d+)/
 
+    def initialize(file = StringIO.new(""))
+      @start_positions = file.readlines(chomp: true).map { |line| POS_PAT.match(line) { |md| md[1] } }.map(&:to_i)
+
+      @win_score = 2
       @roll_num  = 0
       @all_rolls = [1, 2, 3].repeated_permutation(3)
                             .map(&:sum)
@@ -41,7 +44,7 @@ module AoC2021
           player1_pos   = (player1_pos + move_total_squares) % 10
           player1_pos   = 10 if player1_pos.zero?
           player1_score += player1_pos
-          # puts "Player 1 rolls #{ rolls.map(&:to_s).join("+") } and moves to space #{ player1_pos } for a total score of #{ player1_score_ } after #{ @roll_num } total rolls"
+          # puts "Player 1 rolls #{ rolls.map(&:to_s).join("+") } and moves to space #{ player1_pos } for a total score of #{ active_player_new_score } after #{ @roll_num } total rolls"
         else
           player2_pos   = (player2_pos + move_total_squares) % 10
           player2_pos   = 10 if player2_pos.zero?
@@ -59,8 +62,7 @@ module AoC2021
 
     def dirac_to_score(win_score = 2)
       @win_score = win_score
-      # wins       = roll_one_move 4, 8, 0, 0, true, [nil, 0, 0]  # with the given example
-      wins       = roll_one_move 9, 3, 0, 0, true, [nil, 0, 0]    # my puzzle input
+      wins       = roll_one_move(*@start_positions, 0, 0, true, [nil, 0, 0]) # with the given example
       puts "Player 1: #{ wins[1] } universes"
       puts "Player 2: #{ wins[2] } universes"
       wins
@@ -71,22 +73,26 @@ module AoC2021
     def roll_one_move(player1_pos, player2_pos, player1_score, player2_score, player1s_turn, wins, weight_so_far = 1)
       @all_rolls.each do |roll_sum, weight|
         if player1s_turn
-          player1_pos_   = ((player1_pos + roll_sum - 1) % 10) + 1
-          player1_score_ = player1_score + player1_pos_
-          # puts "P1 rolls #{ roll_sum }, moves fr #{ player1_pos } to #{ player1_pos_ }, score now #{ player1_score_ } wt #{ weight }"
-          if player1_score_ >= @win_score
+          active_player_pos       = player1_pos
+          active_player_score     = player1_score
+          active_player_new_pos   = ((active_player_pos + roll_sum - 1) % 10) + 1
+          active_player_new_score = active_player_score + active_player_new_pos
+          if active_player_new_score >= @win_score
             wins[1] += weight * weight_so_far
           else
-            wins = roll_one_move(player1_pos_, player2_pos, player1_score_, player2_score, false, wins, weight * weight_so_far)
+            wins = roll_one_move(active_player_new_pos, player2_pos, active_player_new_score, player2_score, false, wins,
+                                 weight * weight_so_far)
           end
         else
-          player2_pos_   = ((player2_pos + roll_sum - 1) % 10) + 1
-          player2_score_ = player2_score + player2_pos_
-          # puts "  P2 rolls #{ roll_sum }, moves fr #{ player2_pos } to #{ player2_pos_ }, score now #{ player2_score_ } wt #{ weight }"
-          if player2_score_ >= @win_score
+          active_player_pos       = player2_pos
+          active_player_score     = player2_score
+          active_player_new_pos   = ((active_player_pos + roll_sum - 1) % 10) + 1
+          active_player_new_score = active_player_score + active_player_new_pos
+          if active_player_new_score >= @win_score
             wins[2] += weight * weight_so_far
           else
-            wins = roll_one_move(player1_pos, player2_pos_, player1_score, player2_score_, true, wins, weight * weight_so_far)
+            wins = roll_one_move(player1_pos, active_player_new_pos, player1_score, active_player_new_score, true, wins,
+                                 weight * weight_so_far)
           end
         end
       end
