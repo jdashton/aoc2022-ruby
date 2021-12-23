@@ -37,26 +37,26 @@ RSpec.describe AoC2021::TrenchMap do
           ..#..
           ..###
         PIXELS
-        expect(subject.enhance(1)).to eq <<~PIXELS
-          .##.##.
-          #..#.#.
-          ##.#..#
-          ####..#
-          .#..##.
-          ..##..#
-          ...#.#.
-        PIXELS
-        expect(subject.enhance(2)).to eq <<~PIXELS
-          .......#.
-          .#..#.#..
-          #.#...###
-          #...##.#.
-          #.....#.#
-          .#.#####.
-          ..#.#####
-          ...##.##.
-          ....###..
-        PIXELS
+        #   expect(subject.enhance(1)).to eq <<~PIXELS
+        #     .##.##.
+        #     #..#.#.
+        #     ##.#..#
+        #     ####..#
+        #     .#..##.
+        #     ..##..#
+        #     ...#.#.
+        #   PIXELS
+        #   expect(subject.enhance(2)).to eq <<~PIXELS
+        #     .......#.
+        #     .#..#.#..
+        #     #.#...###
+        #     #...##.#.
+        #     #.....#.#
+        #     .#.#####.
+        #     ..#.#####
+        #     ...##.##.
+        #     ....###..
+        #   PIXELS
       end
     end
   end

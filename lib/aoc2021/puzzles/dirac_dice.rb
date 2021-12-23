@@ -6,7 +6,7 @@ module AoC2021
   # Image Enhancement for Day 20
   class DiracDice
     extend Forwardable
-    def_instance_delegators "self.class", :parse_position
+    def_instance_delegators "self.class", :parse_position, :calculate_new_pos_score_weight
 
     def self.day21
       dirac_dice = File.open("input/day21a.txt") { |file| DiracDice.new file }
@@ -42,12 +42,10 @@ module AoC2021
           player1_pos   = (player1_pos + move_total_squares) % 10
           player1_pos   = 10 if player1_pos.zero?
           player1_score += player1_pos
-          # puts "Player 1 rolls #{ rolls.map(&:to_s).join("+") } and moves to space #{ active_player_pos } for a total score of #{ active_player_new_score } after #{ @roll_num } total rolls"
         else
           player2_pos   = (player2_pos + move_total_squares) % 10
           player2_pos   = 10 if player2_pos.zero?
           player2_score += player2_pos
-          # puts "Player 2 rolls #{ rolls.map(&:to_s).join("+") } and moves to space #{ player2_pos } for a total score of #{ player2_score } after #{ @roll_num } total rolls"
         end
 
         player1s_turn = !player1s_turn
@@ -63,22 +61,32 @@ module AoC2021
       roll_one_move(*@start_positions, 0, 0, [0, 0], 1, 0)
     end
 
-    private
-
     def self.parse_position(line)
       POS_PAT.match(line) { |md| md[1] }
     end
 
-    def roll_one_move(active_player_pos, other_player_pos, active_player_score, other_player_score, wins, weight_so_far, player_num)
-      @all_rolls.reduce(0) do |_, (roll_sum, weight)|
-        active_player_new_pos   = ((active_player_pos + roll_sum - 1) % 10) + 1
-        active_player_new_score = active_player_score + active_player_new_pos
-        weight_product          = weight * weight_so_far
+    def self.calculate_new_pos_score_weight(active_player_pos, active_player_score, roll_data, weight_so_far)
+      roll_sum, weight        = roll_data
+      active_player_new_pos   = ((active_player_pos + roll_sum - 1) % 10) + 1
+      active_player_new_score = active_player_score + active_player_new_pos
+      weight_product          = weight * weight_so_far
+      [active_player_new_pos, active_player_new_score, weight_product]
+    end
+
+    private
+
+    def roll_one_move(active_player_pos, other_player_pos, active_player_score, other_player_score, wins,
+                      weight_so_far, player_num)
+      @all_rolls.reduce(0) do |_, roll_data|
+        active_player_new_pos, active_player_new_score, weight_product = calculate_new_pos_score_weight(active_player_pos,
+                                                                                                        active_player_score,
+                                                                                                        roll_data,
+                                                                                                        weight_so_far)
         if active_player_new_score >= @win_score
           wins.fill(wins[player_num] + weight_product, player_num, 1) # A form of assignment that returns self
         else
-          wins = roll_one_move(other_player_pos, active_player_new_pos, other_player_score, active_player_new_score, wins,
-                               weight_product, (player_num + 1) % 2)
+          roll_one_move(other_player_pos, active_player_new_pos, other_player_score, active_player_new_score, wins,
+                        weight_product, (player_num + 1) % 2)
         end
       end
     end
