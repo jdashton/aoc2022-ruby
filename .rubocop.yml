@@ -37,8 +37,10 @@ Metrics/BlockLength:
 
 Naming/MethodParameterName:
   AllowedNames:
+    - w
     - x
     - y
+    - z
 
 Style/BlockDelimiters:
   EnforcedStyle: braces_for_chaining
