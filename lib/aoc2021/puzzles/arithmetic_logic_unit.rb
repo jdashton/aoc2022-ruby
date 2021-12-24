@@ -23,6 +23,7 @@ module AoC2021
     ZS = [1, 1, 1, 1, 26, 26, 26, 1, 1, 26, 26, 26, 1, 26].freeze
     XS = [13, 15, 15, 11, -16, -11, -6, 11, 10, -10, -8, -11, 12, -15].freeze
     WS = [5, 14, 15, 16, 8, 9, 2, 13, 16, 6, 6, 9, 11, 5].freeze
+    IN = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9].freeze
 
     def self.calculate_one(digit, w, z = 0)
       z = z / ZS[digit] # either 1 (bno-op) or 26 (pop)
@@ -31,5 +32,15 @@ module AoC2021
     end
 
     def self.one_place(place) = 9.downto(1) { |w| calculate_one(place, w, 0) }
+
+    def self.stack_based
+      zz = [0]
+      IN.zip(XS, WS, ZS).each do |w, a, a2, d|
+        last = zz.last
+        zz.pop if d == 26
+        zz.push w + a2 if w != last + a
+        pp [w, zz.reduce(0) { _1 * 26 + _2 }, zz]
+      end
+    end
   end
 end
