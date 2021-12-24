@@ -37,6 +37,7 @@ Metrics/BlockLength:
 
 Naming/MethodParameterName:
   AllowedNames:
+    - i
     - w
     - x
     - y
