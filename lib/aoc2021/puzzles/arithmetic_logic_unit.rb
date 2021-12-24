@@ -20,14 +20,14 @@ module AoC2021
 
     def self.largest_model_number = 99_999_999_999_999
 
-    ZS = [1, 1, 1, 1, 26, 26, 26, 1, 1, 26, 26, 26, 1, 26].freeze
-    XS = [13, 15, 15, 11, -16, -11, -6, 11, 10, -10, -8, -11, 12, -15].freeze
-    WS = [5, 14, 15, 16, 8, 9, 2, 13, 16, 6, 6, 9, 11, 5].freeze
-    IN = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9].freeze
+    DIVS  = [1, 1, 1, 1, 26, 26, 26, 1, 1, 26, 26, 26, 1, 26].freeze
+    ADD1  = [13, 15, 15, 11, -16, -11, -6, 11, 10, -10, -8, -11, 12, -15].freeze
+    ADD2  = [5, 14, 15, 16, 8, 9, 2, 13, 16, 6, 6, 9, 11, 5].freeze
+    INPUT = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9].freeze
 
     def self.calculate_one(digit, w, z = 0)
-      z /= ZS[digit] # either 1 (bno-op) or 26 (pop)
-      z = (z * 26) + w + WS[digit] if w != ((z % 26) + XS[digit])
+      z /= DIVS[digit] # either 1 (bno-op) or 26 (pop)
+      z = (z * 26) + w + ADD2[digit] if w != ((z % 26) + ADD1[digit])
       pp [digit, w, z]
     end
 
@@ -35,40 +35,37 @@ module AoC2021
 
     def self.stack_based
       zz = [0]
-      IN.zip(XS, WS, ZS).each do |w, a, a2, d|
+      INPUT.zip(ADD1, ADD2, DIVS).each do |w, a, a2, d|
         last = zz.last
         zz.pop if d == 26
         zz.push w + a2 if w != last + a
-        pp [w, zz.reduce(0) { (_1 * 26) + _2 }, zz]
+        pp [w, zz.reduce(0) { |acc, num| (acc * 26) + num }, zz]
       end
     end
 
+    # These answers totally based on https://notes.dt.in.th/20211224T121217Z7595
+
     def self.state_space_search
-      find = -> w, i, zz, path {
-        if i == 14
-          pp zz, path.join[0...14]
-          return
-        end
-        a  = XS[i]
-        a2 = WS[i]
-        d  = ZS[i]
-        if d == 26
-          return if w - a != zz.last
-          next_zz = zz[0...-1]
-          9.downto 1 do |next_w|
-            find[next_w, i + 1, next_zz, [*path, next_w]]
-          end
-        else
-          next_zz = [*zz, w + a2]
-          9.downto 1 do |next_w|
-            find[next_w, i + 1, next_zz, [*path, next_w]]
-          end
+      model_numbers = []
+
+      find = lambda { |w, i, zz, path|
+        next_zz = if DIVS[i] == 26
+                    zz[0..-2] # pop and forget the last element
+                  else
+                    [*zz, w + ADD2[i]] # push w + a2
+                  end
+        9.downto 1 do |next_w|
+          next if DIVS[i + 1] == 26 && next_zz.last != next_w - ADD1[i + 1]
+
+          return model_numbers << (path << next_w).join if i == 12
+
+          find[next_w, i + 1, next_zz, [*path, next_w]]
         end
       }
       9.downto 1 do |w|
         find[w, 0, [], [w]]
       end
-      puts "Done"
+      puts "Largest model number: #{ model_numbers.max }, smallest model number: #{ model_numbers.min }."
     end
   end
 end
