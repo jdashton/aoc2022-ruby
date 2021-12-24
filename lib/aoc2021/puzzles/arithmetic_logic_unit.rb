@@ -26,8 +26,8 @@ module AoC2021
     IN = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9].freeze
 
     def self.calculate_one(digit, w, z = 0)
-      z = z / ZS[digit] # either 1 (bno-op) or 26 (pop)
-      z = z * 26 + w + WS[digit] if w != (z % 26 + XS[digit])
+      z /= ZS[digit] # either 1 (bno-op) or 26 (pop)
+      z = (z * 26) + w + WS[digit] if w != ((z % 26) + XS[digit])
       pp [digit, w, z]
     end
 
@@ -39,8 +39,36 @@ module AoC2021
         last = zz.last
         zz.pop if d == 26
         zz.push w + a2 if w != last + a
-        pp [w, zz.reduce(0) { _1 * 26 + _2 }, zz]
+        pp [w, zz.reduce(0) { (_1 * 26) + _2 }, zz]
       end
+    end
+
+    def self.state_space_search
+      find = -> w, i, zz, path {
+        if i == 14
+          pp zz, path.join[0...14]
+          return
+        end
+        a  = XS[i]
+        a2 = WS[i]
+        d  = ZS[i]
+        if d == 26
+          return if w - a != zz.last
+          next_zz = zz[0...-1]
+          9.downto 1 do |next_w|
+            find[next_w, i + 1, next_zz, [*path, next_w]]
+          end
+        else
+          next_zz = [*zz, w + a2]
+          9.downto 1 do |next_w|
+            find[next_w, i + 1, next_zz, [*path, next_w]]
+          end
+        end
+      }
+      9.downto 1 do |w|
+        find[w, 0, [], [w]]
+      end
+      puts "Done"
     end
   end
 end
