@@ -26,9 +26,16 @@ module AoC2021
     INPUT = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9].freeze
 
     def self.calculate_one(digit, w, z = 0)
-      z /= DIVS[digit] # either 1 (bno-op) or 26 (pop)
+      z /= DIVS[digit] # either 1 (no-op) or 26 (pop)
       z = (z * 26) + w + ADD2[digit] if w != ((z % 26) + ADD1[digit])
-      pp [digit, w, z]
+      # pp [digit, w, z]
+    end
+
+    def self.replay_number(number)
+      z = 0
+      number.to_s.chars.each_with_index do |w, i|
+        z = calculate_one(i, w, z)
+      end
     end
 
     def self.one_place(place) = 9.downto(1) { |w| calculate_one(place, w, 0) }
@@ -52,14 +59,14 @@ module AoC2021
         next_zz = if DIVS[i] == 26
                     zz[0..-2] # pop and forget the last element
                   else
-                    [*zz, w + ADD2[i]] # push w + a2
+                    zz + [w + ADD2[i]] # push w + a2
                   end
         9.downto 1 do |next_w|
           next if DIVS[i + 1] == 26 && next_zz.last != next_w - ADD1[i + 1]
 
           return model_numbers << (path << next_w).join if i == 12
 
-          find[next_w, i + 1, next_zz, [*path, next_w]]
+          find[next_w, i + 1, next_zz, path + [next_w]]
         end
       }
       9.downto 1 do |w|
