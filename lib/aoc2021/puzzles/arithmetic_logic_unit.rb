@@ -25,17 +25,44 @@ module AoC2021
     ADD2  = [5, 14, 15, 16, 8, 9, 2, 13, 16, 6, 6, 9, 11, 5].freeze
     INPUT = [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9].freeze
 
+    def self.stack_to_s(stack)
+      letters = []
+      while stack > 0
+        letters.push(stack % 26)
+        stack -= letters.last
+        stack /= 26
+      end
+      letters.reverse.map { |letter| to_ltr(letter) }.join("|")
+    end
+
+    def self.to_ltr(num) = ("A".ord + num).chr
+
     def self.calculate_one(digit, w, z = 0)
+      last = z % 26
+      print "#{ digit < 10 ? " " : "" }#{ digit } - #{ w } - #{ stack_to_s z }:      "
+      print DIVS[digit] == 26 ? "\tpop #{ to_ltr(z % 26) }" : ""
       z /= DIVS[digit] # either 1 (no-op) or 26 (pop)
-      z = (z * 26) + w + ADD2[digit] if w != ((z % 26) + ADD1[digit])
-      # pp [digit, w, z]
+
+      if w != (last + ADD1[digit])
+        print "\tpush #{ to_ltr(w + ADD2[digit]) }"
+        print "\tBecause #{ to_ltr(w) } != #{ to_ltr(last) } + #{ ADD1[digit] } (#{ to_ltr(last + ADD1[digit]) }), "
+        z = (z * 26) + w + ADD2[digit] 
+        print "pushed #{ to_ltr(w) } + #{ to_ltr(ADD2[digit]) } = #{ to_ltr(w + ADD2[digit]) }"
+      else
+        print "\tBecause #{ to_ltr(w) } == #{ to_ltr(last) } + #{ ADD1[digit] } (#{ to_ltr(last + ADD1[digit]) }), took no further action"
+      end
+      
+      puts
+      z
     end
 
     def self.replay_number(number)
+      puts "Running the code for #{ number }."
       z = 0
       number.to_s.chars.each_with_index do |w, i|
-        z = calculate_one(i, w, z)
+        z = calculate_one(i, w.to_i, z)
       end
+      puts "14 -   - #{ stack_to_s z }: "
     end
 
     def self.one_place(place) = 9.downto(1) { |w| calculate_one(place, w, 0) }
