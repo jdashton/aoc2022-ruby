@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 
-require "aoc2021/puzzles/amphipod"
-
 RSpec.describe AoC2021::Amphipod do
-  before do
-    # Do nothing
-  end
-
-  after do
-    # Do nothing
-  end
-
   describe "::next_moves" do
     it "finds the expected next moves from the hall" do
       expect(AoC2021::Amphipod.next_moves([[:D,
@@ -43,11 +33,11 @@ RSpec.describe AoC2021::Amphipod do
                ]
     end
 
-    it "finds the expected next moves" do
+    it "finds one expected next move" do
       expect(AoC2021::Amphipod.next_moves([[:x,
                                             :x, %i[A A A A],
                                             :x, %i[B B B B],
-                                            :x, %i[C C C C],
+                                            :x, %i[D C C C],
                                             :x, %i[A D D D],
                                             :empty, :x], 0]))
         .to eq Set[
@@ -58,6 +48,9 @@ RSpec.describe AoC2021::Amphipod do
                    :x, %i[empty D D D],
                    :A, :x], 2]
                ]
+    end
+
+    it "finds all expected next moves into a hallway spot" do
       expect(AoC2021::Amphipod.next_moves([[:empty,
                                             :empty, %i[B D D A],
                                             :empty, %i[C C B D],
@@ -235,6 +228,160 @@ RSpec.describe AoC2021::Amphipod do
                    :empty, :D], 3000]
                ]
     end
+
+    it "finds all expected next moves into a hall or room" do
+      expect(AoC2021::Amphipod.next_moves([[:x,
+                                            :x, %i[empty A A A],
+                                            :empty, %i[empty],
+                                            :empty, %i[empty],
+                                            :empty, %i[A D D D],
+                                            :x, :x], 0]))
+        .to eq Set[
+                 [[:x,
+                   :x, %i[empty A A A],
+                   :A, %i[empty],
+                   :empty, %i[empty],
+                   :empty, %i[empty D D D],
+                   :x, :x], 6],
+                 [[:x,
+                   :x, %i[empty A A A],
+                   :empty, %i[empty],
+                   :A, %i[empty],
+                   :empty, %i[empty D D D],
+                   :x, :x], 4],
+                 [[:x,
+                   :x, %i[empty A A A],
+                   :empty, %i[empty],
+                   :empty, %i[empty],
+                   :A, %i[empty D D D],
+                   :x, :x], 2],
+                 [[:x,
+                   :x, %i[A A A A],
+                   :empty, %i[empty],
+                   :empty, %i[empty],
+                   :empty, %i[empty D D D],
+                   :x, :x], 8]
+               ]
+    end
+
+    it "finds exactly the expected moves from this board" do
+      expect(AoC2021::Amphipod.next_moves([[:A,
+                                            :B,
+                                            %i[empty empty],
+                                            :D,
+                                            %i[empty empty],
+                                            :C,
+                                            %i[empty empty],
+                                            :D,
+                                            %i[B C],
+                                            :A,
+                                            :empty], 0]))
+        .to eq Set[
+                 [[:A,
+                   :B,
+                   %i[empty empty],
+                   :D,
+                   %i[empty empty],
+                   :empty,
+                   %i[empty C],
+                   :D,
+                   %i[B C],
+                   :A,
+                   :empty], 300]
+               ]
+    end
+  end
+
+  describe "::clear_path_to?" do
+    it "finds clear paths" do
+      expect(AoC2021::Amphipod.clear_path_to?(0, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[C],
+                                                     :empty, %i[A],
+                                                     :empty, :empty])).to be true
+      expect(AoC2021::Amphipod.clear_path_to?(1, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[C],
+                                                     :empty, %i[A],
+                                                     :empty, :empty])).to be true
+      expect(AoC2021::Amphipod.clear_path_to?(3, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[C],
+                                                     :empty, %i[A],
+                                                     :empty, :empty])).to be true
+      expect(AoC2021::Amphipod.clear_path_to?(5, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[C],
+                                                     :empty, %i[A],
+                                                     :empty, :empty])).to be true
+      expect(AoC2021::Amphipod.clear_path_to?(7, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[C],
+                                                     :empty, %i[A],
+                                                     :empty, :empty])).to be true
+      expect(AoC2021::Amphipod.clear_path_to?(9, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[C],
+                                                     :empty, %i[A],
+                                                     :empty, :empty])).to be true
+      expect(AoC2021::Amphipod.clear_path_to?(10, 8, [:empty,
+                                                      :empty, %i[empty],
+                                                      :empty, %i[B],
+                                                      :empty, %i[empty],
+                                                      :C, %i[A],
+                                                      :empty, :empty])).to be true
+    end
+
+    it "finds blocked paths" do
+      expect(AoC2021::Amphipod.clear_path_to?(7, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[empty],
+                                                     :C, %i[A],
+                                                     :empty, :empty])).to be false
+      expect(AoC2021::Amphipod.clear_path_to?(5, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[empty],
+                                                     :C, %i[A],
+                                                     :empty, :empty])).to be false
+      expect(AoC2021::Amphipod.clear_path_to?(3, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[empty],
+                                                     :C, %i[A],
+                                                     :empty, :empty])).to be false
+      expect(AoC2021::Amphipod.clear_path_to?(1, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[empty],
+                                                     :C, %i[A],
+                                                     :empty, :empty])).to be false
+      expect(AoC2021::Amphipod.clear_path_to?(0, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[empty],
+                                                     :C, %i[A],
+                                                     :empty, :empty])).to be false
+      expect(AoC2021::Amphipod.clear_path_to?(9, 8, [:empty,
+                                                     :empty, %i[empty],
+                                                     :empty, %i[B],
+                                                     :empty, %i[empty],
+                                                     :empty, %i[A],
+                                                     :C, :empty])).to be false
+      expect(AoC2021::Amphipod.clear_path_to?(10, 8, [:empty,
+                                                      :empty, %i[empty],
+                                                      :empty, %i[B],
+                                                      :empty, %i[empty],
+                                                      :empty, %i[A],
+                                                      :C, :empty])).to be false
+    end
   end
 
   describe "::ready_to_move" do
@@ -342,24 +489,53 @@ RSpec.describe AoC2021::Amphipod do
 
   describe "::final_state" do
     it "detects a final state" do
-      expect(AoC2021::Amphipod.final_state?([:empty, :empty,
-                                             %i[A A A A], :empty,
-                                             %i[B B B B], :empty,
-                                             %i[C C C C], :empty,
-                                             %i[D D D D], :empty, :empty])).to be true
+      expect(AoC2021::Amphipod.final_state?([[:empty, :empty,
+                                              %i[A A A A], :empty,
+                                              %i[B B B B], :empty,
+                                              %i[C C C C], :empty,
+                                              %i[D D D D], :empty, :empty], 0])).to be true
+      expect(AoC2021::Amphipod.final_state?([[:empty, :empty,
+                                              %i[A], :empty,
+                                              %i[B], :empty,
+                                              %i[C], :empty,
+                                              %i[D], :empty, :empty], 0])).to be true
     end
 
     it "detects a non-final state" do
-      expect(AoC2021::Amphipod.final_state?([:empty, :empty,
-                                             %i[A A A B], :empty,
-                                             %i[B B B A], :empty,
-                                             %i[C C C C], :empty,
-                                             %i[D D D D], :empty, :empty])).to be false
-      expect(AoC2021::Amphipod.final_state?([:empty, :empty,
-                                             %i[A A A empty], :empty,
-                                             %i[B B B A], :empty,
-                                             %i[C C C C], :empty,
-                                             %i[D D D D], :empty, :A])).to be false
+      expect(AoC2021::Amphipod.final_state?([[:empty, :empty,
+                                              %i[A A A B], :empty,
+                                              %i[B B B A], :empty,
+                                              %i[C C C C], :empty,
+                                              %i[D D D D], :empty, :empty], 0])).to be false
+      expect(AoC2021::Amphipod.final_state?([[:empty, :empty,
+                                              %i[A A A empty], :empty,
+                                              %i[B B B A], :empty,
+                                              %i[C C C C], :empty,
+                                              %i[D D D D], :empty, :A], 0])).to be false
+      expect(AoC2021::Amphipod.final_state?([[:empty, :empty,
+                                              %i[A], :empty,
+                                              %i[B], :empty,
+                                              %i[D], :empty,
+                                              %i[C], :empty, :empty], 0])).to be false
+      expect(AoC2021::Amphipod.final_state?([[:empty, :empty,
+                                              %i[A], :empty,
+                                              %i[empty], :B,
+                                              %i[D], :empty,
+                                              %i[C], :empty, :empty], 0])).to be false
+    end
+  end
+
+  describe "#play_game" do
+    subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+      #############
+      #...........#
+      ###A#D#A#B###
+        #B#C#D#C#
+        #########
+    BOARD
+
+    it "finds a least score of 12521 energy" do
+      expect(subject.play_game).to eq 12_521
     end
   end
 end
