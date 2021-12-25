@@ -23,7 +23,7 @@ module AoC2021
       (room - x).abs + 1 + y
     end
 
-    COSTS = { A: 1, B: 10, C: 100, D: 1000 }
+    COSTS = { A: 1, B: 10, C: 100, D: 1000 }.freeze
 
     def self.next_moves((board, score))
       pp board, ready_to_move(board)

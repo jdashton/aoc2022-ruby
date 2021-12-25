@@ -5,6 +5,8 @@ AllCops:
   Exclude:
     - bin/bundle
     - vendor/**/*
+    - lib/aoc2021/puzzles/amphipod.rb
+    - lib/aoc2021/puzzles/arithmetic_logic_unit.rb
     - lib/aoc2021/puzzles/beacon_scanner.rb
     - lib/aoc2021/puzzles/chitons.rb
     - lib/aoc2021/puzzles/dirac_dice.rb

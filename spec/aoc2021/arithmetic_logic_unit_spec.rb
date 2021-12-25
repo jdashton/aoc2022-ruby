@@ -1,20 +1,11 @@
 # frozen_string_literal: true
 
-require "aoc2021/puzzles/arithmetic_logic_unit"
-
 RSpec.describe AoC2021::ArithmeticLogicUnit do
-  before do
-    # Do nothing
+  it "finds the highest accepted model number" do
+    expect(subject.max_num).to eq "91599994399395"
   end
 
-  after do
-    # Do nothing
-  end
-
-  describe "::largest_model_number" do
-    it "finds the expected next moves from the hall" do
-      expect(AoC2021::ArithmeticLogicUnit.largest_model_number)
-        .to eq 99_999_999_999_999
-    end
+  it "finds the lowest accepted model number" do
+    expect(subject.min_num).to eq "71111591176151"
   end
 end

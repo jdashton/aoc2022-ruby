@@ -5,20 +5,18 @@ require "set"
 module AoC2021
   # Calculates conditions of victory for given plays and boards
   class ArithmeticLogicUnit
-    def self.day23
-      arithmetic_logic_unit = File.open("input/day24a.txt") { |file| ArithmeticLogicUnit.new file }
-      puts "Day 24, part A: #{ arithmetic_logic_unit.largest_model_number } is the largest model number accepted by MONAD."
-      # puts "Day 24, part B: #{ arithmetic_logic_unit.least_energy_unfolded }  is the
-      # least energy required to organize all the arithmetic_logic_units."
+    def self.day24
+      arithmetic_logic_unit = File.open("input/day24a.txt") { |_file| ArithmeticLogicUnit.new }
+      puts "Day 24, part A: #{ arithmetic_logic_unit.max_num } is the largest model number accepted by MONAD."
+      puts "Day 24, part B: #{ arithmetic_logic_unit.min_num } is the smallest model number accepted by MONAD."
       puts
     end
 
-    def initialize(_file)
-      @last_board  = nil
-      @last_number = nil
-    end
+    attr_reader :max_num, :min_num
 
-    def self.largest_model_number = 99_999_999_999_999
+    def initialize
+      @max_num, @min_num = self.class.state_space_search
+    end
 
     DIVS  = [1, 1, 1, 1, 26, 26, 26, 1, 1, 26, 26, 26, 1, 26].freeze
     ADD1  = [13, 15, 15, 11, -16, -11, -6, 11, 10, -10, -8, -11, 12, -15].freeze
@@ -27,7 +25,7 @@ module AoC2021
 
     def self.stack_to_s(stack)
       letters = []
-      while stack > 0
+      while stack.positive?
         letters.push(stack % 26)
         stack -= letters.last
         stack /= 26
@@ -43,15 +41,15 @@ module AoC2021
       print DIVS[digit] == 26 ? "\tpop #{ to_ltr(z % 26) }" : ""
       z /= DIVS[digit] # either 1 (no-op) or 26 (pop)
 
-      if w != (last + ADD1[digit])
+      if w == (last + ADD1[digit])
+        print "\tBecause #{ to_ltr(w) } == #{ to_ltr(last) } + #{ ADD1[digit] } (#{ to_ltr(last + ADD1[digit]) }), took no further action"
+      else
         print "\tpush #{ to_ltr(w + ADD2[digit]) }"
         print "\tBecause #{ to_ltr(w) } != #{ to_ltr(last) } + #{ ADD1[digit] } (#{ to_ltr(last + ADD1[digit]) }), "
-        z = (z * 26) + w + ADD2[digit] 
+        z = (z * 26) + w + ADD2[digit]
         print "pushed #{ to_ltr(w) } + #{ to_ltr(ADD2[digit]) } = #{ to_ltr(w + ADD2[digit]) }"
-      else
-        print "\tBecause #{ to_ltr(w) } == #{ to_ltr(last) } + #{ ADD1[digit] } (#{ to_ltr(last + ADD1[digit]) }), took no further action"
       end
-      
+
       puts
       z
     end
@@ -99,7 +97,8 @@ module AoC2021
       9.downto 1 do |w|
         find[w, 0, [], [w]]
       end
-      puts "Largest model number: #{ model_numbers.max }, smallest model number: #{ model_numbers.min }."
+      [model_numbers.max, model_numbers.min]
+      # puts "Largest model number: #{ model_numbers.max }, smallest model number: #{ model_numbers.min }."
     end
   end
 end
