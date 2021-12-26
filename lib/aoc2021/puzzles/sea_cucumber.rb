@@ -53,7 +53,7 @@ module AoC2021
     def south_col(col_num)
       # puts "Starting with \n#{ @current.map(&:join).join "\n" }"
       @current.each_index do |row_num|
-        @next[row_num]          ||= []
+        @next[row_num] ||= []
         @next[row_num][col_num] = case @current[row_num][col_num]
                                     when ">" then ">"
                                     when "v" then (@current.dig(row_num + 1, col_num) || @current[0][col_num]) == "." ? "." : "v"
@@ -80,10 +80,10 @@ module AoC2021
     end
 
     def after_steps(num_steps)
-      num_steps.times do ||
+      num_steps.times do
         one_step
       end
-      (@current.map(&:join).join "\n") + "\n"
+      "#{ @current.map(&:join).join "\n" }\n"
     end
   end
 end

@@ -34,11 +34,13 @@ module AoC2021
     def play_game(board = @board)
       return if board[1] >= @low_score
 
-      self.class.next_moves(board).each do |next_board|
-        if self.class.final_state?(next_board)
-          puts "final state: #{ @low_score = next_board[1] }" if next_board[1] < @low_score
+      Amphipod.next_moves(board).each do |next_board|
+        next if (score = next_board[1]) >= @low_score
+
+        if Amphipod.final_state?(next_board)
+          puts "final state: #{ @low_score = score }"
         else
-          play_game(next_board) if next_board[1] < @low_score
+          play_game(next_board)
         end
       end
       @low_score
@@ -52,9 +54,8 @@ module AoC2021
 
     HALL_SPOTS = [0, 1, 3, 5, 7, 9, 10].freeze
 
-    def self.hall_avail(board, old_room, score)
-      amphipod  = board[old_room].reject { |spot| spot == :empty }.first
-      room_spot = board[old_room].index(amphipod)
+    def self.hall_avail(board, old_room, room_spot, score)
+      amphipod = board[old_room][room_spot]
       HALL_SPOTS.filter { |hall_spot| clear_path_to?(hall_spot, old_room, board) }
                 .reduce([]) do |acc, hall_spot|
         new_board                      = board.map(&:clone)
@@ -66,8 +67,8 @@ module AoC2021
       end
     end
 
-    def self.room_avail(board, old_room, score)
-      amphipod   = board[old_room].reject { |spot| spot == :empty }.first
+    def self.room_avail(board, old_room, old_room_spot, score)
+      amphipod   = board[old_room][old_room_spot]
       right_room = RIGHT_ROOM[amphipod]
       return [] unless board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
         clear_path_to?(right_room, old_room, board)
@@ -75,7 +76,6 @@ module AoC2021
       new_board                            = board.map(&:clone)
       new_room_spot                        = board[right_room].rindex(:empty)
       new_board[right_room][new_room_spot] = amphipod
-      old_room_spot                        = board[old_room].index(amphipod)
       new_board[old_room][old_room_spot]   = :empty
       # print "found "
       # pp [new_board, score + (distance(right_room, old_room, old_room_spot + new_room_spot + 1) * COSTS[amphipod])]
@@ -97,21 +97,21 @@ module AoC2021
             room_num     = RIGHT_ROOM[amphipod]
             room         = new_board[room_num]
             new_y        = room.rindex(:empty)
-            if new_y.nil?
-              pp room, board
-            end
-            room[new_y]  = amphipod
+            pp room, board if new_y.nil?
+            room[new_y] = amphipod
             acc << [new_board, score + (distance(x, room_num, new_y) * COSTS[amphipod])]
           in [x, y]
             # puts "Looking for moves for #{ board[x][y] } at #{ x }, #{ y }"
-            hall_list = hall_avail(board, x, score)
-            room_list = room_avail(board, x, score)
+            hall_list = hall_avail(board, x, y, score)
+            room_list = room_avail(board, x, y, score)
             acc + hall_list + room_list
+          else
+            # no-op
         end
       end)
     end
 
-    def self.final_state?((board, score))
+    def self.final_state?((board, _score))
       board.values_at(*HALL_SPOTS).all?(:empty) &&
         board.values_at(*ROOMS).zip(ROOMS).all? { |(room, num)| room.all?(ROOM_AMPHIPOD[num]) }
     end
@@ -143,7 +143,7 @@ module AoC2021
 
     ROOMS = Set[2, 4, 6, 8]
 
-    # Returns true/false whether a piece has at least one valid move available.
+    # Returns true/false whether a piece can move from start_x to destination_x.
     def self.clear_path_to?(destination_x, start_x, board)
       range = if destination_x < start_x
                 destination_x..start_x - 1
@@ -159,20 +159,23 @@ module AoC2021
           # puts "#{ x }, #{ y } => #{ board[x][y] }"
           # handle [x, y] in a room
           # In all cases, if x - 1 is not :empty AND x + 1 is not :empty, this piece cannot move.
+          current_room = board[x]
+          amphipod     = current_room[y]
           board[(x - 1..x + 1).step(2)].any?(:empty) &&
             # y must have no other pieces with a lower index  [:empty, :empty, :D, :A] the :D can move
-            (y.zero? || board[x][..y - 1].all?(:empty)) &&
+            (y.zero? || current_room[..y - 1].all?(:empty)) &&
             # and must be in the wrong room OR
-            (RIGHT_ROOM[board[x][y]] != x ||
+            (RIGHT_ROOM[amphipod] != x ||
               # be followed by a different piece [:empty, :empty, :D, :A] the :D can move even if it is in the :D (x = 8) room
-              ((y < (board[x].length - 1)) && board[x][(y + 1..)].any? { |amphipod| amphipod != board[x][y] }))
+              ((y < (current_room.length - 1)) && current_room[(y + 1..)].any? { |denizen| denizen != amphipod }))
         in Integer => x
           # puts "#{ x } => #{ board[x] }"
           # handle x in a hallway position
           # An amphipod in the hallway cannot move unless it has a clear shot to its room, and that room contains
           # no other type of amphipod.
-          right_room = RIGHT_ROOM[board[x]]
-          board[right_room].all? { |room_spot| [:empty, board[x]].include?(room_spot) } &&
+          amphipod   = board[x]
+          right_room = RIGHT_ROOM[amphipod]
+          board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
             clear_path_to?(right_room, x, board)
         else
           false

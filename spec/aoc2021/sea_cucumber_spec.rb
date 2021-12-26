@@ -372,7 +372,6 @@ RSpec.describe AoC2021::SeaCucumber do
             .>v.vv.v..
         CUCUMBERS
       end
-
     end
   end
 end
