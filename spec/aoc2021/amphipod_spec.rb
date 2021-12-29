@@ -302,125 +302,203 @@ RSpec.describe AoC2021::Amphipod do
 
       it "finds [6, 0] -> 3 among the possible next moves" do
         expect(AoC2021::Amphipod.next_moves(subject.board))
-          .to include [[:empty, :empty,
-                       %i[B A],
-                       :B,
-                       %i[C D],
-                       :empty,
-                       %i[empty C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 40]
+          .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 40]
+            #############
+            #...B.......#
+            ###B#C#.#D###
+              #A#D#C#A#
+              #########
+        BOARD
       end
     end
 
     context "from the second configuration" do
-      subject { AoC2021::Amphipod.new "" }
+      subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+        #############
+        #...B.......#
+        ###B#C#.#D###
+          #A#D#C#A#
+          #########
+      BOARD
 
       it "finds [4, 0] -> [6, 0] among the possible next moves" do
-        expect(AoC2021::Amphipod.next_moves([[:empty, :empty,
-                       %i[B A],
-                       :B,
-                       %i[C D],
-                       :empty,
-                       %i[empty C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 0]))
-          .to include [[:empty, :empty,
-                       %i[B A],
-                       :B,
-                       %i[empty D],
-                       :empty,
-                       %i[C C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 400]
+        expect(AoC2021::Amphipod.next_moves(subject.board))
+          .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 400]
+            #############
+            #...B.......#
+            ###B#.#C#D###
+              #A#D#C#A#
+              #########
+        BOARD
       end
     end
 
     context "from the third configuration" do
-      subject { AoC2021::Amphipod.new "" }
+      subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+        #############
+        #...B.......#
+        ###B#.#C#D###
+          #A#D#C#A#
+          #########
+      BOARD
 
       it "finds [4, 1] -> 5 among the possible next moves" do
-        expect(AoC2021::Amphipod.next_moves([[:empty, :empty,
-                       %i[B A],
-                       :B,
-                       %i[empty D],
-                       :empty,
-                       %i[C C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 0]))
-          .to include [[:empty, :empty,
-                       %i[B A],
-                       :B,
-                       %i[empty empty],
-                       :D,
-                       %i[C C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 3000]
+        expect(AoC2021::Amphipod.next_moves(subject.board))
+          .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 3000]
+            #############
+            #...B.D.....#
+            ###B#.#C#D###
+              #A#.#C#A#
+              #########
+        BOARD
       end
     end
 
     context "from the third-A configuration" do
-      subject { AoC2021::Amphipod.new "" }
+      subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+        #############
+        #...B.D.....#
+        ###B#.#C#D###
+          #A#.#C#A#
+          #########
+      BOARD
 
       it "finds 3 -> [4, 1] among the possible next moves" do
-        expect(AoC2021::Amphipod.next_moves([[:empty, :empty,
-                       %i[B A],
-                       :B,
-                       %i[empty empty],
-                       :D,
-                       %i[C C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 0]))
-          .to include [[:empty, :empty,
-                       %i[B A],
-                       :empty,
-                       %i[empty B],
-                       :D,
-                       %i[C C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 30]
+        expect(AoC2021::Amphipod.next_moves(subject.board))
+          .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 30]
+            #############
+            #.....D.....#
+            ###B#.#C#D###
+              #A#B#C#A#
+              #########
+        BOARD
       end
     end
 
     context "from the fourth configuration" do
-      subject { AoC2021::Amphipod.new "" }
+      subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+        #############
+        #.....D.....#
+        ###B#.#C#D###
+          #A#B#C#A#
+          #########
+      BOARD
 
-      it "finds 3 -> [4, 1] among the possible next moves" do
-        expect(AoC2021::Amphipod.next_moves([[:empty, :empty,
-                       %i[B A],
-                       :empty,
-                       %i[empty B],
-                       :D,
-                       %i[C C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 0]))
-          .to include [[:empty, :empty,
-                       %i[empty A],
-                       :empty,
-                       %i[B B],
-                       :D,
-                       %i[C C],
-                       :empty,
-                       %i[D A],
-                       :empty,
-                       :empty], 40]
+      it "finds [2, 0] -> [4, 0] among the possible next moves" do
+        expect(AoC2021::Amphipod.next_moves(subject.board))
+          .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 40]
+            #############
+            #.....D.....#
+            ###.#B#C#D###
+              #A#B#C#A#
+              #########
+        BOARD
       end
+    end
+
+    context "from the fifth configuration" do
+      subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+        #############
+        #.....D.....#
+        ###.#B#C#D###
+          #A#B#C#A#
+          #########
+      BOARD
+
+      it "finds [8, 0] -> 7 among the possible next moves" do
+        expect(AoC2021::Amphipod.next_moves(subject.board))
+          .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 2000]
+            #############
+            #.....D.D...#
+            ###.#B#C#.###
+              #A#B#C#A#
+              #########
+        BOARD
+      end
+    end
+
+    context "from the fifth-A configuration" do
+      subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+        #############
+        #.....D.D...#
+        ###.#B#C#.###
+          #A#B#C#A#
+          #########
+      BOARD
+
+      it "finds [8, 1] -> 9 among the possible next moves" do
+        expect(AoC2021::Amphipod.next_moves(subject.board))
+          .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 3]
+            #############
+            #.....D.D.A.#
+            ###.#B#C#.###
+              #A#B#C#.#
+              #########
+        BOARD
+      end
+    end
+  end
+
+  context "from the sixth configuration" do
+    subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+      #############
+      #.....D.D.A.#
+      ###.#B#C#.###
+        #A#B#C#.#
+        #########
+    BOARD
+
+    it "finds [8, 1] -> 9 among the possible next moves" do
+      expect(AoC2021::Amphipod.next_moves(subject.board))
+        .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 3000]
+          #############
+          #.....D...A.#
+          ###.#B#C#.###
+            #A#B#C#D#
+            #########
+      BOARD
+    end
+  end
+
+  context "from the sixth-A configuration" do
+    subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+      #############
+      #.....D...A.#
+      ###.#B#C#.###
+        #A#B#C#D#
+        #########
+    BOARD
+
+    it "finds [8, 1] -> 9 among the possible next moves" do
+      expect(AoC2021::Amphipod.next_moves(subject.board))
+        .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 4000]
+          #############
+          #.........A.#
+          ###.#B#C#D###
+            #A#B#C#D#
+            #########
+      BOARD
+    end
+  end
+
+  context "from the seventh configuration" do
+    subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+      #############
+      #.........A.#
+      ###.#B#C#D###
+        #A#B#C#D#
+        #########
+    BOARD
+
+    it "finds [8, 1] -> 9 among the possible next moves" do
+      expect(AoC2021::Amphipod.next_moves(subject.board))
+        .to include [AoC2021::Amphipod.new(StringIO.new(<<~BOARD)).board[0], 8]
+          #############
+          #...........#
+          ###A#B#C#D###
+            #A#B#C#D#
+            #########
+      BOARD
     end
   end
 
@@ -658,16 +736,33 @@ RSpec.describe AoC2021::Amphipod do
   end
 
   describe "#play_game" do
-    subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
-      #############
-      #...........#
-      ###A#D#A#B###
-        #B#C#D#C#
-        #########
-    BOARD
+    context "with my actual input" do
+      subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+        #############
+        #...........#
+        ###A#D#A#B###
+          #B#C#D#C#
+          #########
+      BOARD
 
-    it "finds a least score of 12521 energy" do
-    #  expect(subject.play_game).to eq 12_521
+      it "finds a least score of 13455 energy" do
+         expect(subject.play_game).to eq 13_455
+      end
+    end
+
+    context "with the example input" do
+      subject { AoC2021::Amphipod.new StringIO.new(<<~BOARD) }
+        #############
+        #.B.........#
+        ###.#C#B#D###
+          #A#D#C#A#
+          #########
+      BOARD
+
+      it "finds a least score of 12521 energy" do
+        subject
+        expect(subject.play_game).to eq 12_521
+      end
     end
   end
 end

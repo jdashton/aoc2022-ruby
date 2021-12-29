@@ -11,25 +11,35 @@ module AoC2021
       # puts "Day 23, part B: #{ amphipod.least_energy_unfolded }  is the least energy required to organize all the amphipods."
       puts
     end
-    
+
     attr_reader :board
 
     def initialize(file)
       lines = file.readlines(chomp: true)
       board = Array.new(11)
-      HALL_SPOTS.each { |spot| board[spot] = :empty }
+      /#([A-D.])([A-D.])\.([A-D.])\.([A-D.])\.([A-D.])\.([A-D.])([A-D.])#/.match(lines[1]) do |md|
+        board[0]  = md[1].to_sym
+        board[1]  = md[2].to_sym
+        board[3]  = md[3].to_sym
+        board[5]  = md[4].to_sym
+        board[7]  = md[5].to_sym
+        board[9]  = md[6].to_sym
+        board[10] = md[7].to_sym
+      end
+      HALL_SPOTS.each { |spot| board[spot] = :empty if board[spot] == :"." }
       ROOMS.each { |room_num| board[room_num] = [] }
       (0..1).each do |room_spot|
-        /#+([A-D])#([A-D])#([A-D])#([A-D])#+/.match(lines[room_spot + 2]) do |md|
-          board[2][room_spot] = md[1].to_sym
-          board[4][room_spot] = md[2].to_sym
-          board[6][room_spot] = md[3].to_sym
-          board[8][room_spot] = md[4].to_sym
+        /#+([A-D.])#([A-D.])#([A-D.])#([A-D.])#+/.match(lines[room_spot + 2]) do |md|
+          board[2][room_spot] = (md[1].to_sym in AMPHIPODS) ? md[1].to_sym : :empty
+          board[4][room_spot] = (md[2].to_sym in AMPHIPODS) ? md[2].to_sym : :empty
+          board[6][room_spot] = (md[3].to_sym in AMPHIPODS) ? md[3].to_sym : :empty
+          board[8][room_spot] = (md[4].to_sym in AMPHIPODS) ? md[4].to_sym : :empty
         end
       end
       @board     = [board, 0]
       @low_score = Float::INFINITY
-      @queue = PriorityQueue.new
+      @queue     = PriorityQueue.new
+      pp @board
     end
 
     def least_energy = 13_455
@@ -49,7 +59,7 @@ module AoC2021
       pp next_board
 
       if Amphipod.final_state?(next_board)
-        puts "final state: #{ @low_score = score }"
+        puts "final state: #{ @low_score = next_board[1] }"
         return @low_score
       else
         play_game(next_board)
