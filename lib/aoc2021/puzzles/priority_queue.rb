@@ -29,6 +29,7 @@ module AoC2021
 
     def +(collection)
       collection.each { |item| self << item }
+      self
     end
   end
 end

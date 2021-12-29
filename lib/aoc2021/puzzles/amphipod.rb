@@ -11,6 +11,8 @@ module AoC2021
       # puts "Day 23, part B: #{ amphipod.least_energy_unfolded }  is the least energy required to organize all the amphipods."
       puts
     end
+    
+    attr_reader :board
 
     def initialize(file)
       lines = file.readlines(chomp: true)
@@ -27,23 +29,31 @@ module AoC2021
       end
       @board     = [board, 0]
       @low_score = Float::INFINITY
+      @queue = PriorityQueue.new
     end
 
     def least_energy = 13_455
 
     def play_game(board = @board)
-      return if board[1] >= @low_score
+      return unless board
+      # return if board[1] >= @low_score
 
-      Amphipod.next_moves(board).each do |next_board|
-        next if (score = next_board[1]) >= @low_score
+      @queue += Amphipod.next_moves(board)
 
-        if Amphipod.final_state?(next_board)
-          puts "final state: #{ @low_score = score }"
-        else
-          play_game(next_board)
-        end
+      unless (next_board = @queue.next)
+        puts "Ran out of boards to try"
+        return
       end
-      @low_score
+
+      print "Considering board "
+      pp next_board
+
+      if Amphipod.final_state?(next_board)
+        puts "final state: #{ @low_score = score }"
+        return @low_score
+      else
+        play_game(next_board)
+      end
     end
 
     def self.distance(x, room, y)
