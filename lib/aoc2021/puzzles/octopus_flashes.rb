@@ -42,7 +42,7 @@ module AoC2021
 
         # Find if any cells are non-zero.
         def any_positive?
-          @row.reject(&:nil?).any?(&:positive?)
+          @row.compact.any?(&:positive?)
         end
 
         def increase_row_by_one

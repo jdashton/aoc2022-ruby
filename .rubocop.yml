@@ -37,6 +37,10 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*
 
+Naming/BlockForwarding:
+  Exclude:
+    - lib/aoc2021/puzzles/vents.rb
+
 Naming/MethodParameterName:
   AllowedNames:
     - i

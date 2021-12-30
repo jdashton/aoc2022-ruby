@@ -1,9 +1,11 @@
-
+# frozen_string_literal: true
 
 module AoC2021
+  # This priority queue is based on a sparse array with sets in each
+  # populated bucket.
   class PriorityQueue
     def initialize
-      @queue = []
+      @queue    = []
       @low_item = Float::INFINITY
     end
 
@@ -11,7 +13,7 @@ module AoC2021
       return nil if @low_item == Float::INFINITY
 
       while @low_item < @queue.length
-        @queue[@low_item] = nil if @queue[@low_item]&.empty?
+        @queue[@low_item] = nil if @queue[@low_item] && @queue[@low_item].empty?
         next @low_item += 1 unless @queue[@low_item]
 
         item = @queue[@low_item].first
@@ -20,16 +22,13 @@ module AoC2021
       end
     end
 
+    # `item` must respond to the `score` method call.
     def <<(item)
-      weight = item[1]
-      @queue[weight] ||= Set[]
-      @queue[weight] << item
-      @low_item = [@low_item, weight].min
-    end
+      raise "nil priority" unless (priority = item.score)
 
-    def +(collection)
-      collection.each { |item| self << item }
-      self
+      @queue[priority] ||= Set[]
+      @queue[priority] << item
+      @low_item = [@low_item, priority].min
     end
   end
 end
