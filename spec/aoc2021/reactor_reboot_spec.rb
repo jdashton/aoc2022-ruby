@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe AoC2021::ReactorReboot do
-  before do
-    # Do nothing
-  end
-
-  after do
-    # Do nothing
-  end
-
   describe "::rectify" do
     it "keeps values within 0..100 and adds +50" do
       expect(AoC2021::ReactorReboot.rectify(0)).to eq 50

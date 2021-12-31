@@ -38,13 +38,13 @@ module AoC2021
           # print "Considering board "
           # pp next_board
           count += 1
-          puts "#{ count }...#{ next_move.score }" if count % 10000 == 0
+          puts "#{ count }...#{ next_move.score }" if (count % 10_000).zero?
 
-          if next_move.final_state?
-            puts "final state: #{ score = next_move.score } after #{ count } moves"
-            next_move.print_history
-            return score
-          end
+          next unless next_move.final_state?
+
+          puts "final state: #{ score = next_move.score } after #{ count } moves"
+          next_move.print_history
+          return score
         end
       end
 
@@ -108,7 +108,7 @@ module AoC2021
         amphipod   = @board[old_room][old_room_spot]
         right_room = RIGHT_ROOM[amphipod]
         return [] unless @board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
-          clear_path_to?(right_room, old_room)
+                         clear_path_to?(right_room, old_room)
 
         new_board                            = @board.map(&:clone)
         new_room_spot                        = @board[right_room].rindex(:empty)
@@ -209,10 +209,10 @@ module AoC2021
       ROOMS.each { |room_num| @board[room_num] = [] }
       (0..3).each do |room_spot|
         /#+([A-D.])#([A-D.])#([A-D.])#([A-D.])#+/.match(lines[room_spot + 2]) do |md|
-          @board[2][room_spot] = AMPHIPODS.include?(md[1].to_sym) ? md[1].to_sym : :empty
-          @board[4][room_spot] = AMPHIPODS.include?(md[2].to_sym) ? md[2].to_sym : :empty
-          @board[6][room_spot] = AMPHIPODS.include?(md[3].to_sym) ? md[3].to_sym : :empty
-          @board[8][room_spot] = AMPHIPODS.include?(md[4].to_sym) ? md[4].to_sym : :empty
+          @board[2][room_spot] = (md[1].to_sym in AMPHIPODS) ? md[1].to_sym : :empty
+          @board[4][room_spot] = (md[2].to_sym in AMPHIPODS) ? md[2].to_sym : :empty
+          @board[6][room_spot] = (md[3].to_sym in AMPHIPODS) ? md[3].to_sym : :empty
+          @board[8][room_spot] = (md[4].to_sym in AMPHIPODS) ? md[4].to_sym : :empty
         end
       end
       # @board     = [board, 0]

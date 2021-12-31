@@ -38,9 +38,9 @@ module AoC2021
       search_heightmap([]) { |_, x_idx, y_idx| [[nil, x_idx, y_idx]] }
     end
 
-    def search_heightmap(init_val, &)
+    def search_heightmap(init_val, &block)
       @heightmap.each_with_index.reduce(init_val) do |acc, (line, y_index)|
-        acc + search_row(init_val, line, y_index, &)
+        acc + search_row(init_val, line, y_index, &block)
       end
     end
 

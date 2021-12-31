@@ -38,8 +38,7 @@ Metrics/BlockLength:
     - spec/**/*
 
 Naming/BlockForwarding:
-  Exclude:
-    - lib/aoc2021/puzzles/vents.rb
+  EnforcedStyle: explicit
 
 Naming/MethodParameterName:
   AllowedNames:
@@ -69,3 +68,6 @@ Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
 
+Style/TernaryParentheses:
+  Exclude:
+    - lib/aoc2021/puzzles/amphipod.rb
