@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "aoc2021/puzzles/trick_shot"
-
 RSpec.describe AoC2021::BeaconScanner do
   before do
     # Do nothing
