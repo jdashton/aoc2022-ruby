@@ -8,6 +8,13 @@ module AoC2021
     extend Forwardable
     # def_instance_delegators "self.class", :y_step, :gauss
 
+    def self.day19
+      beacon_scanner = File.open("input/day19a.txt") { |file| BeaconScanner.new file }
+      puts "Day 19, part A: #{ beacon_scanner.num_probes } unique probes visible to these scanners"
+      # puts "Day 19, part B: #{snailfish.permutations} is the largest magnitude of any sum of two different snailfish numbers."
+      puts
+    end
+
     # Encapsulates operations on probes seen by a scanner
     class Scanner
       attr_reader :id, :probes
@@ -31,11 +38,23 @@ module AoC2021
       end
     end
 
-    def self.day19
-      beacon_scanner = File.open("input/day19a.txt") { |file| BeaconScanner.new file }
-      puts "Day 19, part A: #{ beacon_scanner.num_probes } unique probes visible to these scanners"
-      # puts "Day 19, part B: #{snailfish.permutations} is the largest magnitude of any sum of two different snailfish numbers."
-      puts
+    #Encapsultes operations on points
+    class Point
+      attr_reader :x, :y, :z
+
+      def initialize(x, y, z)
+        @x = x
+        @y = y
+        @z = z
+      end
+
+      def sorted_manhattan_distance(other_point)
+        # puts "Distance from #{ pt1 } to #{ pt2 }"
+        # delta_vector =
+        [(@x - other_point.x).abs, (@y - other_point.y).abs, (@z - other_point.z).abs].sort
+        # pp delta_vector
+        # Math.sqrt((delta_vector[0]**2) + (delta_vector[1]**2) + (delta_vector[2]**2))
+      end
     end
 
     attr_reader :scanners
@@ -53,13 +72,6 @@ module AoC2021
       # pp @scanners
     end
 
-    def num_probes = 79
-
-    def distance(pt1, pt2)
-      # puts "Distance from #{ pt1 } to #{ pt2 }"
-      delta_vector = [pt1[0] - pt2[0], pt1[1] - pt2[1], pt1[2] - pt2[2]]
-      # pp delta_vector
-      Math.sqrt((delta_vector[0]**2) + (delta_vector[1]**2) + (delta_vector[2]**2))
-    end
+    def num_probes = 0
   end
 end

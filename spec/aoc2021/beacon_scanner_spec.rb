@@ -1,17 +1,24 @@
 # frozen_string_literal: true
 
-RSpec.describe AoC2021::BeaconScanner do
-  before do
-    # Do nothing
-  end
+include AoC2021
 
-  after do
-    # Do nothing
-  end
+RSpec.describe BeaconScanner::Point do
+  describe "#distance" do
+    subject { BeaconScanner::Point.new(-618, -824, -621) }
 
+    let(:other) { BeaconScanner::Point.new(-537, -823, -458) }
+
+    it "finds the same distance when calculated in either direction" do
+      expect(subject.sorted_manhattan_distance(other))
+        .to eq other.sorted_manhattan_distance(subject)
+    end
+  end
+end
+
+RSpec.describe BeaconScanner do
   describe "#num_probes" do
     context "with two numbers" do
-      subject { AoC2021::BeaconScanner.new StringIO.new(<<~NUMBERS) }
+      subject { BeaconScanner.new StringIO.new(<<~NUMBERS) }
         [9,1]
       NUMBERS
 
@@ -21,15 +28,8 @@ RSpec.describe AoC2021::BeaconScanner do
     end
   end
 
-  describe "#distance" do
-    it "finds the same distance when calculated in either direction" do
-      expect(subject.distance([-618, -824, -621],
-                              [-537, -823, -458])).to eq subject.distance([-537, -823, -458], [-618, -824, -621])
-    end
-  end
-
   describe "#initialize" do
-    subject { AoC2021::BeaconScanner.new StringIO.new(<<~PROBES) }
+    subject { BeaconScanner.new StringIO.new(<<~PROBES) }
       --- scanner 0 ---
       404,-588,-901
       528,-643,409
@@ -50,7 +50,7 @@ RSpec.describe AoC2021::BeaconScanner do
   end
 
   context "with the example report" do
-    subject { AoC2021::BeaconScanner.new StringIO.new(<<~PROBES) }
+    subject { BeaconScanner.new StringIO.new(<<~PROBES) }
       --- scanner 0 ---
       404,-588,-901
       528,-643,409

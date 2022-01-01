@@ -90,12 +90,8 @@ module AoC2021
         acc << [c1s, c1x, (c2y.end + 1)..c1y.end, c1z]
         c1y = c1y.begin..c2y.end
       end
-      if c1z.begin < c2z.begin
-        acc << [c1s, c1x, c1y, c1z.begin..(c2z.begin - 1)]
-      end
-      if c1z.end > c2z.end
-        acc << [c1s, c1x, c1y, (c2z.end + 1)..c1z.end]
-      end
+      acc << [c1s, c1x, c1y, c1z.begin..(c2z.begin - 1)] if c1z.begin < c2z.begin
+      acc << [c1s, c1x, c1y, (c2z.end + 1)..c1z.end] if c1z.end > c2z.end
       acc
     end
 
