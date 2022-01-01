@@ -8,8 +8,7 @@ module AoC2021
     def self.day22
       reactor_reboot = File.open("input/day22a.txt") { |file| ReactorReboot.new file }
       puts "Day 22, part A: #{ reactor_reboot.count_true } cubes are on."
-      # puts "Day 22, part B: Player 1: #{ (wins = reactor_reboot.dirac_to_score(3))[0] } universes,
-      # Player 2: #{ wins[1] } universes"
+      # puts "Day 22, part B: #{ reactor_reboot.process_volumes } cubes are on."
       puts
     end
 
@@ -24,7 +23,11 @@ module AoC2021
     end
 
     def process_volumes
-      @raw_steps.each(&method(:process_one_cube))
+      # puts "raw_steps:"
+      # pp @raw_steps.reverse
+      # puts
+
+      @raw_steps.reverse.each(&method(:process_one_cube))
       cube_volume
     end
 
@@ -53,39 +56,71 @@ module AoC2021
     private
 
     def cube_volume
-      @cubes.reduce(0) do |acc, (x_range, y_range, z_range)|
-        acc + ((x_range.max - x_range.min + 1) * (y_range.max - y_range.min + 1) * (z_range.max - z_range.min + 1))
+      @cubes.reduce(0) do |acc, (state, x_range, y_range, z_range)|
+        next acc if state == :off
+
+        acc + ((x_range.end - x_range.begin + 1) * (y_range.end - y_range.begin + 1) * (z_range.end - z_range.begin + 1))
       end
     end
 
-    def overlaps?((c1x, c1y, c1z), (c2x, c2y, c2z))
-      puts "#{ [c1x, c1y, c1z] }, #{ [c2x, c2y, c2z] }"
-      Set[*c1x].intersect?(Set[*c2x]) && Set[*c1y].intersect?(Set[*c2y]) && Set[*c1z].intersect?(Set[*c2z])
+    def self.overlaps?((_c1state, c1x, c1y, c1z), (_c2state, c2x, c2y, c2z))
+      # puts "#{ [c1x, c1y, c1z] }, #{ [c2x, c2y, c2z] }"
+      (c1x.cover?(c2x.begin) || c1x.cover?(c2x.end) || c2x.cover?(c1x.begin) || c2x.cover?(c1x.end)) &&
+        (c1y.cover?(c2y.begin) || c1y.cover?(c2y.end) || c2y.cover?(c1y.begin) || c2y.cover?(c1y.end)) &&
+        (c1z.cover?(c2z.begin) || c1z.cover?(c2z.end) || c2z.cover?(c1z.begin) || c2z.cover?(c1z.end))
+      # Set[*c1x].intersect?(Set[*c2x]) && Set[*c1y].intersect?(Set[*c2y]) && Set[*c1z].intersect?(Set[*c2z])
     end
 
-    def split(cube1, _cube2)
-      puts "Need to split #{ cube1 }"
-      [cube1]
+    def self.split((c1s, c1x, c1y, c1z), (_, c2x, c2y, c2z))
+      # puts "Need to split #{ cube1 } around #{ cube2 }"
+      acc = []
+      if c1x.begin < c2x.begin
+        acc << [c1s, c1x.begin..(c2x.begin - 1), c1y, c1z]
+        c1x = c2x.begin..c1x.end
+      end
+      if c1x.end > c2x.end
+        acc << [c1s, (c2x.end + 1)..c1x.end, c1y, c1z]
+        c1x = c1x.begin..c2x.end
+      end
+      if c1y.begin < c2y.begin
+        acc << [c1s, c1x, c1y.begin..(c2y.begin - 1), c1z]
+        c1y = c2y.begin..c1y.end
+      end
+      if c1y.end > c2y.end
+        acc << [c1s, c1x, (c2y.end + 1)..c1y.end, c1z]
+        c1y = c1y.begin..c2y.end
+      end
+      if c1z.begin < c2z.begin
+        acc << [c1s, c1x, c1y, c1z.begin..(c2z.begin - 1)]
+      end
+      if c1z.end > c2z.end
+        acc << [c1s, c1x, c1y, (c2z.end + 1)..c1z.end]
+      end
+      acc
     end
 
     def detect_and_split(potential, cube)
       potential.reduce([]) do |acc, pcube|
-        if overlaps?(pcube, cube)
-          acc + split(pcube, cube)
+        if self.class.overlaps?(pcube, cube)
+          acc + self.class.split(pcube, cube)
         else
           acc << pcube
         end
       end
     end
 
-    def process_one_cube((power, x_range, y_range, z_range))
-      return unless power == :on
+    def process_one_cube(new_cube)
+      # puts " .. Processing #{ new_cube }"
 
-      potential = [[x_range, y_range, z_range]]
+      potential = [new_cube]
       @cubes.each do |cube|
         potential = detect_and_split(potential, cube)
       end
       @cubes += potential
+
+      # print "Cubes: "
+      # pp @cubes
+      # puts
     end
 
     def run_step(step) = step[3].each { |page_num| mark_page page_num, step }

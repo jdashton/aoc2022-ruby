@@ -7,7 +7,7 @@ module AoC2021
   class Amphipod
     def self.day23
       amphipod = File.open("input/day23a.txt") { |file| Amphipod.new file }
-      puts "Day 23, part A: #{ amphipod.play_game } is the least energy required to organize the amphipods."
+      # puts "Day 23, part A: #{ Move.new(amphipod.board).play_game(PriorityQueue.new) } is the least energy required to organize the amphipods."
       # puts "Day 23, part B: #{ amphipod.least_energy_unfolded }  is the least energy required to organize all the amphipods."
       puts
     end
@@ -108,7 +108,7 @@ module AoC2021
         amphipod   = @board[old_room][old_room_spot]
         right_room = RIGHT_ROOM[amphipod]
         return [] unless @board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
-                         clear_path_to?(right_room, old_room)
+          clear_path_to?(right_room, old_room)
 
         new_board                            = @board.map(&:clone)
         new_room_spot                        = @board[right_room].rindex(:empty)
