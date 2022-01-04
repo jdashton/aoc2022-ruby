@@ -7,37 +7,40 @@ module AoC2021
   # Resolves positions of scanners and probes
   class BeaconScanner
     def self.day19
-      beacon_scanner = File.open("input/day19a.txt") { |file| BeaconScanner.new file }
-      beacon_scanner.merge_all
-      puts "Day 19, part A: #{ beacon_scanner.num_beacons } unique probes visible to these scanners"
+      beacon_scanner = File.open("input/day19a.txt") { |file| BeaconScanner.new file }.merge_all
+      puts "Day 19, part A: #{ beacon_scanner.num_beacons } unique beacons visible to these scanners"
       puts "Day 19, part B: #{ beacon_scanner.largest_distance } is the largest Manhattan distance between any two scanners."
       puts
     end
 
     # Encapsulates operations on probes seen by a scanner
     class Scanner
-      attr_reader :beacons, :distances, :pairs, :translation
+      attr_reader :distances
 
       NUMS = /(-?\d+),(-?\d+),(-?\d+)/
 
       def initialize(lines)
-        @beacons =
-          lines.reduce(Set[]) { |acc, line| NUMS.match(line) { |md| match_beacon acc, md } || acc }
-
-        @pairs =
-          @beacons.to_a.combination(2).reduce([], &method(:distance_and_pair)).to_h
-
+        @beacons        = lines.reduce(Set[]) { |acc, line| NUMS.match(line) { |md| match_beacon acc, md } || acc }
+        @pairs          = @beacons.to_a.combination(2).reduce([], &method(:distance_and_pair)).to_h
         @distances      = Set[*@pairs.keys]
         @intersections  = {}
         @common_beacons = {}
-        @translation    = Vector.zero(3)
+        @rotation       = @translation = nil # Matrix.diagonal(1, 1, 1), Vector.zero(3)
       end
 
+      def translation_data = [@rotation, @translation]
+
+      def beacons = @rotation && @translation ? @beacons.map(&method(:translate)) : @beacons
+
+      def pairs = @rotation && @translation ? @pairs.transform_values { |pair| pair.map { translate(_1) } } : @pairs
+
+      def translation = @translation || Vector.zero(3)
+
       def merge(other)
-        rot, trans = other.triangulate(self)
-        @beacons   += other.beacons.map { translate(_1, rot, trans) }
+        other.triangulate(self)
+        @beacons   += other.beacons
         @distances += other.distances
-        @pairs.merge!(other.pairs.transform_values { |pair| pair.map { translate(_1, rot, trans) } })
+        @pairs.merge!(other.pairs)
         @intersections = {}
       end
 
@@ -105,18 +108,19 @@ module AoC2021
         beacon_a, beacon_b = @pairs[distance]
         other_pair         = other.pair(distance).permutation(2)
 
-        [ROTATIONS.find do |rot|
+        @rotation = ROTATIONS.find do |rot|
           other_pair.any? do |other_a, other_b|
             trans = other_b - (rot * beacon_a)
             (rot * beacon_b) + trans == other_a && check_all_common_beacons(rot, (@translation = trans), other)
           end
-        end, @translation]
+        end
+        @rotation && @translation
       end
 
       private
 
-      def translate var1, rot, trans
-        var1.rectify(rot, trans)
+      def translate(beacon)
+        beacon.rectify(@rotation, @translation)
       end
 
       def match_beacon(acc, md)
@@ -164,6 +168,7 @@ module AoC2021
           @merged << @scanners.delete(some_scanner)
         end
       end
+      self
     end
 
     def largest_distance

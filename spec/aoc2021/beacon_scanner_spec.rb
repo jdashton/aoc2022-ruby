@@ -234,24 +234,24 @@ RSpec.describe BeaconScanner do
     end
 
     it "finds 68, -1246, -43 for the location of scanner 1" do
-      expect(subject.scanners[0].triangulate(subject.primary))
-        .to eq [Matrix[[-1, 0, 0], [0, 1, 0], [0, 0, -1]], Vector[68, -1246, -43]]
+      subject.scanners[0].triangulate(subject.primary)
+      expect(subject.scanners[0].translation_data).to eq [Matrix[[-1, 0, 0], [0, 1, 0], [0, 0, -1]], Vector[68, -1246, -43]]
     end
 
     it "finds -20, -1133, 1061 for the location of scanner 4" do
-      expect(subject.scanners[3].triangulate(subject.primary))
-        .to eq [Matrix[[0, -1, 0], [0, 0, -1], [1, 0, 0]], Vector[-20, -1133, 1061]]
+      subject.scanners[3].triangulate(subject.primary)
+      expect(subject.scanners[3].translation_data).to eq [Matrix[[0, -1, 0], [0, 0, -1], [1, 0, 0]], Vector[-20, -1133, 1061]]
     end
 
     it "finds 1105, -1205, 1229 for the location of scanner 2" do
-      expect(subject.scanners[1].triangulate(subject.primary))
-        .to eq [Matrix[[-1, 0, 0], [0, 0, 1], [0, 1, 0]], Vector[1105, -1205, 1229]]
+      subject.scanners[1].triangulate(subject.primary)
+      expect(subject.scanners[1].translation_data).to eq [Matrix[[-1, 0, 0], [0, 0, 1], [0, 1, 0]], Vector[1105, -1205, 1229]]
     end
 
     it "finds -92, -2380, -20 for the location of scanner 3" do
       subject.primary.merge(subject.scanners[0])
-      expect(subject.scanners[2].triangulate(subject.primary))
-        .to eq [Matrix[[-1, 0, 0], [0, 1, 0], [0, 0, -1]], Vector[-92, -2380, -20]]
+      subject.scanners[2].triangulate(subject.primary)
+      expect(subject.scanners[2].translation_data).to eq [Matrix[[-1, 0, 0], [0, 1, 0], [0, 0, -1]], Vector[-92, -2380, -20]]
     end
 
     it "assembles all beacons to a common map" do
@@ -343,6 +343,20 @@ RSpec.describe BeaconScanner do
     it "finds the largest distance is 3621" do
       subject.merge_all
       expect(subject.largest_distance).to eq 3621
+    end
+  end
+
+  context "with my actual input" do
+    subject { File.open("input/day19a.txt") { |file| BeaconScanner.new file } }
+
+    it "finds 400 unique beacons" do
+      subject.merge_all
+      expect(subject.num_beacons).to eq 400
+    end
+
+    it "finds 12,168 as the largest distance between scanners" do
+      subject.merge_all
+      expect(subject.largest_distance).to eq 12_168
     end
   end
 end
