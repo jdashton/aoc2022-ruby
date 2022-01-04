@@ -3,15 +3,15 @@
 require_relative "lib/aoc2021/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "AoC2021"
+  spec.name    = "AoC2021"
   spec.version = AoC2021::VERSION
   spec.authors = ["J. Daniel Ashton"]
-  spec.email = ["jdashton@ashtonfam.org"]
+  spec.email   = ["jdashton@ashtonfam.org"]
 
   spec.summary = "Solutions to the 2021 Advent of Code puzzles"
   # spec.description = "TODO: Write a longer description or delete this line."
   # spec.homepage = "TODO: Put your gem's website or public repo URL here."
-  spec.license = "MIT"
+  spec.license               = "MIT"
   spec.required_ruby_version = ">= 3.1"
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
@@ -27,8 +27,8 @@ Gem::Specification.new do |spec|
       (f == __FILE__) || f.match(%r{\A(?:(?:test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
     end
   end
-  spec.bindir = "exe"
-  spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
+  spec.bindir        = "exe"
+  spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   # Uncomment to register a new dependency of your gem

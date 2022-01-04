@@ -48,6 +48,7 @@ Naming/MethodParameterName:
     - x
     - y
     - z
+    - md
 
 Style/BlockDelimiters:
   EnforcedStyle: braces_for_chaining

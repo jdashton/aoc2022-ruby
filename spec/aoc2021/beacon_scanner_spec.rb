@@ -4,13 +4,13 @@ include AoC2021
 
 RSpec.describe BeaconScanner::Beacon do
   describe "#distance" do
-    subject { BeaconScanner::Beacon.new(-618, -824, -621) }
+    subject { BeaconScanner::Beacon[-618, -824, -621] }
 
-    let(:other) { BeaconScanner::Beacon.new(-537, -823, -458) }
+    let(:other) { BeaconScanner::Beacon[-537, -823, -458] }
 
     it "finds the same distance when calculated in either direction" do
-      expect(subject.sorted_manhattan_distance(other))
-        .to eq other.sorted_manhattan_distance(subject)
+      expect(subject.distance(other))
+        .to eq other.distance(subject)
     end
   end
 end
@@ -29,11 +29,9 @@ RSpec.describe BeaconScanner do
     PROBES
 
     it "parses input as expected" do
-      expect(subject.scanners.size).to eq 2
-      expect(subject.scanners[0].id).to eq 0
-      expect(subject.scanners[1].id).to eq 1
-      expect(subject.scanners[0].beacons.size).to eq 2
-      expect(subject.scanners[1].beacons.size).to eq 3
+      expect(subject.scanners.size).to eq 1
+      expect(subject.primary.beacons.size).to eq 2
+      expect(subject.scanners[0].beacons.size).to eq 3
     end
   end
 
@@ -183,78 +181,76 @@ RSpec.describe BeaconScanner do
     end
 
     it "parses input as expected" do
-      expect(subject.scanners.size).to eq 5
-      expect(subject.scanners[0].id).to eq 0
-      expect(subject.scanners[1].id).to eq 1
+      expect(subject.scanners.size).to eq 4
+      expect(subject.primary.beacons.size).to eq 25
       expect(subject.scanners[0].beacons.size).to eq 25
-      expect(subject.scanners[1].beacons.size).to eq 25
-      expect(subject.scanners[2].beacons.size).to eq 26
-      expect(subject.scanners[3].beacons.size).to eq 25
-      expect(subject.scanners[4].beacons.size).to eq 26
+      expect(subject.scanners[1].beacons.size).to eq 26
+      expect(subject.scanners[2].beacons.size).to eq 25
+      expect(subject.scanners[3].beacons.size).to eq 26
     end
 
     it "sees common beacons between a scanner and itself (identity)" do
-      expect(subject.scanners.first.common(subject.scanners.first)).to be true
+      expect(subject.primary.common(subject.primary)).to be true
     end
 
     it "finds common beacons between S0 and S1" do
-      expect(subject.scanners.first.common(subject.scanners[1])).to be true
+      expect(subject.primary.common(subject.scanners[0])).to be true
     end
 
     it "finds the pairs of beacons common to S0 and S1" do
-      expect(subject.scanners[1].common_beacons(subject.scanners.first))
+      expect(subject.scanners[0].common_beacons(subject.primary))
         .to eq Set[
-                 BeaconScanner::Beacon.new(686, 422, 578),
-                 BeaconScanner::Beacon.new(605, 423, 415),
-                 BeaconScanner::Beacon.new(515, 917, -361),
-                 BeaconScanner::Beacon.new(-336, 658, 858),
-                 BeaconScanner::Beacon.new(-476, 619, 847),
-                 BeaconScanner::Beacon.new(-460, 603, -452),
-                 BeaconScanner::Beacon.new(729, 430, 532),
-                 BeaconScanner::Beacon.new(-322, 571, 750),
-                 BeaconScanner::Beacon.new(-355, 545, -477),
-                 BeaconScanner::Beacon.new(413, 935, -424),
-                 BeaconScanner::Beacon.new(-391, 539, -444),
-                 BeaconScanner::Beacon.new(553, 889, -390)
+                 BeaconScanner::Beacon[686, 422, 578],
+                 BeaconScanner::Beacon[605, 423, 415],
+                 BeaconScanner::Beacon[515, 917, -361],
+                 BeaconScanner::Beacon[-336, 658, 858],
+                 BeaconScanner::Beacon[-476, 619, 847],
+                 BeaconScanner::Beacon[-460, 603, -452],
+                 BeaconScanner::Beacon[729, 430, 532],
+                 BeaconScanner::Beacon[-322, 571, 750],
+                 BeaconScanner::Beacon[-355, 545, -477],
+                 BeaconScanner::Beacon[413, 935, -424],
+                 BeaconScanner::Beacon[-391, 539, -444],
+                 BeaconScanner::Beacon[553, 889, -390]
                ]
     end
 
     it "finds the pairs of beacons common to S1 and S0" do
-      expect(subject.scanners.first.common_beacons(subject.scanners[1]))
+      expect(subject.primary.common_beacons(subject.scanners[0]))
         .to eq Set[
-                 BeaconScanner::Beacon.new(-618, -824, -621),
-                 BeaconScanner::Beacon.new(-537, -823, -458),
-                 BeaconScanner::Beacon.new(-447, -329, 318),
-                 BeaconScanner::Beacon.new(404, -588, -901),
-                 BeaconScanner::Beacon.new(544, -627, -890),
-                 BeaconScanner::Beacon.new(528, -643, 409),
-                 BeaconScanner::Beacon.new(-661, -816, -575),
-                 BeaconScanner::Beacon.new(390, -675, -793),
-                 BeaconScanner::Beacon.new(423, -701, 434),
-                 BeaconScanner::Beacon.new(-345, -311, 381),
-                 BeaconScanner::Beacon.new(459, -707, 401),
-                 BeaconScanner::Beacon.new(-485, -357, 347)
+                 BeaconScanner::Beacon[-618, -824, -621],
+                 BeaconScanner::Beacon[-537, -823, -458],
+                 BeaconScanner::Beacon[-447, -329, 318],
+                 BeaconScanner::Beacon[404, -588, -901],
+                 BeaconScanner::Beacon[544, -627, -890],
+                 BeaconScanner::Beacon[528, -643, 409],
+                 BeaconScanner::Beacon[-661, -816, -575],
+                 BeaconScanner::Beacon[390, -675, -793],
+                 BeaconScanner::Beacon[423, -701, 434],
+                 BeaconScanner::Beacon[-345, -311, 381],
+                 BeaconScanner::Beacon[459, -707, 401],
+                 BeaconScanner::Beacon[-485, -357, 347]
                ]
     end
 
     it "finds 68, -1246, -43 for the location of scanner 1" do
-      expect(subject.scanners[1].triangulate(subject.scanners.first))
+      expect(subject.scanners[0].triangulate(subject.primary))
         .to eq [Matrix[[-1, 0, 0], [0, 1, 0], [0, 0, -1]], Vector[68, -1246, -43]]
     end
 
     it "finds -20, -1133, 1061 for the location of scanner 4" do
-      expect(subject.scanners[4].triangulate(subject.scanners.first))
+      expect(subject.scanners[3].triangulate(subject.primary))
         .to eq [Matrix[[0, -1, 0], [0, 0, -1], [1, 0, 0]], Vector[-20, -1133, 1061]]
     end
 
     it "finds 1105, -1205, 1229 for the location of scanner 2" do
-      expect(subject.scanners[2].triangulate(subject.scanners.first))
+      expect(subject.scanners[1].triangulate(subject.primary))
         .to eq [Matrix[[-1, 0, 0], [0, 0, 1], [0, 1, 0]], Vector[1105, -1205, 1229]]
     end
 
     it "finds -92, -2380, -20 for the location of scanner 3" do
-      subject.scanners.first.merge(subject.scanners[1])
-      expect(subject.scanners[3].triangulate(subject.scanners[0]))
+      subject.primary.merge(subject.scanners[0])
+      expect(subject.scanners[2].triangulate(subject.primary))
         .to eq [Matrix[[-1, 0, 0], [0, 1, 0], [0, 0, -1]], Vector[-92, -2380, -20]]
     end
 
@@ -262,85 +258,85 @@ RSpec.describe BeaconScanner do
       subject.merge_all
       expect(subject.full_map)
         .to eq Set[
-                 BeaconScanner::Beacon.new(-892, 524, 684),
-                 BeaconScanner::Beacon.new(-876, 649, 763),
-                 BeaconScanner::Beacon.new(-838, 591, 734),
-                 BeaconScanner::Beacon.new(-789, 900, -551),
-                 BeaconScanner::Beacon.new(-739, -1745, 668),
-                 BeaconScanner::Beacon.new(-706, -3180, -659),
-                 BeaconScanner::Beacon.new(-697, -3072, -689),
-                 BeaconScanner::Beacon.new(-689, 845, -530),
-                 BeaconScanner::Beacon.new(-687, -1600, 576),
-                 BeaconScanner::Beacon.new(-661, -816, -575),
-                 BeaconScanner::Beacon.new(-654, -3158, -753),
-                 BeaconScanner::Beacon.new(-635, -1737, 486),
-                 BeaconScanner::Beacon.new(-631, -672, 1502),
-                 BeaconScanner::Beacon.new(-624, -1620, 1868),
-                 BeaconScanner::Beacon.new(-620, -3212, 371),
-                 BeaconScanner::Beacon.new(-618, -824, -621),
-                 BeaconScanner::Beacon.new(-612, -1695, 1788),
-                 BeaconScanner::Beacon.new(-601, -1648, -643),
-                 BeaconScanner::Beacon.new(-584, 868, -557),
-                 BeaconScanner::Beacon.new(-537, -823, -458),
-                 BeaconScanner::Beacon.new(-532, -1715, 1894),
-                 BeaconScanner::Beacon.new(-518, -1681, -600),
-                 BeaconScanner::Beacon.new(-499, -1607, -770),
-                 BeaconScanner::Beacon.new(-485, -357, 347),
-                 BeaconScanner::Beacon.new(-470, -3283, 303),
-                 BeaconScanner::Beacon.new(-456, -621, 1527),
-                 BeaconScanner::Beacon.new(-447, -329, 318),
-                 BeaconScanner::Beacon.new(-430, -3130, 366),
-                 BeaconScanner::Beacon.new(-413, -627, 1469),
-                 BeaconScanner::Beacon.new(-345, -311, 381),
-                 BeaconScanner::Beacon.new(-36, -1284, 1171),
-                 BeaconScanner::Beacon.new(-27, -1108, -65),
-                 BeaconScanner::Beacon.new(7, -33, -71),
-                 BeaconScanner::Beacon.new(12, -2351, -103),
-                 BeaconScanner::Beacon.new(26, -1119, 1091),
-                 BeaconScanner::Beacon.new(346, -2985, 342),
-                 BeaconScanner::Beacon.new(366, -3059, 397),
-                 BeaconScanner::Beacon.new(377, -2827, 367),
-                 BeaconScanner::Beacon.new(390, -675, -793),
-                 BeaconScanner::Beacon.new(396, -1931, -563),
-                 BeaconScanner::Beacon.new(404, -588, -901),
-                 BeaconScanner::Beacon.new(408, -1815, 803),
-                 BeaconScanner::Beacon.new(423, -701, 434),
-                 BeaconScanner::Beacon.new(432, -2009, 850),
-                 BeaconScanner::Beacon.new(443, 580, 662),
-                 BeaconScanner::Beacon.new(455, 729, 728),
-                 BeaconScanner::Beacon.new(456, -540, 1869),
-                 BeaconScanner::Beacon.new(459, -707, 401),
-                 BeaconScanner::Beacon.new(465, -695, 1988),
-                 BeaconScanner::Beacon.new(474, 580, 667),
-                 BeaconScanner::Beacon.new(496, -1584, 1900),
-                 BeaconScanner::Beacon.new(497, -1838, -617),
-                 BeaconScanner::Beacon.new(527, -524, 1933),
-                 BeaconScanner::Beacon.new(528, -643, 409),
-                 BeaconScanner::Beacon.new(534, -1912, 768),
-                 BeaconScanner::Beacon.new(544, -627, -890),
-                 BeaconScanner::Beacon.new(553, 345, -567),
-                 BeaconScanner::Beacon.new(564, 392, -477),
-                 BeaconScanner::Beacon.new(568, -2007, -577),
-                 BeaconScanner::Beacon.new(605, -1665, 1952),
-                 BeaconScanner::Beacon.new(612, -1593, 1893),
-                 BeaconScanner::Beacon.new(630, 319, -379),
-                 BeaconScanner::Beacon.new(686, -3108, -505),
-                 BeaconScanner::Beacon.new(776, -3184, -501),
-                 BeaconScanner::Beacon.new(846, -3110, -434),
-                 BeaconScanner::Beacon.new(1135, -1161, 1235),
-                 BeaconScanner::Beacon.new(1243, -1093, 1063),
-                 BeaconScanner::Beacon.new(1660, -552, 429),
-                 BeaconScanner::Beacon.new(1693, -557, 386),
-                 BeaconScanner::Beacon.new(1735, -437, 1738),
-                 BeaconScanner::Beacon.new(1749, -1800, 1813),
-                 BeaconScanner::Beacon.new(1772, -405, 1572),
-                 BeaconScanner::Beacon.new(1776, -675, 371),
-                 BeaconScanner::Beacon.new(1779, -442, 1789),
-                 BeaconScanner::Beacon.new(1780, -1548, 337),
-                 BeaconScanner::Beacon.new(1786, -1538, 337),
-                 BeaconScanner::Beacon.new(1847, -1591, 415),
-                 BeaconScanner::Beacon.new(1889, -1729, 1762),
-                 BeaconScanner::Beacon.new(1994, -1805, 1792)
+                 BeaconScanner::Beacon[-892, 524, 684],
+                 BeaconScanner::Beacon[-876, 649, 763],
+                 BeaconScanner::Beacon[-838, 591, 734],
+                 BeaconScanner::Beacon[-789, 900, -551],
+                 BeaconScanner::Beacon[-739, -1745, 668],
+                 BeaconScanner::Beacon[-706, -3180, -659],
+                 BeaconScanner::Beacon[-697, -3072, -689],
+                 BeaconScanner::Beacon[-689, 845, -530],
+                 BeaconScanner::Beacon[-687, -1600, 576],
+                 BeaconScanner::Beacon[-661, -816, -575],
+                 BeaconScanner::Beacon[-654, -3158, -753],
+                 BeaconScanner::Beacon[-635, -1737, 486],
+                 BeaconScanner::Beacon[-631, -672, 1502],
+                 BeaconScanner::Beacon[-624, -1620, 1868],
+                 BeaconScanner::Beacon[-620, -3212, 371],
+                 BeaconScanner::Beacon[-618, -824, -621],
+                 BeaconScanner::Beacon[-612, -1695, 1788],
+                 BeaconScanner::Beacon[-601, -1648, -643],
+                 BeaconScanner::Beacon[-584, 868, -557],
+                 BeaconScanner::Beacon[-537, -823, -458],
+                 BeaconScanner::Beacon[-532, -1715, 1894],
+                 BeaconScanner::Beacon[-518, -1681, -600],
+                 BeaconScanner::Beacon[-499, -1607, -770],
+                 BeaconScanner::Beacon[-485, -357, 347],
+                 BeaconScanner::Beacon[-470, -3283, 303],
+                 BeaconScanner::Beacon[-456, -621, 1527],
+                 BeaconScanner::Beacon[-447, -329, 318],
+                 BeaconScanner::Beacon[-430, -3130, 366],
+                 BeaconScanner::Beacon[-413, -627, 1469],
+                 BeaconScanner::Beacon[-345, -311, 381],
+                 BeaconScanner::Beacon[-36, -1284, 1171],
+                 BeaconScanner::Beacon[-27, -1108, -65],
+                 BeaconScanner::Beacon[7, -33, -71],
+                 BeaconScanner::Beacon[12, -2351, -103],
+                 BeaconScanner::Beacon[26, -1119, 1091],
+                 BeaconScanner::Beacon[346, -2985, 342],
+                 BeaconScanner::Beacon[366, -3059, 397],
+                 BeaconScanner::Beacon[377, -2827, 367],
+                 BeaconScanner::Beacon[390, -675, -793],
+                 BeaconScanner::Beacon[396, -1931, -563],
+                 BeaconScanner::Beacon[404, -588, -901],
+                 BeaconScanner::Beacon[408, -1815, 803],
+                 BeaconScanner::Beacon[423, -701, 434],
+                 BeaconScanner::Beacon[432, -2009, 850],
+                 BeaconScanner::Beacon[443, 580, 662],
+                 BeaconScanner::Beacon[455, 729, 728],
+                 BeaconScanner::Beacon[456, -540, 1869],
+                 BeaconScanner::Beacon[459, -707, 401],
+                 BeaconScanner::Beacon[465, -695, 1988],
+                 BeaconScanner::Beacon[474, 580, 667],
+                 BeaconScanner::Beacon[496, -1584, 1900],
+                 BeaconScanner::Beacon[497, -1838, -617],
+                 BeaconScanner::Beacon[527, -524, 1933],
+                 BeaconScanner::Beacon[528, -643, 409],
+                 BeaconScanner::Beacon[534, -1912, 768],
+                 BeaconScanner::Beacon[544, -627, -890],
+                 BeaconScanner::Beacon[553, 345, -567],
+                 BeaconScanner::Beacon[564, 392, -477],
+                 BeaconScanner::Beacon[568, -2007, -577],
+                 BeaconScanner::Beacon[605, -1665, 1952],
+                 BeaconScanner::Beacon[612, -1593, 1893],
+                 BeaconScanner::Beacon[630, 319, -379],
+                 BeaconScanner::Beacon[686, -3108, -505],
+                 BeaconScanner::Beacon[776, -3184, -501],
+                 BeaconScanner::Beacon[846, -3110, -434],
+                 BeaconScanner::Beacon[1135, -1161, 1235],
+                 BeaconScanner::Beacon[1243, -1093, 1063],
+                 BeaconScanner::Beacon[1660, -552, 429],
+                 BeaconScanner::Beacon[1693, -557, 386],
+                 BeaconScanner::Beacon[1735, -437, 1738],
+                 BeaconScanner::Beacon[1749, -1800, 1813],
+                 BeaconScanner::Beacon[1772, -405, 1572],
+                 BeaconScanner::Beacon[1776, -675, 371],
+                 BeaconScanner::Beacon[1779, -442, 1789],
+                 BeaconScanner::Beacon[1780, -1548, 337],
+                 BeaconScanner::Beacon[1786, -1538, 337],
+                 BeaconScanner::Beacon[1847, -1591, 415],
+                 BeaconScanner::Beacon[1889, -1729, 1762],
+                 BeaconScanner::Beacon[1994, -1805, 1792]
                ]
     end
 

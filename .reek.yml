@@ -22,12 +22,13 @@ detectors:
       - _
 
 exclude_paths:
+  - lib/aoc2021/puzzles/amphipod.rb
   - lib/aoc2021/puzzles/arithmetic_logic_unit.rb
-  - lib/aoc2021/puzzles/beacon_scanner.rb
   - lib/aoc2021/puzzles/cave_paths.rb
   - lib/aoc2021/puzzles/chitons.rb
   - lib/aoc2021/puzzles/dirac_dice.rb
   - lib/aoc2021/puzzles/packet_decoder.rb
+  - lib/aoc2021/puzzles/priority_queue.rb
   - lib/aoc2021/puzzles/reactor_reboot.rb
   - lib/aoc2021/puzzles/sea_cucumber.rb
   - lib/aoc2021/puzzles/snailfish.rb

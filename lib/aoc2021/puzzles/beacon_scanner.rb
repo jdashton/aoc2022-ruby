@@ -11,44 +11,33 @@ module AoC2021
       beacon_scanner.merge_all
       puts "Day 19, part A: #{ beacon_scanner.num_beacons } unique probes visible to these scanners"
       puts "Day 19, part B: #{ beacon_scanner.largest_distance } is the largest Manhattan distance between any two scanners."
-      # puts "Day 19, part B: #{snailfish.permutations} is the largest magnitude of any sum of two different snailfish numbers."
       puts
     end
 
     # Encapsulates operations on probes seen by a scanner
     class Scanner
-      attr_reader :id, :beacons, :distances, :pairs, :translation
+      attr_reader :beacons, :distances, :pairs, :translation
+
+      NUMS = /(-?\d+),(-?\d+),(-?\d+)/
 
       def initialize(lines)
-        @id      = nil
-        @beacons = Set[]
-        # Need a collection of distances associated with the two points between them.
-        # Also need to have the distances as a Set that can be compared to the Set from another scanner.
-        @distances = Set[]
-        lines.each do |line|
-          case line
-            when /--- scanner (\d+) ---/
-              @id = Regexp.last_match(1).to_i
-            when /(-?\d+),(-?\d+),(-?\d+)/
-              @beacons << Beacon.new(*[Regexp.last_match(1), Regexp.last_match(2), Regexp.last_match(3)].map(&:to_i))
-          end
-        end
-        # puts "#{ @probes.size } probes in set #{ @id }. #{ @probes.to_a.combination(2).to_a.size } combinations"
-        @pairs = {}
-        @beacons.to_a.combination(2).each do |bcn1, bcn2|
-          s_m_distance = bcn1.sorted_manhattan_distance(bcn2)
-          @distances << s_m_distance
-          @pairs[s_m_distance] = [bcn1, bcn2]
-        end
-        @intersections = {}
-        @translation   = Vector.zero(3)
+        @beacons =
+          lines.reduce(Set[]) { |acc, line| NUMS.match(line) { |md| match_beacon acc, md } || acc }
+
+        @pairs =
+          @beacons.to_a.combination(2).reduce([], &method(:distance_and_pair)).to_h
+
+        @distances      = Set[*@pairs.keys]
+        @intersections  = {}
+        @common_beacons = {}
+        @translation    = Vector.zero(3)
       end
 
       def merge(other)
         rot, trans = other.triangulate(self)
-        @beacons   += other.beacons.map { _1.rectify(rot, trans) }
+        @beacons   += other.beacons.map { translate(_1, rot, trans) }
         @distances += other.distances
-        @pairs.merge!(other.pairs.transform_values { |pair| pair.map { _1.rectify(rot, trans) } })
+        @pairs.merge!(other.pairs.transform_values { |pair| pair.map { translate(_1, rot, trans) } })
         @intersections = {}
       end
 
@@ -59,10 +48,10 @@ module AoC2021
       # Returns a Set of the beacons that are common to this scanner
       # and other scanner, in the coordinate system of this scanner.
       def common_beacons(other)
-        intersections(other).reduce(Set[]) do |acc, int|
-          # pairs << @pairs[int]
-          acc + [*@pairs[int]]
-        end
+        @common_beacons[other] ||=
+          intersections(other).reduce(Set[]) do |acc, int|
+            acc + @pairs[int]
+          end
       end
 
       ROTATIONS = [
@@ -105,55 +94,38 @@ module AoC2021
         @pairs[distance]
       end
 
-      def check_all_twelve(rot, translation, common_beacons, other_common_beacons)
-        Set[*other_common_beacons.map(&:to_v)] == Set[*common_beacons.map { |beacon| (rot * beacon.to_v) + translation }]
+      def check_all_common_beacons(rot, translation, other)
+        common_beacons       = self.common_beacons(other)
+        other_common_beacons = other.common_beacons(self)
+        Set[*other_common_beacons] == Set[*common_beacons.map { |beacon| (rot * beacon) + translation }]
       end
 
       def triangulate(other)
-        beacons = common_beacons(other)
-
-        # pp ints
-        distance = intersections(other).to_a.first
-        puts "Starting with distance #{ distance }"
+        distance           = intersections(other).first
         beacon_a, beacon_b = @pairs[distance]
-        puts "Beacons at this distance: #{ beacon_a }, #{ beacon_b }"
-        other_a, other_b = other.pair(distance)
-        puts "Beacons from other scanner at this distance: #{ other_a }, #{ other_b }"
+        other_pair         = other.pair(distance).permutation(2)
 
-        vector_a = beacon_a.to_v
-        vector_b = beacon_b.to_v
-
-        translation = nil
-
-        rotation     = ROTATIONS.find do |rot|
-          translation = other_b.to_v - (rot * vector_a)
-          if (rot * vector_b) + translation == other_a.to_v
-            puts "We found one with rotation #{ rot } and translation #{ translation }"
-            if check_all_twelve(rot, translation, beacons, other.common_beacons(self))
-              puts "All 12 match!"
-              next true
-            else
-              puts " --- Found some matches, but not 12 --- "
-            end
+        [ROTATIONS.find do |rot|
+          other_pair.any? do |other_a, other_b|
+            trans = other_b - (rot * beacon_a)
+            (rot * beacon_b) + trans == other_a && check_all_common_beacons(rot, (@translation = trans), other)
           end
-
-          translation = other_a.to_v - (rot * vector_a)
-          if (rot * vector_b) + translation == other_b.to_v
-            puts "We found one with rotation #{ rot } and translation #{ translation }"
-            if check_all_twelve(rot, translation, beacons, other.common_beacons(self))
-              puts "All 12 match!"
-              next true
-            else
-              puts " --- Found some matches, but not 12 --- "
-            end
-          end
-          false
-        end
-        @translation = translation
-        [rotation, translation]
+        end, @translation]
       end
 
       private
+
+      def translate var1, rot, trans
+        var1.rectify(rot, trans)
+      end
+
+      def match_beacon(acc, md)
+        acc << Beacon[*md.captures.map(&:to_i)]
+      end
+
+      def distance_and_pair(acc, (bcn1, bcn2))
+        acc << [bcn1.distance(bcn2), [bcn1, bcn2]]
+      end
 
       def intersections(other)
         @intersections[other] ||= @distances & other.distances
@@ -161,79 +133,41 @@ module AoC2021
     end
 
     # Encapsulates operations on points
-    class Beacon
-      attr_reader :x, :y, :z
+    class Beacon < Vector
+      def distance(other_point) = (self - other_point).to_a.map(&:abs).sort
 
-      def initialize(x, y, z)
-        @x = x
-        @y = y
-        @z = z
-      end
+      def rectify(rot, trans) = Beacon[*((rot * self) + trans).to_a]
 
-      def sorted_manhattan_distance(other_point)
-        # puts "Distance from #{ pt1 } to #{ pt2 }"
-        # delta_vector =
-        [(@x - other_point.x).abs, (@y - other_point.y).abs, (@z - other_point.z).abs].sort
-        # pp delta_vector
-        # Math.sqrt((delta_vector[0]**2) + (delta_vector[1]**2) + (delta_vector[2]**2))
-      end
+      def to_s = "Beacon[#{ to_a.join(", ") }]"
 
-      def rectify(rot, trans)
-        Beacon.new(*((rot * to_v) + trans).to_a)
-      end
-
-      def to_v
-        Vector[@x, @y, @z]
-      end
-
-      def hash
-        [@x, @y, @z].hash
-      end
-
-      def eql?(other)
-        @x == other.x && @y == other.y && @z == other.z
-      end
-
-      def to_s
-        "Beacon: #{ @x }, #{ @y }, #{ @z }"
-      end
-
-      def inspect = to_s
+      def inspect = "Beacon#{ @elements.inspect }"
     end
 
-    attr_reader :scanners
+    attr_reader :scanners, :primary
 
     def initialize(file = StringIO.new(""))
-      @lines    = file.readlines(chomp: true)
-      @scanners = []
-      index     = 0
-      until index >= @lines.size
-        next_blank = @lines[index..].index(&:empty?) || @lines.size
-        scanner    = Scanner.new(@lines[index..index + next_blank])
-        @scanners << scanner
-        index += next_blank + 1
-      end
-      # pp @scanners
+      @scanners = file.readlines(chomp: true)
+                      .chunk_while { |line, _| !line.empty? }
+                      .reduce([]) { |acc, block| acc << Scanner.new(block) }
+      @merged   = [@primary = @scanners.shift]
     end
 
     def num_beacons = full_map.size
 
-    def full_map = @scanners.first.beacons
+    def full_map = @primary&.beacons
 
     def merge_all
-      unprocessed = @scanners[1..]
-      main        = @scanners.first
-      while unprocessed.size.positive?
-        some_scanner = unprocessed.sample
-        if main.common(some_scanner)
-          main.merge(some_scanner)
-          unprocessed.delete(some_scanner)
+      until @scanners.empty?
+        some_scanner = @scanners.sample
+        if @primary&.common(some_scanner)
+          @primary&.merge(some_scanner)
+          @merged << @scanners.delete(some_scanner)
         end
       end
     end
 
     def largest_distance
-      @scanners.combination(2).map { |scn1, scn2| (scn1.translation - scn2.translation).to_a.sum.abs }.max
+      @merged.combination(2).map { |scn1, scn2| (scn1.translation - scn2.translation).to_a.sum.abs }.max
     end
   end
 end
