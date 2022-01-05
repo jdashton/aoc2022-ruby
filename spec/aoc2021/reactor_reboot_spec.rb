@@ -13,37 +13,23 @@ RSpec.describe AoC2021::ReactorReboot do
     end
   end
 
-  describe "::rectify" do
-    it "keeps values within 0..100 and adds +50" do
-      expect(AoC2021::ReactorReboot.rectify(0)).to eq 50
-      expect(AoC2021::ReactorReboot.rectify(-51)).to eq 0
-      expect(AoC2021::ReactorReboot.rectify(51)).to eq 100
-    end
-  end
-
   context "with first example" do
-    subject { AoC2021::ReactorReboot.new StringIO.new(<<~STEPS) }
+    subject { AoC2021::ReactorReboot.new(StringIO.new(<<~STEPS)).process_volumes }
       on x=10..12,y=10..12,z=10..12
       on x=11..13,y=11..13,z=11..13
       off x=9..11,y=9..11,z=9..11
       on x=10..10,y=10..10,z=10..10
     STEPS
 
-    describe "#count_true" do
-      it "finds 39 lit cubes" do
-        expect(subject.count_true).to eq 39
-      end
-    end
-
     describe "#process_volumes" do
       it "find 39 lit cubes" do
-        expect(subject.process_volumes).to eq 39
+        expect(subject.cube_volume_unlimited).to eq 39
       end
     end
   end
 
   context "with larger example" do
-    subject { AoC2021::ReactorReboot.new StringIO.new(<<~STEPS) }
+    subject { AoC2021::ReactorReboot.new(StringIO.new(<<~STEPS)).process_volumes }
       on x=-20..26,y=-36..17,z=-47..7
       on x=-20..33,y=-21..23,z=-26..28
       on x=-22..28,y=-29..23,z=-38..16
@@ -64,20 +50,13 @@ RSpec.describe AoC2021::ReactorReboot do
       on x=-49..-5,y=-3..45,z=-29..18
       off x=18..30,y=-20..-8,z=-3..13
       on x=-41..9,y=-7..43,z=-33..15
+      on x=-54112..-39298,y=-85059..-49293,z=-27449..7877
+      on x=967..23432,y=45373..81175,z=27513..53682
     STEPS
-
-    # on x=-54112..-39298,y=-85059..-49293,z=-27449..7877
-    # on x=967..23432,y=45373..81175,z=27513..53682
-
-    describe "#count_true" do
-      it "finds 590,784 lit cubes" do
-        expect(subject.count_true).to eq 590_784
-      end
-    end
 
     describe "#process_volumes" do
       it "find 590,784 lit cubes" do
-        expect(subject.process_volumes).to eq 590_784
+        expect(subject.cube_volume(-50..50)).to eq 590_784
       end
     end
   end
@@ -148,7 +127,7 @@ RSpec.describe AoC2021::ReactorReboot do
 
     describe "#process_volumes" do
       it "find 2758514936282235 lit cubes" do
-        expect(subject.process_volumes).to eq 2_758_514_936_282_235
+        expect(subject.process_volumes.cube_volume_unlimited).to eq 2_758_514_936_282_235
       end
     end
   end
@@ -217,15 +196,15 @@ RSpec.describe AoC2021::ReactorReboot do
       off x=-93533..-4276,y=-16170..68771,z=-104985..-24507
     STEPS
 
-    describe "#count_true" do
+    describe "#process_volumes" do
       it "finds 474140 lit cubes" do
-        expect(subject.count_true).to eq 474_140
+        expect(subject.process_volumes.cube_volume(-50..50)).to eq 474_140
       end
     end
   end
 
   context "with part 2 on actual input" do
-    subject { AoC2021::ReactorReboot.new StringIO.new(<<~STEPS) }
+    subject { AoC2021::ReactorReboot.new(StringIO.new(<<~STEPS)).process_volumes }
       on x=-15..36,y=-36..8,z=-12..33
       on x=-49..4,y=-24..27,z=-45..3
       on x=-18..27,y=-44..6,z=-44..5
@@ -648,9 +627,13 @@ RSpec.describe AoC2021::ReactorReboot do
       off x=-7939..4574,y=-85911..-62241,z=-14750..984
     STEPS
 
-    describe "#count_true" do
+    describe "#process_volumes" do
+      it "finds 551,693 lit cubes under the rules for part 1" do
+        expect(subject.cube_volume(-50..50)).to eq 551_693
+      end
+
       it "finds 1,165,737,675,582,132 lit cubes" do
-        # expect(subject.process_volumes).to eq 1165737675582132
+        expect(subject.cube_volume_unlimited).to eq 1_165_737_675_582_132
       end
     end
   end

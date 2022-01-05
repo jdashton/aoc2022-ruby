@@ -10,7 +10,6 @@ AllCops:
     - lib/aoc2021/puzzles/chitons.rb
     - lib/aoc2021/puzzles/dirac_dice.rb
     - lib/aoc2021/puzzles/packet_decoder.rb
-    - lib/aoc2021/puzzles/reactor_reboot.rb
     - lib/aoc2021/puzzles/sea_cucumber.rb
     - lib/aoc2021/puzzles/snailfish.rb
     - lib/aoc2021/puzzles/trench_map.rb
@@ -74,6 +73,6 @@ Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
 
-Style/TernaryParentheses:
-  Exclude:
-    - lib/aoc2021/puzzles/amphipod.rb
+#Style/TernaryParentheses:
+#  Exclude:
+#    - lib/aoc2021/puzzles/amphipod.rb

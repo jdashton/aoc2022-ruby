@@ -6,69 +6,50 @@ module AoC2021
   # Rebooting cubes in the reactor for Day 22
   class ReactorReboot
     def self.day22
-      reactor_reboot = File.open("input/day22a.txt") { |file| ReactorReboot.new file }
-      puts "Day 22, part A: #{ reactor_reboot.count_true } cubes are on."
-      # puts "Day 22, part B: #{ reactor_reboot.process_volumes } cubes are on."
+      reactor_reboot = File.open("input/day22a.txt") { |file| ReactorReboot.new file }.process_volumes
+      puts "Day 22, part A: #{ reactor_reboot.cube_volume(-50..50) } cubes are on within the -50..50 space."
+      puts "Day 22, part B: #{ reactor_reboot.cube_volume_unlimited } cubes are on."
       puts
     end
 
     STEP_PAT = /(on|off) x=(-?\d+)..(-?\d+),y=(-?\d+)..(-?\d+),z=(-?\d+)..(-?\d+)/
 
     def initialize(file = StringIO.new(""))
-      @raw_steps = []
-      @steps     = file.readlines(chomp: true).map { |line| STEP_PAT.match(line, &method(:make_step)) }
+      @raw_steps = file.readlines(chomp: true).map { |line| STEP_PAT.match(line, &method(:make_step)) }
       @cubes     = []
-      @space     = []
-      @steps.each(&method(:run_step))
-    end
-
-    def process_volumes
-      # puts "raw_steps:"
-      # pp @raw_steps.reverse
-      # puts
-
-      @raw_steps.reverse.each(&method(:process_one_cube))
-      cube_volume
-    end
-
-    def count_true = @space.flatten.count(:on)
-
-    def self.rectify(int) = [[int + 50, 0].max, 100].min
-
-    def self.make_range((start, stop))
-      return 2..1 if stop < -50 || start > 50
-
-      Range.new(rectify(start), rectify(stop))
-    end
-
-    def self.make_raw_range((start, stop))
-      Range.new(start, stop)
     end
 
     def make_step(match_data)
-      range_data = match_data.captures[1..].map(&:to_i).each_slice(2)
-      @raw_steps << [match_data[1].to_sym, *range_data.map(&self.class.method(:make_raw_range))]
-      [match_data[1].to_sym, *range_data.map(&self.class.method(:make_range))]
+      [match_data[1].to_sym, *match_data.captures[1..].map(&:to_i).each_slice(2).map { Range.new(*_1) }]
     end
 
-    def self.mark_row(page, row_num, step) = step[1].each { |col| (page[row_num] ||= [])[col] = step[0] }
+    def process_volumes
+      @raw_steps.reverse.each(&method(:process_one_cube))
+      self
+    end
 
-    private
-
-    def cube_volume
+    def cube_volume_unlimited
       @cubes.reduce(0) do |acc, (state, x_range, y_range, z_range)|
         next acc if state == :off
 
-        acc + ((x_range.end - x_range.begin + 1) * (y_range.end - y_range.begin + 1) * (z_range.end - z_range.begin + 1))
+        acc + (x_range.size * y_range.size * z_range.size)
       end
     end
 
-    def self.overlaps?((_c1state, c1x, c1y, c1z), (_c2state, c2x, c2y, c2z))
-      # puts "#{ [c1x, c1y, c1z] }, #{ [c2x, c2y, c2z] }"
-      (c1x.cover?(c2x.begin) || c1x.cover?(c2x.end) || c2x.cover?(c1x.begin) || c2x.cover?(c1x.end)) &&
-        (c1y.cover?(c2y.begin) || c1y.cover?(c2y.end) || c2y.cover?(c1y.begin) || c2y.cover?(c1y.end)) &&
-        (c1z.cover?(c2z.begin) || c1z.cover?(c2z.end) || c2z.cover?(c1z.begin) || c2z.cover?(c1z.end))
-      # Set[*c1x].intersect?(Set[*c2x]) && Set[*c1y].intersect?(Set[*c2y]) && Set[*c1z].intersect?(Set[*c2z])
+    def cube_volume(limit)
+      @cubes.reduce(0) do |acc, (state, x_range, y_range, z_range)|
+        next acc if state == :off
+
+        next acc unless ReactorReboot.overlaps?([nil, limit, limit, limit], [state, x_range, y_range, z_range])
+
+        acc + (x_range.size * y_range.size * z_range.size)
+      end
+    end
+
+    def self.overlaps?((_, c1x, c1y, c1z), (_, c2x, c2y, c2z))
+      c1x.end >= c2x.begin && c1x.begin <= c2x.end &&
+        c1y.end >= c2y.begin && c1y.begin <= c2y.end &&
+        c1z.end >= c2z.begin && c1z.begin <= c2z.end
     end
 
     def self.split((c1s, c1x, c1y, c1z), (_, c2x, c2y, c2z))
@@ -95,10 +76,12 @@ module AoC2021
       acc
     end
 
+    private
+
     def detect_and_split(potential, cube)
       potential.reduce([]) do |acc, pcube|
-        if self.class.overlaps?(pcube, cube)
-          acc + self.class.split(pcube, cube)
+        if ReactorReboot.overlaps?(pcube, cube)
+          acc + ReactorReboot.split(pcube, cube)
         else
           acc << pcube
         end
@@ -106,21 +89,11 @@ module AoC2021
     end
 
     def process_one_cube(new_cube)
-      # puts " .. Processing #{ new_cube }"
-
       potential = [new_cube]
       @cubes.each do |cube|
         potential = detect_and_split(potential, cube)
       end
       @cubes += potential
-
-      # print "Cubes: "
-      # pp @cubes
-      # puts
     end
-
-    def run_step(step) = step[3].each { |page_num| mark_page page_num, step }
-
-    def mark_page(page_num, step) = step[2].each { |row_num| self.class.mark_row (@space[page_num] ||= []), row_num, step }
   end
 end
