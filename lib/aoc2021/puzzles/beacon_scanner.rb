@@ -15,40 +15,44 @@ module AoC2021
 
     # Encapsulates operations on probes seen by a scanner
     class Scanner
-      attr_reader :distances
+      attr_reader :translation_data
 
       def initialize(lines)
-        @beacons   = lines.reduce(Set[]) { |acc, line| (new_beacon = Beacon.from_text(line)) ? (acc << new_beacon) : acc }
-        @pairs     = make_pairs
-        @distances = Set[*@pairs.keys]
-        @cache     = { intersections: {}, common_beacons: {} }
-        @rotation  = @translation = nil # Matrix.diagonal(1, 1, 1), Vector.zero(3)
+        @beacons = lines.reduce(Set[]) { |acc, line| (new_beacon = Beacon.from_text(line)) ? (acc << new_beacon) : acc }
+        @pairs   = make_pairs
+        # @distances = Set[*@pairs.keys]
+        @cache            = { all_distances: Set[*@pairs.keys], common_distances: {}, common_beacons: {} }
+        @translation_data = nil # Matrix.diagonal(1, 1, 1), Vector.zero(3)
       end
 
-      def translation_data = [@rotation, @translation]
+      def beacons = @translation_data ? @beacons.map { _1.rectify(@translation_data) } : @beacons
 
-      def beacons = @rotation ? @beacons.map { _1.rectify(@rotation, @translation) } : @beacons
+      def pairs = @translation_data ? @pairs.transform_values { |pair| pair.map { _1.rectify(@translation_data) } } : @pairs
 
-      def pairs = @rotation ? @pairs.transform_values { |pair| pair.map { _1.rectify(@rotation, @translation) } } : @pairs
+      # Returns a pair of Beacon objects (points) that have the given s_m_distance
+      # with coordinates in the coordinate system of this scanner. This is an accessor
+      # that allows Scanner 1 (for example) to ask Scanner 0 for its beacons that match
+      # the given distance.
+      def pair(distance) = @pairs[distance]
 
-      def translation = @translation || Vector.zero(3)
+      def distances = @cache[:all_distances] ||= Set[*@pairs.keys]
 
-      def merge(other)
-        other.triangulate(self)
-        @beacons   += other.beacons
-        @distances += other.distances
-        @pairs.merge!(other.pairs)
-        @cache[:intersections] = {}
-      end
+      def translation = @translation_data&.last || Vector.zero(3)
 
       # Returns a Set of the beacons that are common to this scanner
       # and other scanner, in the coordinate system of this scanner.
-      def common_beacons(other) = @cache[:common_beacons][other] ||= Set[*intersections(other).flat_map { pair(_1) }]
+      def common_beacons(other) = @cache[:common_beacons][other] ||= Set[*common_distances(other).flat_map { pair(_1) }]
 
-      def intersections(other) = @cache[:intersections][other] ||= @distances & other.distances
+      def common_distances(other) = @cache[:common_distances][other] ||= distances & other.distances
 
-      def common(other)
-        intersections(other).size >= 66
+      def enough_common_distances(other) = common_distances(other).size >= 66
+
+      def merge(other)
+        other.triangulate(self)
+        @beacons += other.beacons
+        @pairs.merge!(other.pairs)
+        @cache[:all_distances]    += other.distances
+        @cache[:common_distances] = {}
       end
 
       ROTATIONS = [
@@ -83,12 +87,14 @@ module AoC2021
         Matrix[[0, 0, -1], [-1, 0, 0], [0, 1, 0]]
       ].freeze
 
-      # Returns a pair of Beacon objects (points) that have the given s_m_distance
-      # with coordinates in the coordinate system of this scanner. This is an accessor
-      # that allows Scanner 1 (for example) to ask Scanner 0 for its beacons that match
-      # the given distance.
-      def pair(distance)
-        @pairs[distance]
+      def triangulate(scanner_zero)
+        beacon_pair = BeaconPairPairing.new(
+          pair(distance = common_distances(scanner_zero).first),
+          scanner_zero.pair(distance).permutation(2),
+          Triangulator.new(self, scanner_zero)
+        )
+
+        @translation_data = [ROTATIONS.find { |rotation| beacon_pair.try_rotation(rotation) }, beacon_pair.translation]
       end
 
       # Encapsulates alignment operations
@@ -103,17 +109,6 @@ module AoC2021
         end
       end
 
-      def triangulate(scanner_zero)
-        beacon_pair = BeaconPairPairing.new(
-          pair(distance = intersections(scanner_zero).first),
-          scanner_zero.pair(distance).permutation(2),
-          Triangulator.new(self, scanner_zero)
-        )
-
-        @rotation    = ROTATIONS.find { |rotation| beacon_pair.try_rotation(rotation) }
-        @translation = beacon_pair.translation
-      end
-
       # Encapsulates operations on a pair of local and pair of remote beacons
       class BeaconPairPairing
         attr_reader :translation
@@ -125,12 +120,12 @@ module AoC2021
           @translation              = nil
         end
 
-        def try_rotation(rot)
-          a_rotated, b_rotated = @local_pair.map { rot * _1 }
+        def try_rotation(rotation)
+          a_rotated, b_rotated = @local_pair.map { rotation * _1 }
           @remote_pair_permutations.any? do |oth_a, oth_b|
             (@translation = oth_b - a_rotated) &&
               b_rotated + @translation == oth_a &&
-              @triangulator.aligns?(rot, @translation)
+              @triangulator.aligns?(rotation, @translation)
           end
         end
       end
@@ -152,7 +147,7 @@ module AoC2021
 
       def distance(other) = (self - other).to_a.map(&:abs).sort
 
-      def rectify(rot, trans) = Beacon[*((rot * self) + trans).to_a]
+      def rectify((rot, trans)) = Beacon[*((rot * self) + trans).to_a]
 
       def to_s = "Beacon[#{ to_a.join(", ") }]"
 
@@ -175,7 +170,7 @@ module AoC2021
     def merge_all
       until @scanners.empty?
         some_scanner = @scanners.sample
-        if @primary&.common(some_scanner)
+        if @primary&.enough_common_distances(some_scanner)
           @primary&.merge(some_scanner)
           @merged << @scanners.delete(some_scanner)
         end

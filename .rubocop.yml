@@ -29,7 +29,7 @@ Layout/MultilineMethodCallIndentation:
   EnforcedStyle: aligned
 
 Layout/SpaceAroundOperators:
-  AllowForAlignment: true
+  Enabled: false
 
 Layout/SpaceInsideStringInterpolation:
   EnforcedStyle: space

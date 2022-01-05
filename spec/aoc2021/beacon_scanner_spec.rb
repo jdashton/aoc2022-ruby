@@ -190,11 +190,11 @@ RSpec.describe BeaconScanner do
     end
 
     it "sees common beacons between a scanner and itself (identity)" do
-      expect(subject.primary.common(subject.primary)).to be true
+      expect(subject.primary.enough_common_distances(subject.primary)).to be true
     end
 
     it "finds common beacons between S0 and S1" do
-      expect(subject.primary.common(subject.scanners[0])).to be true
+      expect(subject.primary.enough_common_distances(subject.scanners[0])).to be true
     end
 
     it "finds the pairs of beacons common to S0 and S1" do
