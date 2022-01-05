@@ -17,22 +17,19 @@ module AoC2021
     class Scanner
       attr_reader :distances
 
-      NUMS = /(-?\d+),(-?\d+),(-?\d+)/
-
       def initialize(lines)
-        @beacons        = lines.reduce(Set[]) { |acc, line| NUMS.match(line) { |md| match_beacon acc, md } || acc }
-        @pairs          = @beacons.to_a.combination(2).reduce([], &method(:distance_and_pair)).to_h
-        @distances      = Set[*@pairs.keys]
-        @intersections  = {}
-        @common_beacons = {}
-        @rotation       = @translation = nil # Matrix.diagonal(1, 1, 1), Vector.zero(3)
+        @beacons   = lines.reduce(Set[]) { |acc, line| (new_beacon = Beacon.from_text(line)) ? (acc << new_beacon) : acc }
+        @pairs     = make_pairs
+        @distances = Set[*@pairs.keys]
+        @cache     = { intersections: {}, common_beacons: {} }
+        @rotation  = @translation = nil # Matrix.diagonal(1, 1, 1), Vector.zero(3)
       end
 
       def translation_data = [@rotation, @translation]
 
-      def beacons = @rotation && @translation ? @beacons.map(&method(:translate)) : @beacons
+      def beacons = @rotation ? @beacons.map { _1.rectify(@rotation, @translation) } : @beacons
 
-      def pairs = @rotation && @translation ? @pairs.transform_values { |pair| pair.map { translate(_1) } } : @pairs
+      def pairs = @rotation ? @pairs.transform_values { |pair| pair.map { _1.rectify(@rotation, @translation) } } : @pairs
 
       def translation = @translation || Vector.zero(3)
 
@@ -41,20 +38,17 @@ module AoC2021
         @beacons   += other.beacons
         @distances += other.distances
         @pairs.merge!(other.pairs)
-        @intersections = {}
-      end
-
-      def common(other)
-        intersections(other).size >= 66
+        @cache[:intersections] = {}
       end
 
       # Returns a Set of the beacons that are common to this scanner
       # and other scanner, in the coordinate system of this scanner.
-      def common_beacons(other)
-        @common_beacons[other] ||=
-          intersections(other).reduce(Set[]) do |acc, int|
-            acc + @pairs[int]
-          end
+      def common_beacons(other) = @cache[:common_beacons][other] ||= Set[*intersections(other).flat_map { pair(_1) }]
+
+      def intersections(other) = @cache[:intersections][other] ||= @distances & other.distances
+
+      def common(other)
+        intersections(other).size >= 66
       end
 
       ROTATIONS = [
@@ -97,54 +91,72 @@ module AoC2021
         @pairs[distance]
       end
 
-      def check_all_common_beacons(rot, translation, other)
-        common_beacons       = self.common_beacons(other)
-        other_common_beacons = other.common_beacons(self)
-        Set[*other_common_beacons] == Set[*common_beacons.map { |beacon| (rot * beacon) + translation }]
+      # Encapsulates alignment operations
+      class Triangulator
+        def initialize(scanner, primary)
+          @other_common_beacons = primary.common_beacons(scanner)
+          @common_beacons_other = scanner.common_beacons(primary)
+        end
+
+        def aligns?(rotation, translation)
+          @other_common_beacons == Set[*@common_beacons_other.map { (rotation * _1) + translation }]
+        end
       end
 
-      def triangulate(other)
-        distance           = intersections(other).first
-        beacon_a, beacon_b = @pairs[distance]
-        other_pair         = other.pair(distance).permutation(2)
+      def triangulate(scanner_zero)
+        beacon_pair = BeaconPairPairing.new(
+          pair(distance = intersections(scanner_zero).first),
+          scanner_zero.pair(distance).permutation(2),
+          Triangulator.new(self, scanner_zero)
+        )
 
-        @rotation = ROTATIONS.find do |rot|
-          other_pair.any? do |other_a, other_b|
-            trans = other_b - (rot * beacon_a)
-            (rot * beacon_b) + trans == other_a && check_all_common_beacons(rot, (@translation = trans), other)
+        @rotation    = ROTATIONS.find { |rotation| beacon_pair.try_rotation(rotation) }
+        @translation = beacon_pair.translation
+      end
+
+      # Encapsulates operations on a pair of local and pair of remote beacons
+      class BeaconPairPairing
+        attr_reader :translation
+
+        def initialize(local_pair, remote_permutations, triangulator)
+          @local_pair               = local_pair
+          @remote_pair_permutations = remote_permutations
+          @triangulator             = triangulator
+          @translation              = nil
+        end
+
+        def try_rotation(rot)
+          a_rotated, b_rotated = @local_pair.map { rot * _1 }
+          @remote_pair_permutations.any? do |oth_a, oth_b|
+            (@translation = oth_b - a_rotated) &&
+              b_rotated + @translation == oth_a &&
+              @triangulator.aligns?(rot, @translation)
           end
         end
-        @rotation && @translation
       end
 
       private
 
-      def translate(beacon)
-        beacon.rectify(@rotation, @translation)
-      end
-
-      def match_beacon(acc, md)
-        acc << Beacon[*md.captures.map(&:to_i)]
-      end
-
-      def distance_and_pair(acc, (bcn1, bcn2))
-        acc << [bcn1.distance(bcn2), [bcn1, bcn2]]
-      end
-
-      def intersections(other)
-        @intersections[other] ||= @distances & other.distances
+      def make_pairs
+        @beacons.to_a
+                .combination(2)
+                .reduce([]) { |acc, (bcn_a, bcn_b)| acc << [bcn_a.distance(bcn_b), [bcn_a, bcn_b]] }.to_h
       end
     end
 
     # Encapsulates operations on points
     class Beacon < Vector
-      def distance(other_point) = (self - other_point).to_a.map(&:abs).sort
+      BEACON_LINE = /(-?\d+),(-?\d+),(-?\d+)/
+
+      def self.from_text(line) = BEACON_LINE.match(line) { |match_data| Beacon[*match_data.captures.map(&:to_i)] }
+
+      def distance(other) = (self - other).to_a.map(&:abs).sort
 
       def rectify(rot, trans) = Beacon[*((rot * self) + trans).to_a]
 
       def to_s = "Beacon[#{ to_a.join(", ") }]"
 
-      def inspect = "Beacon#{ @elements.inspect }"
+      def inspect = "Beacon#{ self[0..].inspect }"
     end
 
     attr_reader :scanners, :primary
@@ -172,7 +184,7 @@ module AoC2021
     end
 
     def largest_distance
-      @merged.combination(2).map { |scn1, scn2| (scn1.translation - scn2.translation).to_a.sum.abs }.max
+      @merged.combination(2).map { |scanner_a, scanner_b| (scanner_a.translation - scanner_b.translation).to_a.sum.abs }.max
     end
   end
 end
