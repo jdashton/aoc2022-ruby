@@ -65,10 +65,8 @@ RSpec.describe ReactorReboot do
       on x=967..23432,y=45373..81175,z=27513..53682
     STEPS
 
-    describe "#cube_volume" do
-      it "find 590,784 lit cubes" do
-        expect(subject.cube_volume).to eq 590_784
-      end
+    it "find 590,784 lit cubes" do
+      expect(subject.cube_volume).to eq 590_784
     end
   end
 

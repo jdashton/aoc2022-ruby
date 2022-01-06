@@ -14,17 +14,22 @@ module AoC2021
 
     STEP_PAT = /(on|off) x=(-?\d+)\.\.(-?\d+),y=(-?\d+)\.\.(-?\d+),z=(-?\d+)\.\.(-?\d+)/
 
+    attr_reader :cuboids
+
     def initialize(file = StringIO.new(""))
       @cuboids     = CuboidList.new
       @full_volume = @near_volume = 0
       file.readlines(chomp: true)
-          .map { |line| STEP_PAT.match(line, &method(:make_and_process)) }
+          .map { |line|
+            md = STEP_PAT.match(line)
+            Cuboid.new(md[1] == "on", *md.captures[1..].map(&:to_i).each_slice(2).map { Range.new(*_1) })
+          }
           .each(&method(:process_cuboid))
     end
 
-    def make_and_process(match_data)
-      Cuboid.new(match_data[1] == "on", *match_data.captures[1..].map(&:to_i).each_slice(2).map { Range.new(*_1) })
-    end
+    # def make_and_process(match_data)
+    #   Cuboid.new(match_data[1] == "on", *match_data.captures[1..].map(&:to_i).each_slice(2).map { Range.new(*_1) })
+    # end
 
     def process_cuboid(cuboid)
       # puts "Processing #{ cuboid }"
@@ -88,9 +93,9 @@ module AoC2021
       def near_volume = intersects?(NEAR_SPACE) ? volume : 0
 
       def intersects?(other)
-        @x_range.begin <= other.x_range.end && @x_range.end >= other.x_range.begin &&
+        @z_range.begin <= other.z_range.end && @z_range.end >= other.z_range.begin &&
           @y_range.begin <= other.y_range.end && @y_range.end >= other.y_range.begin &&
-          @z_range.begin <= other.z_range.end && @z_range.end >= other.z_range.begin
+          @x_range.begin <= other.x_range.end && @x_range.end >= other.x_range.begin
       end
 
       def intersection(other)
