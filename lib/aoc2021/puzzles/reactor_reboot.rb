@@ -16,7 +16,7 @@ module AoC2021
 
     def initialize(file = StringIO.new(""))
       @raw_steps = file.readlines(chomp: true).map { |line| STEP_PAT.match(line, &method(:make_step)) }
-      @cubes     = []
+      @cubes     = nil
     end
 
     def make_step(match_data)
@@ -24,6 +24,7 @@ module AoC2021
     end
 
     def process_volumes
+      @cubes = [@raw_steps.pop]
       @raw_steps.reverse.each(&method(:process_one_cube))
       self
     end
@@ -53,7 +54,6 @@ module AoC2021
     end
 
     def self.split((c1s, c1x, c1y, c1z), (_, c2x, c2y, c2z))
-      # puts "Need to split #{ cube1 } around #{ cube2 }"
       acc = []
       if c1x.begin < c2x.begin
         acc << [c1s, c1x.begin..(c2x.begin - 1), c1y, c1z]
@@ -90,10 +90,12 @@ module AoC2021
 
     def process_one_cube(new_cube)
       potential = [new_cube]
-      @cubes.each do |cube|
+      # @cubes.each do |cube|
+      @cubes[(@cubes.bsearch_index { _1[1].end >= new_cube[1].begin })..].each do |cube|
         potential = detect_and_split(potential, cube)
       end
-      @cubes += potential
+      @cubes.insert(@cubes.bsearch_index { _1[1].end > new_cube[1].end } || @cubes.size, *potential)
+      @cubes.sort_by! { _1[1].end }
     end
   end
 end
