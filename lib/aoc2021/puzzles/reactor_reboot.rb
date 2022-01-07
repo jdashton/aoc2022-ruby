@@ -22,7 +22,7 @@ module AoC2021
       file.readlines(chomp: true)
           .map { |line|
             md = STEP_PAT.match(line)
-            Cuboid.new(md[1] == "on", *md.captures[1..].map(&:to_i).each_slice(2).map { Range.new(*_1) })
+            Cuboid.new(md[1] == "on", *md.captures[1..].map(&:to_i))
           }
           .each(&method(:process_cuboid))
     end
@@ -41,10 +41,10 @@ module AoC2021
                       []
                     end
 
-      @cuboids.each do |other_cuboid|
-        next unless cuboid.intersects? other_cuboid
+      @cuboids.each do |oc|
+        next unless cuboid.intersects?(oc.x1, oc.x2, oc.y1, oc.y2, oc.z1, oc.z2)
 
-        cuboid_intersection = other_cuboid.intersection(cuboid)
+        cuboid_intersection = oc.intersection(cuboid)
         # puts "  ..  Intersects with #{ other_cuboid }, adding #{ cuboid_intersection }"
 
         @full_volume += cuboid_intersection.volume
@@ -74,46 +74,54 @@ module AoC2021
 
     # Encapsulates operations on a cube
     class Cuboid
-      attr_reader :lit, :x_range, :y_range, :z_range
+      attr_reader :lit, :x1, :x2, :y1, :y2, :z1, :z2
 
-      def initialize(lit, x_range, y_range, z_range)
-        @lit     = lit
-        @x_range = x_range
-        @y_range = y_range
-        @z_range = z_range
-        @volume  = @x_range.size * @y_range.size * @z_range.size
+      def initialize(lit, x1, x2, y1, y2, z1, z2)
+        @lit    = lit
+        @x1     = x1
+        @x2     = x2
+        @y1     = y1
+        @y2     = y2
+        @z1     = z1
+        @z2     = z2
+        @volume = (x2 - x1 + 1) * (y2 - y1 + 1) * (z2 - z1 + 1)
       end
 
-      NEAR_SPACE = Cuboid.new(false, -50..50, -50..50, -50..50)
+      NEAR_SPACE = [-50, 50] * 3
 
-      def to_s = "Cuboid[ lit: #{ @lit }, #{ @x_range }, #{ @y_range }, #{ @z_range } ]"
+      def to_s = "Cuboid[ lit: #{ @lit }, #{ @x1 }, #{ @x2 }, #{ @y1 }, #{ @y2 }, #{ @z1 }, #{ @z2 } ]"
 
       def volume = @lit ? @volume : (0 - @volume)
 
-      def near_volume = intersects?(NEAR_SPACE) ? volume : 0
+      def near_volume = intersects?(*NEAR_SPACE) ? volume : 0
 
-      def intersects?(other)
-        @z_range.begin <= other.z_range.end && @z_range.end >= other.z_range.begin &&
-          @y_range.begin <= other.y_range.end && @y_range.end >= other.y_range.begin &&
-          @x_range.begin <= other.x_range.end && @x_range.end >= other.x_range.begin
+      def intersects?(x1, x2, y1, y2, z1, z2)
+        # max_x, max_y, max_z = [max(box_a[i], box_b[i]) for i in (0, 2, 4)]
+        # min_xp, min_yp, min_zp = [min(box_a[i], box_b[i]) for i in (1, 3, 5)]
+        # if min_xp - max_x >= 0 and min_yp - max_y >= 0 and min_zp - max_z >= 0:
+        #   return max_x, min_xp, max_y,  min_yp, max_z, min_zp
+
+        @z1 <= z2 && @z2 >= z1 &&
+          @y1 <= y2 && @y2 >= y1 &&
+          @x1 <= x2 && @x2 >= x1
       end
 
       def intersection(other)
-        Cuboid.new(!@lit, make_x_range(other.x_range), make_y_range(other.y_range), make_z_range(other.z_range))
+        Cuboid.new(!@lit, *make_x_range(other), *make_y_range(other), *make_z_range(other))
       end
 
       private
 
-      def make_x_range(x_range)
-        [@x_range.begin, x_range.begin].max..[@x_range.end, x_range.end].min
+      def make_x_range(other)
+        [[@x1, other.x1].max, [@x2, other.x2].min]
       end
 
-      def make_y_range(y_range)
-        [@y_range.begin, y_range.begin].max..[@y_range.end, y_range.end].min
+      def make_y_range(other)
+        [[@y1, other.y1].max, [@y2, other.y2].min]
       end
 
-      def make_z_range(z_range)
-        [@z_range.begin, z_range.begin].max..[@z_range.end, z_range.end].min
+      def make_z_range(other)
+        [[@z1, other.z1].max, [@z2, other.z2].min]
       end
     end
 
