@@ -55,16 +55,10 @@ module AoC2021
 
           dead_list = []
 
-          @counted.each do |oc|
-            next unless cuboid.intersects?(oc.coords)
+          @counted.each { |oc| dead_list << cuboid.intersects?(oc.coords) }
 
-            cuboid_intersection = oc.intersection(cuboid)
-            # puts "  ..  Intersects with #{ oc }, adding #{ cuboid_intersection }"
-            dead_list << cuboid_intersection
-          end
-
-          dead_list = CuboidList.new(dead_list)
-          dead_list.each { |cuboid| dead_list.process_cuboid(cuboid) }
+          dead_list = CuboidList.new(dead_list.compact)
+          dead_list.each { dead_list.process_cuboid(_1) }
 
           @full_volume -= dead_list.full_volume
           @near_volume -= dead_list.near_volume
@@ -107,37 +101,15 @@ module AoC2021
         # if min_xp - max_x >= 0 and min_yp - max_y >= 0 and min_zp - max_z >= 0:
         #   return max_x, min_xp, max_y,  min_yp, max_z, min_zp
 
-        max_x = [@coords[0], coords[0]].max
-        max_y = [@coords[2], coords[2]].max
-        max_z = [@coords[4], coords[4]].max
-        min_x = [@coords[1], coords[1]].min
-        min_y = [@coords[3], coords[3]].min
-        min_z = [@coords[5], coords[5]].min
-        min_x - max_x >= 0 && min_y - max_y >= 0 && min_z - max_z >= 0
+        max_x_left   = [@coords[0], coords[0]].max
+        min_x_right  = [@coords[1], coords[1]].min
+        max_y_bottom = [@coords[2], coords[2]].max
+        min_y_top    = [@coords[3], coords[3]].min
+        max_z_front  = [@coords[4], coords[4]].max
+        min_z_back   = [@coords[5], coords[5]].min
 
-        # x1, x2, y1, y2, z1, z2                   = coords
-        # my_x1, my_x2, my_y1, my_y2, my_z1, my_z2 = @coords
-        # my_z1 <= z2 && my_z2 >= z1 &&
-        #   my_y1 <= y2 && my_y2 >= y1 &&
-        #   my_x1 <= x2 && my_x2 >= x1
-      end
-
-      def intersection(other)
-        Cuboid.new(true, make_x_range(other) + make_y_range(other) + make_z_range(other))
-      end
-
-      private
-
-      def make_x_range(other)
-        [[@coords[0], other.coords[0]].max, [@coords[1], other.coords[1]].min]
-      end
-
-      def make_y_range(other)
-        [[@coords[2], other.coords[2]].max, [@coords[3], other.coords[3]].min]
-      end
-
-      def make_z_range(other)
-        [[@coords[4], other.coords[4]].max, [@coords[5], other.coords[5]].min]
+        (max_x_left <= min_x_right && max_y_bottom <= min_y_top && max_z_front <= min_z_back &&
+          Cuboid.new(true, [max_x_left, min_x_right, max_y_bottom, min_y_top, max_z_front, min_z_back])) || nil
       end
     end
 
