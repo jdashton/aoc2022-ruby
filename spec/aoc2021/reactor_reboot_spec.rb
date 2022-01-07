@@ -5,24 +5,24 @@ include AoC2021
 RSpec.describe ReactorReboot do
   describe "::intersects?" do
     it "finds an overlap with 3x9..11 and 3x11..13" do
-      expect(ReactorReboot::Cuboid.new(false, 9..11, 9..11, 9..11)
-                                  .intersects?(ReactorReboot::Cuboid.new(true, 11..13, 11..13, 11..13))).to be true
-      expect(ReactorReboot::Cuboid.new(true, 11..13, 11..13, 11..13)
-                                  .intersects?(ReactorReboot::Cuboid.new(false, 9..11, 9..11, 9..11))).to be true
+      expect(ReactorReboot::Cuboid.new(false, [9, 11, 9, 11, 9, 11])
+                                  .intersects?([11, 13, 11, 13, 11, 13])).to be true
+      expect(ReactorReboot::Cuboid.new(true, [11, 13, 11, 13, 11, 13])
+                                  .intersects?([9, 11, 9, 11, 9, 11])).to be true
     end
 
-    it "finds an overlap with 3x10..10 and 3x9..11" do
-      expect(ReactorReboot::Cuboid.new(false, 9..11, 9..11, 9..11)
-                                  .intersects?(ReactorReboot::Cuboid.new(true, 10..10, 10..10, 10..10))).to be true
-      expect(ReactorReboot::Cuboid.new(true, 10..10, 10..10, 10..10)
-                                  .intersects?(ReactorReboot::Cuboid.new(false, 9..11, 9..11, 9..11))).to be true
+    it "finds an overlap with 3x10, 10 and 3x9, 11" do
+      expect(ReactorReboot::Cuboid.new(false, [9, 11, 9, 11, 9, 11])
+                                  .intersects?([10, 10, 10, 10, 10, 10])).to be true
+      expect(ReactorReboot::Cuboid.new(true, [10, 10, 10, 10, 10, 10])
+                                  .intersects?([9, 11, 9, 11, 9, 11])).to be true
     end
 
-    it "finds no overlap with 3x10..10 and 3x11..11" do
-      expect(ReactorReboot::Cuboid.new(false, 11..11, 11..11, 11..11)
-                                  .intersects?(ReactorReboot::Cuboid.new(true, 10..10, 10..10, 10..10))).to be false
-      expect(ReactorReboot::Cuboid.new(true, 10..10, 10..10, 10..10)
-                                  .intersects?(ReactorReboot::Cuboid.new(false, 11..11, 11..11, 11..11))).to be false
+    it "finds no overlap with 3x10, 10 and 3x11, 11" do
+      expect(ReactorReboot::Cuboid.new(false, [11, 11, 11, 11, 11, 11])
+                                  .intersects?([10, 10, 10, 10, 10, 10])).to be false
+      expect(ReactorReboot::Cuboid.new(true, [10, 10, 10, 10, 10, 10])
+                                  .intersects?([11, 11, 11, 11, 11, 11])).to be false
     end
   end
 
