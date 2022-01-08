@@ -6,23 +6,23 @@ RSpec.describe ReactorReboot do
   describe "::intersects?" do
     it "finds an overlap with 3x9..11 and 3x11..13" do
       expect(ReactorReboot::Cuboid.new(false, [9, 11, 9, 11, 9, 11])
-                                  .intersects?([11, 13, 11, 13, 11, 13])).to be_truthy
+                                  .intersection([11, 13, 11, 13, 11, 13])).to be_truthy
       expect(ReactorReboot::Cuboid.new(true, [11, 13, 11, 13, 11, 13])
-                                  .intersects?([9, 11, 9, 11, 9, 11])).to be_truthy
+                                  .intersection([9, 11, 9, 11, 9, 11])).to be_truthy
     end
 
     it "finds an overlap with 3x10, 10 and 3x9, 11" do
       expect(ReactorReboot::Cuboid.new(false, [9, 11, 9, 11, 9, 11])
-                                  .intersects?([10, 10, 10, 10, 10, 10])).to be_truthy
+                                  .intersection([10, 10, 10, 10, 10, 10])).to be_truthy
       expect(ReactorReboot::Cuboid.new(true, [10, 10, 10, 10, 10, 10])
-                                  .intersects?([9, 11, 9, 11, 9, 11])).to be_truthy
+                                  .intersection([9, 11, 9, 11, 9, 11])).to be_truthy
     end
 
     it "finds no overlap with 3x10, 10 and 3x11, 11" do
       expect(ReactorReboot::Cuboid.new(false, [11, 11, 11, 11, 11, 11])
-                                  .intersects?([10, 10, 10, 10, 10, 10])).to be_falsey
+                                  .intersection([10, 10, 10, 10, 10, 10])).to be_falsey
       expect(ReactorReboot::Cuboid.new(true, [10, 10, 10, 10, 10, 10])
-                                  .intersects?([11, 11, 11, 11, 11, 11])).to be_falsey
+                                  .intersection([11, 11, 11, 11, 11, 11])).to be_falsey
     end
   end
 
