@@ -50,19 +50,12 @@ module AoC2021
       def process_cuboid(cuboid)
         # puts "Processing #{ cuboid }"
         if cuboid.lit
-          @full_volume += cuboid.volume
-          @near_volume += cuboid.near_volume
           # puts "Total volume now #{ @full_volume }."
-
-          dead_list = []
-
-          @counted.each { dead_list << cuboid.intersection(_1.coords) }
-
-          dead_list = CuboidList.new(dead_list.compact)
+          dead_list = CuboidList.new(@counted.map { cuboid.intersection(_1.coords) }.compact)
           dead_list.each { dead_list.process_cuboid(_1) }
 
-          @full_volume -= dead_list.full_volume
-          @near_volume -= dead_list.near_volume
+          @full_volume += cuboid.volume - dead_list.full_volume
+          @near_volume += cuboid.near_volume - dead_list.near_volume
         end
         @counted << cuboid
         # puts "Total volume of #{ @full_volume }."
@@ -91,11 +84,15 @@ module AoC2021
       def to_s = "Cuboid[ lit: #{ @lit }, #{ @coords } ]"
 
       def near_volume
-        (@coords[0] > -50 ? @coords[0] : -50) <= (@coords[1] < 50 ? @coords[1] : 50) &&
-          (@coords[2] > -50 ? @coords[2] : -50) <= (@coords[3] < 50 ? @coords[3] : 50) &&
-          (@coords[4] > -50 ? @coords[4] : -50) <= (@coords[5] < 50 ? @coords[5] : 50) ? @volume : 0
+        (@coords[0] >= -50 && @coords[1] <= 50 &&
+          # ((@coords[0] > -50 ? @coords[0] : -50) <= (@coords[1] < 50 ? @coords[1] : 50) &&
+          #   (@coords[2] > -50 ? @coords[2] : -50) <= (@coords[3] < 50 ? @coords[3] : 50) &&
+          #   (@coords[4] > -50 ? @coords[4] : -50) <= (@coords[5] < 50 ? @coords[5] : 50) &&
+          @volume) || 0
       end
 
+      # rubocop:disable Metrics, Layout/LineLength
+      # :reek:DuplicateMethodCall and :reek:TooManyStatements
       def intersection(coords)
         # max_x, max_y, max_z = [max(box_a[i], box_b[i]) for i in (0, 2, 4)]
         # min_xp, min_yp, min_zp = [min(box_a[i], box_b[i]) for i in (1, 3, 5)]
@@ -132,7 +129,8 @@ module AoC2021
         ((max_x_l = @coords[0] > coords[0] ? @coords[0] : coords[0]) <= (min_x_r = @coords[1] < coords[1] ? @coords[1] : coords[1]) &&
           (max_y_b = @coords[2] > coords[2] ? @coords[2] : coords[2]) <= (min_y_t = @coords[3] < coords[3] ? @coords[3] : coords[3]) &&
           (max_z_f = @coords[4] > coords[4] ? @coords[4] : coords[4]) <= (min_z_b = @coords[5] < coords[5] ? @coords[5] : coords[5]) &&
-          Cuboid.new(true, [max_x_l, min_x_r, max_y_b, min_y_t, max_z_f, min_z_b])) || nil
+          Cuboid.new(true, [max_x_l, min_x_r, max_y_b, min_y_t, max_z_f, min_z_b])
+        ) || nil
 
         # max_x_left   = @coords[0] > coords[0] ? @coords[0] : coords[0]
         # min_x_right  = @coords[1] < coords[1] ? @coords[1] : coords[1]
@@ -144,6 +142,8 @@ module AoC2021
         # (max_x_left <= min_x_right && max_y_bottom <= min_y_top && max_z_front <= min_z_back &&
         #   Cuboid.new(true, [max_x_left, min_x_right, max_y_bottom, min_y_top, max_z_front, min_z_back])) || nil
       end
+
+      # rubocop:enable Metrics, Layout/LineLength
     end
 
     # def process_one_cube(new_cube)
