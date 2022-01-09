@@ -22,7 +22,6 @@ detectors:
       - _
 
 exclude_paths:
-  - lib/aoc2021/puzzles/amphipod.rb
   - lib/aoc2021/puzzles/arithmetic_logic_unit.rb
   - lib/aoc2021/puzzles/cave_paths.rb
   - lib/aoc2021/puzzles/chitons.rb

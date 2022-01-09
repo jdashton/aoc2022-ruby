@@ -5,7 +5,6 @@ AllCops:
   Exclude:
     - bin/bundle
     - vendor/**/*
-    - lib/aoc2021/puzzles/amphipod.rb
     - lib/aoc2021/puzzles/arithmetic_logic_unit.rb
     - lib/aoc2021/puzzles/chitons.rb
     - lib/aoc2021/puzzles/dirac_dice.rb
@@ -73,6 +72,6 @@ Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
 
-#Style/TernaryParentheses:
-#  Exclude:
-#    - lib/aoc2021/puzzles/amphipod.rb
+Style/TernaryParentheses:
+  Exclude:
+    - lib/aoc2021/puzzles/amphipod.rb

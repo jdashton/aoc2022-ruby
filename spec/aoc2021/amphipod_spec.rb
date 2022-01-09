@@ -647,25 +647,25 @@ RSpec.describe Amphipod do
                                  :empty, %i[C C B D], # x = 4
                                  :empty, %i[B B A C], # x = 6
                                  :empty, %i[empty A C A], # x = 8
-                                 :empty, :D]).can_move?([2, 0])).to be true
+                                 :empty, :D]).can_move_from_room_spot?(2, 0)).to be true
       expect(Amphipod::Move.new([:empty,
                                  :B, %i[empty D D A],
                                  :empty, %i[C C B D],
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?([2, 1])).to be true
+                                 :empty, :D]).can_move_from_room_spot?(2, 1)).to be true
       expect(Amphipod::Move.new([:empty,
                                  :empty, %i[B D D A],
                                  :empty, %i[empty empty C B], # [4, 2] is in the wrong room (:C should be in [6, y])
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?([4, 2])).to be true
+                                 :empty, :D]).can_move_from_room_spot?(4, 2)).to be true
       expect(Amphipod::Move.new([:empty,
                                  :empty, %i[B D D A],
                                  :empty, %i[empty empty B C], # [4, 3] is in the wrong room, so [4, 2] can move
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?([4, 2])).to be true
+                                 :empty, :D]).can_move_from_room_spot?(4, 2)).to be true
     end
 
     it "correctly indicates that a piece cannot move from a room" do
@@ -674,25 +674,25 @@ RSpec.describe Amphipod do
                                  :empty, %i[C C B D],
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?([2, 2])).to be false # [2, 2] is not nearest the door
+                                 :empty, :D]).can_move_from_room_spot?(2, 2)).to be false # [2, 2] is not nearest the door
       expect(Amphipod::Move.new([:empty,
                                  :C, %i[B D D A],
                                  :C, %i[empty empty B D],
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?([2, 0])).to be false # adjoining hallways spaces both full
+                                 :empty, :D]).can_move_from_room_spot?(2, 0)).to be false # adjoining hallways spaces both full
       expect(Amphipod::Move.new([:empty,
                                  :empty, %i[B D D A],
                                  :empty, %i[empty empty B B], # in the right room and no other kind below [2, 2]
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?([4, 2])).to be false
+                                 :empty, :D]).can_move_from_room_spot?(4, 2)).to be false
       expect(Amphipod::Move.new([:empty,
                                  :empty, %i[empty A], # right room, farthest from door
                                  :empty, %i[empty empty B B],
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?([2, 1])).to be false
+                                 :empty, :D]).can_move_from_room_spot?(2, 1)).to be false
     end
 
     it "correctly indicates that a piece can move from the hallway" do
@@ -701,7 +701,7 @@ RSpec.describe Amphipod do
                                  :empty, %i[empty empty B B],
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?(0)).to be true
+                                 :empty, :D]).can_move_to_room?(0)).to be true
     end
 
     it "correctly indicates that a piece cannot move from the hallway" do
@@ -710,13 +710,13 @@ RSpec.describe Amphipod do
                                  :empty, %i[empty empty B B],
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?(0)).to be false
+                                 :empty, :D]).can_move_to_room?(0)).to be false
       expect(Amphipod::Move.new([:B,
                                  :B, %i[B D D A], # Path open but :C in :B's room
                                  :empty, %i[empty empty B C],
                                  :empty, %i[B B A C],
                                  :empty, %i[empty A C A],
-                                 :empty, :D]).can_move?(1)).to be false
+                                 :empty, :D]).can_move_to_room?(1)).to be false
     end
   end
 
@@ -759,20 +759,6 @@ RSpec.describe Amphipod do
   end
 
   describe "#play_game" do
-    context "with my actual input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
-        #############
-        #...........#
-        ###A#D#A#B###
-          #B#C#D#C#
-          #########
-      BOARD
-
-      it "finds a least score of 13455 energy" do
-        # expect(subject.play_game(PriorityQueue.new)).to eq 13_455
-      end
-    end
-
     context "with the example input" do
       subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
         #############
@@ -784,7 +770,21 @@ RSpec.describe Amphipod do
 
       it "finds a least score of 12521 energy" do
         subject
-        # expect(subject.play_game(PriorityQueue.new)).to eq 12_521
+        expect(subject.play_game(PriorityQueue.new)).to eq 12_521
+      end
+    end
+
+    context "with my actual input" do
+      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+        #############
+        #...........#
+        ###A#D#A#B###
+          #B#C#D#C#
+          #########
+      BOARD
+
+      it "finds a least score of 13455 energy" do
+        # expect(subject.play_game(PriorityQueue.new)).to eq 13_455
       end
     end
 

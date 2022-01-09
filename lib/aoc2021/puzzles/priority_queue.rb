@@ -24,11 +24,15 @@ module AoC2021
 
     # `item` must respond to the `score` method call.
     def <<(item)
-      raise "nil priority" unless (priority = item.score)
-
-      @queue[priority] ||= Set[]
+      @queue[priority = item.score] ||= Set[]
       @queue[priority] << item
       @low_item = [@low_item, priority].min
+    end
+
+    def concat(*others)
+      others.each do |oth|
+        oth.each { self << _1 }
+      end
     end
   end
 end

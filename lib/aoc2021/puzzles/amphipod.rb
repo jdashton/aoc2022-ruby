@@ -24,26 +24,22 @@ module AoC2021
       end
 
       def play_game(queue)
-        next_move = self
-        count     = 0
+        move  = self
+        count = 0
 
         loop do
-          next_move.next_moves.each { |move| queue << move }
-
-          unless (next_move = queue.next)
-            puts "Ran out of moves to try"
-            return
-          end
+          queue.concat move.next_moves
+          move = queue.next
 
           # print "Considering board "
           # pp next_board
           count += 1
-          puts "#{ count }...#{ next_move.score }" if (count % 10_000).zero?
+          puts "#{ count }...#{ move.score }" if (count % 10_000).zero?
 
-          next unless next_move.final_state?
+          next unless move.final_state?
 
-          puts "final state: #{ score = next_move.score } after #{ count } moves"
-          next_move.print_history
+          puts "final state: #{ score = move.score } after #{ count } moves"
+          move.print_history
           return score
         end
       end
@@ -66,24 +62,24 @@ module AoC2021
         Set.new(ready_to_move.reduce([]) do |acc, pos|
           # pp @board, pos
           case pos
-            in Integer => x
-              # puts "Looking for moves for #{ @board[x] } at #{ x }"
-              # An amphipod in the hallway can only move into the last available :empty position in the right room.
-              # Return the board transformed in this way.
-              amphipod     = @board[x]
-              new_board    = @board.map(&:clone)
-              new_board[x] = :empty
-              room_num     = RIGHT_ROOM[amphipod]
-              room         = new_board[room_num]
-              new_y        = room.rindex(:empty)
-              pp room, @board if new_y.nil?
-              room[new_y] = amphipod
-              acc << Move.new(new_board, @score + (Move.distance(x, room_num, new_y) * COSTS[amphipod]), self)
             in [room, room_spot]
               # puts "Looking for moves for #{ board[x][y] } at #{ x }, #{ y }"
               hall_list = hall_avail(room, room_spot)
               room_list = room_avail(room, room_spot)
               acc + hall_list + room_list
+            in hall_spot
+              # puts "Looking for moves for #{ @board[x] } at #{ x }"
+              # An amphipod in the hallway can only move into the last available :empty position in the right room.
+              # Return the board transformed in this way.
+              amphipod             = @board[hall_spot]
+              new_board            = @board.map(&:clone)
+              new_board[hall_spot] = :empty
+              room_num             = RIGHT_ROOM[amphipod]
+              room                 = new_board[room_num]
+              new_y                = room.rindex(:empty)
+              pp room, @board if new_y.nil?
+              room[new_y] = amphipod
+              acc << Move.new(new_board, @score + (Move.distance(hall_spot, room_num, new_y) * COSTS[amphipod]), self)
             else
               raise "Unexpected branch"
           end
@@ -108,7 +104,7 @@ module AoC2021
         amphipod   = @board[old_room][old_room_spot]
         right_room = RIGHT_ROOM[amphipod]
         return [] unless @board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
-                         clear_path_to?(right_room, old_room)
+          clear_path_to?(right_room, old_room)
 
         new_board                            = @board.map(&:clone)
         new_room_spot                        = @board[right_room].rindex(:empty)
@@ -130,50 +126,44 @@ module AoC2021
       # Returns a list of pieces that can make at least one valid move.
       def ready_to_move
         # pp @board
-        @board.each_with_index.flat_map do |pos, x|
+        @board.each_with_index.map do |thing_at_pos, x|
           # pp pos, x
-          case pos
+          case thing_at_pos
             in AMPHIPODS
-              can_move?(x) ? x : []
+              can_move_to_room?(x) ? x : nil
             in Array => room
-              room.each_index.reduce([]) do |acc, y|
-                next acc if @board[x][y] == :empty
-
-                can_move?([x, y]) ? acc << [x, y] : acc
-              end
+              y = room.each_index.find { @board[x][_1] != :empty }
+              y && (can_move_from_room_spot?(x, y) ? [x, y] : nil)
             else
-              []
+              nil
           end
-        end
+        end.compact
       end
 
-      def can_move?(piece)
-        case piece
-          in Integer => x, Integer => y
-            # puts "#{ x }, #{ y } => #{ board[x][y] }"
-            # handle [x, y] in a room
-            # In all cases, if x - 1 is not :empty AND x + 1 is not :empty, this piece cannot move.
-            current_room = @board[x]
-            amphipod     = current_room[y]
-            @board[(x - 1..x + 1).step(2)].any?(:empty) &&
-              # y must have no other pieces with a lower index  [:empty, :empty, :D, :A] the :D can move
-              (y.zero? || current_room[..y - 1].all?(:empty)) &&
-              # and must be in the wrong room OR
-              (RIGHT_ROOM[amphipod] != x ||
-                # be followed by a different piece [:empty, :empty, :D, :A] the :D can move even if it is in the :D (x = 8) room
-                ((y < (current_room.length - 1)) && current_room[(y + 1..)].any? { |denizen| denizen != amphipod }))
-          in Integer => x
-            # puts "#{ x } => #{ board[x] }"
-            # handle x in a hallway position
-            # An amphipod in the hallway cannot move unless it has a clear shot to its room, and that room contains
-            # no other type of amphipod.
-            amphipod   = @board[x]
-            right_room = RIGHT_ROOM[amphipod]
-            @board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
-              clear_path_to?(right_room, x)
-          else
-            false
-        end
+      def can_move_to_room?(hall_spot)
+        # puts "#{ x } => #{ board[x] }"
+        # handle x in a hallway position
+        # An amphipod in the hallway cannot move unless it has a clear shot to its room, and that room contains
+        # no other type of amphipod.
+        amphipod   = @board[hall_spot]
+        right_room = RIGHT_ROOM[amphipod]
+        @board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
+          clear_path_to?(right_room, hall_spot)
+      end
+
+      def can_move_from_room_spot?(room_num, spot)
+        # puts "#{ x }, #{ y } => #{ board[x][y] }"
+        # handle [x, y] in a room
+        # In all cases, if x - 1 is not :empty AND x + 1 is not :empty, this piece cannot move.
+        current_room = @board[room_num]
+        amphipod     = current_room[spot]
+        @board[(room_num - 1..room_num + 1).step(2)].any?(:empty) &&
+          # y must have no other pieces with a lower index  [:empty, :empty, :D, :A] the :D can move
+          (spot.zero? || current_room[..spot - 1].all?(:empty)) &&
+          # and must be in the wrong room OR
+          (RIGHT_ROOM[amphipod] != room_num ||
+            # be followed by a different piece [:empty, :empty, :D, :A] the :D can move even if it is in the :D (x = 8) room
+            ((spot < (current_room.length - 1)) && current_room[(spot + 1..)].any? { |denizen| denizen != amphipod }))
       end
 
       # Returns true/false whether a piece can move from start_x to destination_x.
