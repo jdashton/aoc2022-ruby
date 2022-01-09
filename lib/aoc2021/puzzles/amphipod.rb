@@ -46,14 +46,17 @@ module AoC2021
 
       def print_history
         brd = @board
-        puts "  #{ brd[0] }#{ brd[1] } #{ brd[3] } #{ brd[5] } #{ brd[7] } #{ brd[9] }#{ brd[10] }".gsub("empty", ".")
-        brd[2].each_index { |i| puts "    #{ brd[2][i] } #{ brd[4][i] } #{ brd[6][i] } #{ brd[8][i] }".gsub("empty", ".") }
+        pp board
+        puts "  #{ brd[0] || "." }#{ brd[1] || "." }.#{ brd[3] || "." }.#{ brd[5] || "." }.#{ brd[7] || "." }.#{ brd[9] || "." }#{ brd[10] || "." }"
+        brd[2].each_index do |i|
+          puts "    #{ brd[2][i] || "." } #{ brd[4][i] || "." } #{ brd[6][i] || "." } #{ brd[8][i] || "." }"
+        end
         puts ("-" * 15) + " #{ @score }"
         @history&.print_history
       end
 
       def final_state?
-        @board.values_at(*HALL_SPOTS).all?(:empty) &&
+        @board.values_at(*HALL_SPOTS).all?(nil) &&
           @board.values_at(*ROOMS).zip(ROOMS).all? { |(room, num)| room.all?(ROOM_AMPHIPOD[num]) }
       end
 
@@ -73,10 +76,10 @@ module AoC2021
               # Return the board transformed in this way.
               amphipod             = @board[hall_spot]
               new_board            = @board.map(&:clone)
-              new_board[hall_spot] = :empty
+              new_board[hall_spot] = nil
               room_num             = RIGHT_ROOM[amphipod]
               room                 = new_board[room_num]
-              new_y                = room.rindex(:empty)
+              new_y                = room.rindex(nil)
               pp room, @board if new_y.nil?
               room[new_y] = amphipod
               acc << Move.new(new_board, @score + (Move.distance(hall_spot, room_num, new_y) * COSTS[amphipod]), self)
@@ -92,7 +95,7 @@ module AoC2021
                   .reduce([]) do |acc, hall_spot|
           new_board                      = @board.map(&:clone)
           new_board[hall_spot]           = amphipod
-          new_board[old_room][room_spot] = :empty
+          new_board[old_room][room_spot] = nil
           # print "found "
           # pp [new_board, @score + (Move.distance(hall_spot, room, room_spot) * COSTS[amphipod])]
           acc << Move.new(new_board, @score + (Move.distance(hall_spot, old_room, room_spot) * COSTS[amphipod]), self)
@@ -103,13 +106,13 @@ module AoC2021
         # print_history
         amphipod   = @board[old_room][old_room_spot]
         right_room = RIGHT_ROOM[amphipod]
-        return [] unless @board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
-          clear_path_to?(right_room, old_room)
+        return [] unless @board[right_room].all? { |room_spot| [nil, amphipod].include?(room_spot) } &&
+                         clear_path_to?(right_room, old_room)
 
         new_board                            = @board.map(&:clone)
-        new_room_spot                        = @board[right_room].rindex(:empty)
+        new_room_spot                        = @board[right_room].rindex(nil)
         new_board[right_room][new_room_spot] = amphipod
-        new_board[old_room][old_room_spot]   = :empty
+        new_board[old_room][old_room_spot]   = nil
         # print "found "
         # pp [new_board, @score + (Move.distance(right_room, old_room, old_room_spot + new_room_spot + 1) * COSTS[amphipod])]
         [
@@ -125,19 +128,17 @@ module AoC2021
 
       # Returns a list of pieces that can make at least one valid move.
       def ready_to_move
-        # pp @board
-        @board.each_with_index.map do |thing_at_pos, x|
-          # pp pos, x
+        @board.each_with_index.map { |thing_at_pos, x|
           case thing_at_pos
             in AMPHIPODS
               can_move_to_room?(x) ? x : nil
             in Array => room
-              y = room.each_index.find { @board[x][_1] != :empty }
+              y = room.each_index.find { room[_1] } # != nil
               y && (can_move_from_room_spot?(x, y) ? [x, y] : nil)
             else
               nil
           end
-        end.compact
+        }.compact
       end
 
       def can_move_to_room?(hall_spot)
@@ -147,7 +148,7 @@ module AoC2021
         # no other type of amphipod.
         amphipod   = @board[hall_spot]
         right_room = RIGHT_ROOM[amphipod]
-        @board[right_room].all? { |room_spot| [:empty, amphipod].include?(room_spot) } &&
+        @board[right_room].all? { |room_spot| [nil, amphipod].include?(room_spot) } &&
           clear_path_to?(right_room, hall_spot)
       end
 
@@ -157,9 +158,9 @@ module AoC2021
         # In all cases, if x - 1 is not :empty AND x + 1 is not :empty, this piece cannot move.
         current_room = @board[room_num]
         amphipod     = current_room[spot]
-        @board[(room_num - 1..room_num + 1).step(2)].any?(:empty) &&
+        @board[(room_num - 1..room_num + 1).step(2)].any?(nil) &&
           # y must have no other pieces with a lower index  [:empty, :empty, :D, :A] the :D can move
-          (spot.zero? || current_room[..spot - 1].all?(:empty)) &&
+          (spot.zero? || current_room[..spot - 1].all?(nil)) &&
           # and must be in the wrong room OR
           (RIGHT_ROOM[amphipod] != room_num ||
             # be followed by a different piece [:empty, :empty, :D, :A] the :D can move even if it is in the :D (x = 8) room
@@ -173,7 +174,7 @@ module AoC2021
                 else
                   start_x + 1..destination_x
                 end
-        @board[range].filter { _1.is_a? Symbol }.all?(:empty)
+        @board[range].filter { _1.is_a? Symbol }.all?(nil)
       end
 
       def hash = [@board, @score].hash
@@ -195,14 +196,14 @@ module AoC2021
         @board[9]  = md[6].to_sym
         @board[10] = md[7].to_sym
       end
-      HALL_SPOTS.each { |spot| @board[spot] = :empty if @board[spot] == :"." }
+      HALL_SPOTS.each { |spot| @board[spot] = nil if @board[spot] == :"." }
       ROOMS.each { |room_num| @board[room_num] = [] }
       (0..3).each do |room_spot|
         /#+([A-D.])#([A-D.])#([A-D.])#([A-D.])#+/.match(lines[room_spot + 2]) do |md|
-          @board[2][room_spot] = (md[1].to_sym in AMPHIPODS) ? md[1].to_sym : :empty
-          @board[4][room_spot] = (md[2].to_sym in AMPHIPODS) ? md[2].to_sym : :empty
-          @board[6][room_spot] = (md[3].to_sym in AMPHIPODS) ? md[3].to_sym : :empty
-          @board[8][room_spot] = (md[4].to_sym in AMPHIPODS) ? md[4].to_sym : :empty
+          @board[2][room_spot] = (md[1].to_sym in AMPHIPODS) ? md[1].to_sym : nil
+          @board[4][room_spot] = (md[2].to_sym in AMPHIPODS) ? md[2].to_sym : nil
+          @board[6][room_spot] = (md[3].to_sym in AMPHIPODS) ? md[3].to_sym : nil
+          @board[8][room_spot] = (md[4].to_sym in AMPHIPODS) ? md[4].to_sym : nil
         end
       end
       # @board     = [board, 0]
