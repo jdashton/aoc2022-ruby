@@ -25,7 +25,6 @@ exclude_paths:
   - lib/aoc2021/puzzles/arithmetic_logic_unit.rb
   - lib/aoc2021/puzzles/cave_paths.rb
   - lib/aoc2021/puzzles/chitons.rb
-  - lib/aoc2021/puzzles/dirac_dice.rb
   - lib/aoc2021/puzzles/packet_decoder.rb
   - lib/aoc2021/puzzles/priority_queue.rb
   - lib/aoc2021/puzzles/sea_cucumber.rb

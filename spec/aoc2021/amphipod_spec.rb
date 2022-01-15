@@ -758,6 +758,38 @@ RSpec.describe Amphipod do
     end
   end
 
+  describe "#cost_to_leave_rooms" do
+    context "with the example input" do
+      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+        #############
+        #...........#
+        ###B#C#B#D###
+          #A#D#C#A#
+          #########
+      BOARD
+
+      it "finds a cost of 3,122 energy for all non-homed pods to leave the initial rooms" do
+        expect(subject.cost_to_leave_rooms(subject.board)).to eq 3_122
+      end
+    end
+  end
+
+  describe "#cost_to_enter_rooms" do
+    context "with the example input" do
+      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+        #############
+        #...........#
+        ###B#C#B#D###
+          #A#D#C#A#
+          #########
+      BOARD
+
+      it "finds a cost of 3,131 energy to fill all rooms from the initial state" do
+        expect(subject.cost_to_enter_rooms(subject.board)).to eq 3_131
+      end
+    end
+  end
+
   describe "#play_game" do
     context "with the example input" do
       subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
@@ -769,7 +801,6 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a least score of 12521 energy" do
-        subject
         expect(subject.play_game(PriorityQueue.new)).to eq 12_521
       end
     end
@@ -784,7 +815,21 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a least score of 13455 energy" do
-        # expect(subject.play_game(PriorityQueue.new)).to eq 13_455
+        expect(subject.play_game(PriorityQueue.new)).to eq 13_455
+      end
+    end
+
+    context "with vodik's input" do
+      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+        #############
+        #...........#
+        ###A#C#B#A###
+          #D#D#B#C#
+          #########
+      BOARD
+
+      it "finds a least score of 18,195 energy" do
+        expect(subject.play_game(PriorityQueue.new)).to eq 18_195
       end
     end
 
@@ -799,9 +844,13 @@ RSpec.describe Amphipod do
           #########
       BOARD
 
+      it "finds a cost of x to leave the rooms" do
+        expect(subject.cost_to_leave_rooms(subject.board))
+          .to eq 10 + 2000 + 3000 + 100 + 200 + 30 + 4000 + 10 + 20 + 3 + 1000 + 2 + 300 + 4
+      end
+
       it "finds a least score of 44169 energy" do
-        subject
-        # expect(subject.play_game(PriorityQueue.new)).to eq 44_169
+        expect(subject.play_game(PriorityQueue.new)).to eq 44_169
       end
     end
 
@@ -817,7 +866,23 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a least score of 43567 energy" do
-        # expect(subject.play_game(PriorityQueue.new)).to eq 43_567
+        expect(subject.play_game(PriorityQueue.new)).to eq 43_567
+      end
+    end
+
+    context "with vodik's part 2 input" do
+      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+        #############
+        #...........#
+        ###A#C#B#A###
+          #D#C#B#A#
+          #D#B#A#C#
+          #D#D#B#C#
+          #########
+      BOARD
+
+      it "finds a least score of 50,265 energy" do
+        expect(subject.play_game(PriorityQueue.new)).to eq 50_265
       end
     end
   end

@@ -7,7 +7,6 @@ AllCops:
     - vendor/**/*
     - lib/aoc2021/puzzles/arithmetic_logic_unit.rb
     - lib/aoc2021/puzzles/chitons.rb
-    - lib/aoc2021/puzzles/dirac_dice.rb
     - lib/aoc2021/puzzles/packet_decoder.rb
     - lib/aoc2021/puzzles/sea_cucumber.rb
     - lib/aoc2021/puzzles/snailfish.rb

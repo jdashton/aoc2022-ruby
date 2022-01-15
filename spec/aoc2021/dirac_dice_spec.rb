@@ -5,33 +5,72 @@ include AoC2021
 
 RSpec.describe DiracDice do
   describe "#deterministic_die" do
-    subject { DiracDice.new StringIO.new(<<~NUMBERS) }
-      Player 1 starting position: 4
-      Player 2 starting position: 8
-    NUMBERS
+    context "with example input" do
+      subject { DiracDice.new StringIO.new(<<~NUMBERS) }
+        Player 1 starting position: 4
+        Player 2 starting position: 8
+      NUMBERS
 
-    it "find an answer of 1073709" do
-      expect(subject.deterministic_die).to eq "897 * 1197 = 1073709"
+      it "finds an answer of 739785" do
+        expect(subject.deterministic_die).to eq "745 * 993 = 739785"
+      end
+    end
+
+    context "with vodik's input" do
+      subject { DiracDice.new StringIO.new(<<~NUMBERS) }
+        Player 1 starting position: 8
+        Player 2 starting position: 1
+      NUMBERS
+
+      it "finds an answer of 518418" do
+        expect(subject.deterministic_die).to eq "694 * 747 = 518418"
+      end
+    end
+
+    context "with my actual input" do
+      subject { File.open("input/day21a.txt") { |file| DiracDice.new file } }
+
+      it "finds an answer of 1073709" do
+        expect(subject.deterministic_die).to eq "897 * 1197 = 1073709"
+      end
     end
   end
 
+  # describe "timing Array.new and array.dup" do
+  #   ARRAY_NEW = Array.new(57_314, 0)
+  #
+  #   it "times constant dup for 10,000 iterations" do
+  #     ary = nil
+  #     (0...10_000).each { ary = ARRAY_NEW.dup; ary[57_313] = 57_313 }
+  #     puts ary.size
+  #     puts ary[57_313]
+  #   end
+  #
+  #   it "times Array.new for 10,000 iterations" do
+  #     ary = nil
+  #     (0...10_000).each { ary = Array.new(57_314, 0); ary[57_313] = 57_313 }
+  #     puts ary.size
+  #     puts ary[57_313]
+  #   end
+  #
+  #   it "times array.dup for 10,000 iterations" do
+  #     source = Array.new(57_314, 0)
+  #     ary    = nil
+  #     (0...10_000).each { ary = source.dup; ary[57_313] = 57_313 }
+  #     puts ary.size
+  #     puts ary[57_313]
+  #   end
+  # end
+
   describe "DiracDice::State" do
     it "packs and unpacks as expected: (9, 0), (3, 0)" do
-      unpacked = DiracDice::State.unpack(DiracDice::State.new(DiracDice::Player.new(9), DiracDice::Player.new(3)).pack)
-      expect([unpacked.player1.position_adjusted,
-              unpacked.player1.score,
-              unpacked.player2.position_adjusted,
-              unpacked.player2.score])
-        .to eq [9, 0, 3, 0]
+      pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(9), DiracDice::Player.new(3)))
+      expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score]).to eq [9, 0, 3, 0]
     end
 
     it "packs and unpacks as expected: (20, 5), (22, 2)" do
-      unpacked = DiracDice::State.unpack(DiracDice::State.new(DiracDice::Player.new(5, 20), DiracDice::Player.new(2, 22)).pack)
-      expect([unpacked.player1.position_adjusted,
-              unpacked.player1.score,
-              unpacked.player2.position_adjusted,
-              unpacked.player2.score])
-        .to eq [5, 20, 2, 22]
+      pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(5, 20), DiracDice::Player.new(2, 22)))
+      expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score]).to eq [5, 20, 2, 22]
     end
 
     it "should pack/unpack as expected" do
@@ -39,11 +78,9 @@ RSpec.describe DiracDice do
         (1..10).each do |p1_pos|
           (0..20).each do |p2_score|
             (1..10).each do |p2_pos|
-              unpacked = DiracDice::State.unpack(DiracDice::State.new(DiracDice::Player.new(p1_pos, p1_score), DiracDice::Player.new(p2_pos, p2_score)).pack)
-              expect([unpacked.player1.position_adjusted,
-                      unpacked.player1.score,
-                      unpacked.player2.position_adjusted,
-                      unpacked.player2.score])
+              pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(p1_pos, p1_score),
+                                                                       DiracDice::Player.new(p2_pos, p2_score)))
+              expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score])
                 .to eq [p1_pos, p1_score, p2_pos, p2_score]
             end
           end
@@ -236,10 +273,7 @@ RSpec.describe DiracDice do
     end
 
     context "with my actual input" do
-      subject { AoC2021::DiracDice.new StringIO.new(<<~NUMBERS) }
-        Player 1 starting position: 9
-        Player 2 starting position: 3
-      NUMBERS
+      subject { File.open("input/day21a.txt") { |file| DiracDice.new file } }
 
       it "gets the expected results for wins at 1 point" do
         expect(subject.dirac_to_score(1)).to eq [27, 0]
