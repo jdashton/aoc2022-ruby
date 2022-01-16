@@ -89,6 +89,17 @@ RSpec.describe DiracDice do
     end
   end
 
+  # describe "start positions that favor player 2" do
+  #   subject { DiracDice.new StringIO.new(<<~NUMBERS) }
+  #       Player 1 starting position: 4
+  #       Player 2 starting position: 8
+  #   NUMBERS
+  #
+  #   it "tries all starting positions" do
+  #     subject.try_all_starting_positions
+  #   end
+  # end
+
   describe "#dirac_to_score" do
     context "with example input" do
       subject { DiracDice.new StringIO.new(<<~NUMBERS) }

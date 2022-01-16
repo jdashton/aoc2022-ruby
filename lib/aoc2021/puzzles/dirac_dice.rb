@@ -8,8 +8,7 @@ module AoC2021
     def self.day21
       dirac_dice = File.open("input/day21a.txt") { |file| DiracDice.new file }
       puts "Day 21, part A: #{ dirac_dice.deterministic_die }"
-      wins = dirac_dice.dirac_to_score
-      puts "Day 21, part B: Player 1: #{ wins[0] } universes, Player 2: #{ wins[1] } universes"
+      puts "Day 21, part B: Player 1: #{ (wins = dirac_dice.dirac_to_score)[0] } universes, Player 2: #{ wins[1] } universes"
       puts
     end
 
@@ -30,6 +29,7 @@ module AoC2021
       def advance(rolls)
         @position = (@position + rolls) % 10
         @score    += @position + 1
+        self
       end
 
       def pack = (@score * 10) + @position
@@ -64,8 +64,8 @@ module AoC2021
     def deterministic_die
       player1_score = player2_score = 0
 
-      player1_pos   = @start_positions.first
-      player2_pos   = @start_positions.last
+      player1_pos, player2_pos = @start_positions
+
       player1s_turn = true
       while player1_score < 1000 && player2_score < 1000
         move_total_squares = (1..3).map { next_roll % 100 }.sum
@@ -93,29 +93,27 @@ module AoC2021
 
     # This implementation based directly on the work of Simon Gomizelj (vodik on Github)
     def dirac_to_score(win_score = 21)
-      counter = Array.new(2_314, 0) # highest packed state with 1 + position 9 for both players
+      counter = Array.new(2_314, 0)
 
-      counter[State.pack(Player.new(@start_positions.first), Player.new(@start_positions.last))] = 1
+      counter[State.pack(*@start_positions.map { Player.new _1 })] = 1
 
       wins1 = wins2 = 0
-
-      loop do
+      dirty = true
+      while dirty
         dirty        = false
-        next_counter = Array.new(57_314, 0) # 57314 highest packed state with 1 + position 9 and score 20 for both players
+        next_counter = Array.new(57_314, 0)
 
-        counter.each_with_index.filter { _1.first.positive? }.each do |state_qty, packed_state|
+        counter.each_with_index do |state_qty, packed_state|
+          next if state_qty.zero?
+
           pl_a, pl_b = State.unpack(packed_state)
 
           ALL_ROLLS.each do |p1_roll, p1_qty|
-            player1 = pl_a.dup
-            player1.advance(p1_roll)
-
+            player1 = pl_a.dup.advance(p1_roll)
             next wins1 += state_qty * p1_qty if player1.score >= win_score
 
             ALL_ROLLS.each do |p2_roll, p2_qty|
-              player2 = pl_b.dup
-              player2.advance(p2_roll)
-
+              player2 = pl_b.dup.advance(p2_roll)
               p2_hits = state_qty * p1_qty * p2_qty
               next wins2 += p2_hits if player2.score >= win_score
 
@@ -123,9 +121,16 @@ module AoC2021
             end
           end
         end
-        next counter = next_counter if dirty
+        counter = next_counter
+      end
+      [wins1, wins2]
+    end
 
-        break [wins1, wins2]
+    def try_all_starting_positions
+      [*1..10].repeated_permutation(2).each do |starts|
+        @start_positions = starts
+        scores = dirac_to_score(21)
+        puts "#{ starts } favors player #{ scores[0] > scores[1] ? 1 : 2 } (#{ scores }) #{ (scores[0].to_f / scores.sum * 100).round(0) }% vs #{ (scores[1].to_f / scores.sum * 100).round(0) }%"
       end
     end
   end
