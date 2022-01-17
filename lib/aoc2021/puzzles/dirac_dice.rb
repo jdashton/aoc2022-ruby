@@ -93,71 +93,70 @@ module AoC2021
 
     # This implementation based directly on the work of Simon Gomizelj (vodik on Github)
     def dirac_to_score(win_score = 21)
-      counter = Array.new(2_314, 0)
-
-      counter[State.pack(*@start_positions.map { Player.new _1 })] = 1
-
-      Ractor.make_shareable ALL_ROLLS
-
-      wins1 = wins2 = 0
-      dirty = true
-      round = moves = 0
-      while dirty
-        dirty        = false
-        next_counter = Array.new(57_314, 0)
-        round        += 1
-
-        counter.each_with_index do |state_qty, packed_state|
-          next if state_qty.zero?
-
-          pl_a, pl_b = State.unpack(packed_state)
-
-          ractors = []
-
-          ALL_ROLLS.each do |p1_roll, p1_qty|
-            moves   += 1
-            player1 = pl_a.dup.advance(p1_roll)
-            p1_hits = state_qty * p1_qty
-            next wins1 += p1_hits if player1.score >= win_score
-
-            ALL_ROLLS.each do |p2_roll, p2_qty|
-              moves   += 1
-              player2 = pl_b.dup.advance(p2_roll)
-              p2_hits = p1_hits * p2_qty
-              next wins2 += p2_hits if player2.score >= win_score
-
-              ractors << Ractor.new(player1.position, player1.score, player2.position, player2.score, p2_hits, win_score, &method(:seven_rolls))
-
-              # state_pack = State.pack(player1, player2)
-              # # puts "#{ next_counter[state_pack].zero? ? "first" : "adding" }: #{ [player1, player2] } (#{ state_pack }) +#{ p2_hits }"
-              # dirty = next_counter[state_pack] += p2_hits
-            end
+      DiracDice.const_set("WINNING_SCORE", win_score)
+      cache = Ractor.new do
+        # puts "CACHE running: #{ self.inspect }"
+        che = Array.new(57_314)
+        loop do
+          msg, state, obj = Ractor.receive
+          # puts "CACHE received #{ msg.inspect }, #{ state.inspect }, #{ obj.inspect }"
+          case msg
+            when :cache
+              che[state] = obj
+            when :read
+              obj.send che[state]
           end
-
-          wins1, wins2 = ractors.reduce([wins1, wins2]) { |acc, ractor| unva, unvb = ractor.take; [acc[0] + unva, acc[1] + unvb] }
         end
-        counter = next_counter
-        # puts " ... end of round #{ round }: #{ moves } total moves considered"
       end
-      [wins1, wins2]
+      DiracDice.const_set("CACHE", cache)
+      [ALL_ROLLS, WINNING_SCORE, CACHE].each { Ractor.make_shareable _1 }
+
+      wins1   = wins2 = 0
+      ractors = []
+
+      p1_start_pos, p2_start_pos = @start_positions.map { _1 - 1 }
+
+      ALL_ROLLS.each do |p1_roll, p1_hits|
+        p1_pos   = (p1_start_pos + p1_roll) % 10
+        p1_score = p1_pos + 1
+        next wins1 += p1_hits if p1_score >= WINNING_SCORE
+
+        ALL_ROLLS.each do |p2_roll, p2_qty|
+          p2_pos   = (p2_start_pos + p2_roll) % 10
+          p2_score = p2_pos + 1
+          p2_hits  = p1_hits * p2_qty
+          next wins2 += p2_hits if p2_score >= WINNING_SCORE
+
+          ractors << Ractor.new(p1_pos, p1_score, p2_pos, p2_score, p2_hits, &method(:seven_rolls))
+        end
+      end
+
+      ractors.reduce([wins1, wins2]) do |acc, ractor|
+        unv_a, unv_b = ractor.take
+        [acc[0] + unv_a, acc[1] + unv_b]
+      end
     end
 
-    def seven_rolls(player_pos, player_score, other_player_pos, other_player_score, quantity, win_score)
-      score_a = score_b = 0
-      ALL_ROLLS.each { |roll, qty|
+    def seven_rolls(player_pos, player_score, other_player_pos, other_player_score, quantity)
+      packed_state = (((player_score * 10) + player_pos) << 8) | ((other_player_score * 10) + other_player_pos)
+      CACHE.send [:read, packed_state, Ractor.current]
+      answer = Ractor.receive
+      # return [answer[0] * quantity, answer[1] * quantity] if answer
+
+      wins_a = wins_b = 0
+      ALL_ROLLS.each do |roll, qty|
         new_position = (player_pos + roll) % 10
         new_score    = player_score + new_position + 1
         hits         = quantity * qty
-        if new_score >= win_score
-          score_a += hits
-        else
-          # recursive call (swapping current with other) and swap returned score
-          universes = seven_rolls(other_player_pos, other_player_score, new_position, new_score, hits, win_score)
-          score_a   += universes[1]
-          score_b   += universes[0]
-        end
-      }
-      [score_a, score_b]
+        next wins_a += hits if new_score >= WINNING_SCORE
+
+        # recursive call (swapping current with other) and swap returned score
+        unv_a, unv_b = seven_rolls(other_player_pos, other_player_score, new_position, new_score, hits)
+        wins_a       += unv_b
+        wins_b       += unv_a
+      end
+      CACHE.send [:cache, packed_state, [wins_a, wins_b]]
+      [wins_a, wins_b]
     end
 
     def try_all_starting_positions
