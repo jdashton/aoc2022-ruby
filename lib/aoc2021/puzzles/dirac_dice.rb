@@ -99,9 +99,11 @@ module AoC2021
 
       wins1 = wins2 = 0
       dirty = true
+      round = moves = 0
       while dirty
         dirty        = false
         next_counter = Array.new(57_314, 0)
+        round        += 1
 
         counter.each_with_index do |state_qty, packed_state|
           next if state_qty.zero?
@@ -109,20 +111,25 @@ module AoC2021
           pl_a, pl_b = State.unpack(packed_state)
 
           ALL_ROLLS.each do |p1_roll, p1_qty|
+            moves   += 1
             player1 = pl_a.dup.advance(p1_roll)
             p1_hits = state_qty * p1_qty
             next wins1 += p1_hits if player1.score >= win_score
 
             ALL_ROLLS.each do |p2_roll, p2_qty|
+              moves   += 1
               player2 = pl_b.dup.advance(p2_roll)
               p2_hits = p1_hits * p2_qty
               next wins2 += p2_hits if player2.score >= win_score
 
-              dirty = next_counter[State.pack(player1, player2)] += p2_hits
+              state_pack = State.pack(player1, player2)
+              puts "#{ next_counter[state_pack].zero? ? "first" : "adding" }: #{ [player1, player2] } (#{ state_pack }) +#{ p2_hits }"
+              dirty = next_counter[state_pack] += p2_hits
             end
           end
         end
         counter = next_counter
+        puts " ... end of round #{ round }: #{ moves } total moves considered"
       end
       [wins1, wins2]
     end
