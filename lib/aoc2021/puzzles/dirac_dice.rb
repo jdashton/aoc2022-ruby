@@ -138,21 +138,21 @@ module AoC2021
     def seven_rolls(player_pos, player_score, other_player_pos, other_player_score, quantity)
       packed_state = (((player_score * 10) + player_pos) << 8) | ((other_player_score * 10) + other_player_pos)
       CACHE.send [:read, packed_state, Ractor.current]
-      answer = Ractor.receive
-      return [answer[0] * quantity, answer[1] * quantity] if answer
+      wins_a, wins_b = Ractor.receive
+      unless wins_b
+        wins_a = wins_b = 0
+        ALL_ROLLS.each do |roll, qty|
+          new_position = (player_pos + roll) % 10
+          new_score    = player_score + new_position + 1
+          next wins_a += qty if new_score >= WINNING_SCORE
 
-      wins_a = wins_b = 0
-      ALL_ROLLS.each do |roll, qty|
-        new_position = (player_pos + roll) % 10
-        new_score    = player_score + new_position + 1
-        next wins_a += qty if new_score >= WINNING_SCORE
-
-        # recursive call (swapping current with other) and swap returned score
-        unv_a, unv_b = seven_rolls(other_player_pos, other_player_score, new_position, new_score, qty)
-        wins_a       += unv_b
-        wins_b       += unv_a
+          # recursive call (swapping current with other) and swap returned score
+          unv_a, unv_b = seven_rolls(other_player_pos, other_player_score, new_position, new_score, qty)
+          wins_a       += unv_b
+          wins_b       += unv_a
+        end
+        CACHE.send [:cache, packed_state, [wins_a, wins_b]]
       end
-      CACHE.send [:cache, packed_state, [wins_a, wins_b]]
       [wins_a * quantity, wins_b * quantity]
     end
 
