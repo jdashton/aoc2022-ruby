@@ -14,7 +14,7 @@ module AoC2021
 
     # Encapsulates player state
     class Player
-      attr_reader :score
+      attr_reader :score, :position
 
       def initialize(position, score = 0)
         if position
@@ -97,6 +97,8 @@ module AoC2021
 
       counter[State.pack(*@start_positions.map { Player.new _1 })] = 1
 
+      Ractor.make_shareable ALL_ROLLS
+
       wins1 = wins2 = 0
       dirty = true
       round = moves = 0
@@ -110,6 +112,8 @@ module AoC2021
 
           pl_a, pl_b = State.unpack(packed_state)
 
+          ractors = []
+
           ALL_ROLLS.each do |p1_roll, p1_qty|
             moves   += 1
             player1 = pl_a.dup.advance(p1_roll)
@@ -122,16 +126,38 @@ module AoC2021
               p2_hits = p1_hits * p2_qty
               next wins2 += p2_hits if player2.score >= win_score
 
-              state_pack = State.pack(player1, player2)
-              puts "#{ next_counter[state_pack].zero? ? "first" : "adding" }: #{ [player1, player2] } (#{ state_pack }) +#{ p2_hits }"
-              dirty = next_counter[state_pack] += p2_hits
+              ractors << Ractor.new(player1.position, player1.score, player2.position, player2.score, p2_hits, win_score, &method(:seven_rolls))
+
+              # state_pack = State.pack(player1, player2)
+              # # puts "#{ next_counter[state_pack].zero? ? "first" : "adding" }: #{ [player1, player2] } (#{ state_pack }) +#{ p2_hits }"
+              # dirty = next_counter[state_pack] += p2_hits
             end
           end
+
+          wins1, wins2 = ractors.reduce([wins1, wins2]) { |acc, ractor| unva, unvb = ractor.take; [acc[0] + unva, acc[1] + unvb] }
         end
         counter = next_counter
-        puts " ... end of round #{ round }: #{ moves } total moves considered"
+        # puts " ... end of round #{ round }: #{ moves } total moves considered"
       end
       [wins1, wins2]
+    end
+
+    def seven_rolls(player_pos, player_score, other_player_pos, other_player_score, quantity, win_score)
+      score_a = score_b = 0
+      ALL_ROLLS.each { |roll, qty|
+        new_position = (player_pos + roll) % 10
+        new_score    = player_score + new_position + 1
+        hits         = quantity * qty
+        if new_score >= win_score
+          score_a += hits
+        else
+          # recursive call (swapping current with other) and swap returned score
+          universes = seven_rolls(other_player_pos, other_player_score, new_position, new_score, hits, win_score)
+          score_a   += universes[1]
+          score_b   += universes[0]
+        end
+      }
+      [score_a, score_b]
     end
 
     def try_all_starting_positions
