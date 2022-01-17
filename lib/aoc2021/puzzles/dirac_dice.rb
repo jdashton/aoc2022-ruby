@@ -110,11 +110,12 @@ module AoC2021
 
           ALL_ROLLS.each do |p1_roll, p1_qty|
             player1 = pl_a.dup.advance(p1_roll)
-            next wins1 += state_qty * p1_qty if player1.score >= win_score
+            p1_hits = state_qty * p1_qty
+            next wins1 += p1_hits if player1.score >= win_score
 
             ALL_ROLLS.each do |p2_roll, p2_qty|
               player2 = pl_b.dup.advance(p2_roll)
-              p2_hits = state_qty * p1_qty * p2_qty
+              p2_hits = p1_hits * p2_qty
               next wins2 += p2_hits if player2.score >= win_score
 
               dirty = next_counter[State.pack(player1, player2)] += p2_hits
@@ -129,9 +130,17 @@ module AoC2021
     def try_all_starting_positions
       [*1..10].repeated_permutation(2).each do |starts|
         @start_positions = starts
-        scores = dirac_to_score(21)
-        puts "#{ starts } favors player #{ scores[0] > scores[1] ? 1 : 2 } (#{ scores }) #{ (scores[0].to_f / scores.sum * 100).round(0) }% vs #{ (scores[1].to_f / scores.sum * 100).round(0) }%"
+        print_summary(dirac_to_score(21), starts)
       end
+    end
+
+    private
+
+    def print_summary(scores, starts)
+      sum                            = scores.sum
+      player_1_score, player_2_score = scores
+      puts "#{ starts } favors player #{ player_1_score > player_2_score ? 1 : 2 }\t(#{ scores })\t" \
+           "#{ (player_1_score.to_f / sum * 100).round(0) }% vs #{ (player_2_score.to_f / sum * 100).round(0) }%"
     end
   end
 end
