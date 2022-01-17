@@ -95,11 +95,9 @@ module AoC2021
     def dirac_to_score(win_score = 21)
       DiracDice.const_set("WINNING_SCORE", win_score)
       cache = Ractor.new do
-        # puts "CACHE running: #{ self.inspect }"
         che = Array.new(57_314)
         loop do
           msg, state, obj = Ractor.receive
-          # puts "CACHE received #{ msg.inspect }, #{ state.inspect }, #{ obj.inspect }"
           case msg
             when :cache
               che[state] = obj
@@ -141,22 +139,21 @@ module AoC2021
       packed_state = (((player_score * 10) + player_pos) << 8) | ((other_player_score * 10) + other_player_pos)
       CACHE.send [:read, packed_state, Ractor.current]
       answer = Ractor.receive
-      # return [answer[0] * quantity, answer[1] * quantity] if answer
+      return [answer[0] * quantity, answer[1] * quantity] if answer
 
       wins_a = wins_b = 0
       ALL_ROLLS.each do |roll, qty|
         new_position = (player_pos + roll) % 10
         new_score    = player_score + new_position + 1
-        hits         = quantity * qty
-        next wins_a += hits if new_score >= WINNING_SCORE
+        next wins_a += qty if new_score >= WINNING_SCORE
 
         # recursive call (swapping current with other) and swap returned score
-        unv_a, unv_b = seven_rolls(other_player_pos, other_player_score, new_position, new_score, hits)
+        unv_a, unv_b = seven_rolls(other_player_pos, other_player_score, new_position, new_score, qty)
         wins_a       += unv_b
         wins_b       += unv_a
       end
       CACHE.send [:cache, packed_state, [wins_a, wins_b]]
-      [wins_a, wins_b]
+      [wins_a * quantity, wins_b * quantity]
     end
 
     def try_all_starting_positions
