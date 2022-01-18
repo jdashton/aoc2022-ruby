@@ -62,32 +62,32 @@ RSpec.describe DiracDice do
   #   end
   # end
 
-  describe "DiracDice::State" do
-    it "packs and unpacks as expected: (9, 0), (3, 0)" do
-      pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(9), DiracDice::Player.new(3)))
-      expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score]).to eq [9, 0, 3, 0]
-    end
-
-    it "packs and unpacks as expected: (20, 5), (22, 2)" do
-      pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(5, 20), DiracDice::Player.new(2, 22)))
-      expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score]).to eq [5, 20, 2, 22]
-    end
-
-    it "should pack/unpack as expected" do
-      (0..20).each do |p1_score|
-        (1..10).each do |p1_pos|
-          (0..20).each do |p2_score|
-            (1..10).each do |p2_pos|
-              pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(p1_pos, p1_score),
-                                                                       DiracDice::Player.new(p2_pos, p2_score)))
-              expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score])
-                .to eq [p1_pos, p1_score, p2_pos, p2_score]
-            end
-          end
-        end
-      end
-    end
-  end
+  # describe "DiracDice::State" do
+  #   it "packs and unpacks as expected: (9, 0), (3, 0)" do
+  #     pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(9), DiracDice::Player.new(3)))
+  #     expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score]).to eq [9, 0, 3, 0]
+  #   end
+  #
+  #   it "packs and unpacks as expected: (20, 5), (22, 2)" do
+  #     pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(5, 20), DiracDice::Player.new(2, 22)))
+  #     expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score]).to eq [5, 20, 2, 22]
+  #   end
+  #
+  #   it "should pack/unpack as expected" do
+  #     (0..20).each do |p1_score|
+  #       (1..10).each do |p1_pos|
+  #         (0..20).each do |p2_score|
+  #           (1..10).each do |p2_pos|
+  #             pl1, pl2 = DiracDice::State.unpack(DiracDice::State.pack(DiracDice::Player.new(p1_pos, p1_score),
+  #                                                                      DiracDice::Player.new(p2_pos, p2_score)))
+  #             expect([pl1.position_adjusted, pl1.score, pl2.position_adjusted, pl2.score])
+  #               .to eq [p1_pos, p1_score, p2_pos, p2_score]
+  #           end
+  #         end
+  #       end
+  #     end
+  #   end
+  # end
 
   # describe "start positions that favor player 2" do
   #   subject { DiracDice.new StringIO.new(<<~NUMBERS) }
