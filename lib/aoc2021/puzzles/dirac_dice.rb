@@ -61,7 +61,7 @@ module AoC2021
     def dirac_to_score(win_score = 21)
       DiracDice.const_set("WINNING_SCORE", win_score)
       cache = Ractor.new do
-        che = Array.new(57_314)
+        che = Array.new(53_714)
         loop do
           msg, state, obj = Ractor.receive
           case msg
