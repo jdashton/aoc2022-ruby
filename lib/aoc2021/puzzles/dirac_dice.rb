@@ -83,19 +83,12 @@ module AoC2021
         p1_score = p1_pos + 1
         next wins1 += p1_hits if p1_score >= WINNING_SCORE
 
-        ALL_ROLLS.each do |p2_roll, p2_qty|
-          p2_pos   = (p2_start_pos + p2_roll) % 10
-          p2_score = p2_pos + 1
-          p2_hits  = p1_hits * p2_qty
-          next wins2 += p2_hits if p2_score >= WINNING_SCORE
-
-          ractors << Ractor.new(p1_pos, p1_score, p2_pos, p2_score, p2_hits, &method(:seven_rolls))
-        end
+        ractors << Ractor.new(p2_start_pos, 0, p1_pos, p1_score, p1_hits, &method(:seven_rolls))
       end
 
       ractors.reduce([wins1, wins2]) do |acc, ractor|
         unv_a, unv_b = ractor.take
-        [acc[0] + unv_a, acc[1] + unv_b]
+        [acc[0] + unv_b, acc[1] + unv_a]
       end
     end
 
