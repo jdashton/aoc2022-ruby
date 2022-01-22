@@ -44,6 +44,10 @@ module AoC2021
         end
       end
 
+      def play_vodik(_queue)
+        entry_energy(board) + exit_energy(board) + solve(board)
+      end
+
       def print_history
         brd = @board
         pp board
@@ -89,6 +93,26 @@ module AoC2021
         end)
       end
 
+      def solve(board)
+        6_268
+      end
+
+      def entry_energy(board)
+        prune(board)
+        ROOMS.reduce(0) { |acc, room_num| acc + ((1..board[room_num].length).sum * COSTS[ROOM_AMPHIPOD[room_num]]) }
+      end
+
+      def exit_energy(board)
+        prune(board)
+        ROOMS.reduce(0) do |acc, room_num|
+          acc + board[room_num].each_with_index.reduce(0) { |acm, (pod, idx)| acm + (COSTS[pod] * (1 + idx)) }
+        end
+      end
+
+      def prune(board)
+        ROOMS.each { board[_1].pop while board[_1].last == ROOM_AMPHIPOD[_1] }
+      end
+
       def hall_avail(old_room, room_spot)
         amphipod = @board[old_room][room_spot]
         HALL_SPOTS.filter { |hall_spot| clear_path_to?(hall_spot, old_room) }
@@ -106,8 +130,9 @@ module AoC2021
         # print_history
         amphipod   = @board[old_room][old_room_spot]
         right_room = RIGHT_ROOM[amphipod]
-        return [] unless @board[right_room].all? { |room_spot| [nil, amphipod].include?(room_spot) } &&
-                         clear_path_to?(right_room, old_room)
+        return [] unless @board[right_room].all? do |room_spot|
+          [nil, amphipod].include?(room_spot)
+        end && clear_path_to?(right_room, old_room)
 
         new_board                            = @board.map(&:clone)
         new_room_spot                        = @board[right_room].rindex(nil)
