@@ -4,9 +4,9 @@ require "set"
 
 module AoC2021
   # Calculates conditions of victory for given moves and boards
-  class Amphipod
+  module Amphipod
     def self.day23
-      amphipod = File.open("input/day23a.txt") { |file| Amphipod.new file }
+      board = File.open("input/day23a.txt") { |file| Amphipod::parse_board file }
       # puts "Day 23, part A: #{ Move.new(amphipod.board).play_game(PriorityQueue.new) } is the least energy required to organize the amphipods."
       # puts "Day 23, part B: #{ amphipod.least_energy_unfolded }  is the least energy required to organize all the amphipods."
       puts
@@ -17,7 +17,7 @@ module AoC2021
       attr_reader :board, :score, :history
 
       def initialize(board, score = 0, history = nil)
-        @board   = board
+        @board   = board.respond_to?(:fileno) ? Amphipod::parse_board(board) : board
         @score   = score
         @history = history
         # pp @board; exit
@@ -42,11 +42,6 @@ module AoC2021
           move.print_history
           return score
         end
-      end
-
-      def play_vodik(_queue)
-        prune(board)
-        entry_energy(board) + exit_energy(board) + solve(board)
       end
 
       def print_history
@@ -92,60 +87,6 @@ module AoC2021
               raise "Unexpected branch"
           end
         end)
-      end
-
-      def solve(board)
-        #     let mut stack = vec![(Burrow::<N>::new(rooms), 0)];  Returns a vector of (Burrow, cost) tuples.
-        # ##    [(Burrow {
-        #           rooms: [
-        #             Room { slots: [Some(Amber),  Some(Desert)], pos: 0 },
-        #             Room { slots: [Some(Copper), Some(Desert)], pos: 0 },
-        #             Room { slots: [Some(Bronze), Some(Bronze)], pos: 0 },
-        #             Room { slots: [Some(Amber),  Some(Copper)], pos: 0 }
-        #           ],
-        #           hallway: BitBoard { amber: 0, bronze: 0, copper: 0, desert: 0 }
-        #         },
-        #         0)]    this is the cost (already incurred?)
-        #     let mut min = usize::MAX;  (Essentially Float::INFINITY)
-        #
-        #     while let Some((burrow, cost)) = stack.pop() {
-        #         for t in (0..4).rev() {  (.. is non-inclusive, so start with room[3] and work down to room[0])
-        #             if let Some((pod, target, futures)) = burrow.moves(t) {
-        #                 for future in futures {
-        #                     let mut burrow = burrow;
-        #                     let cost = cost + future.1;
-        #                     if cost < min {
-        #                         burrow.commit(pod, target, future.0);
-        #
-        #                         if burrow.hallway.is_empty() {
-        #                             min = cost;
-        #                         } else {
-        #                             stack.push((burrow, cost));
-        #                         }
-        #                     }
-        #                 }
-        #             }
-        #         }
-        #     }
-        #
-        #     min
-
-        6_268
-      end
-
-      def entry_energy(board)
-        ROOMS.reduce(0) { |acc, room_num| acc + ((1..board[room_num].length).sum * COSTS[ROOM_AMPHIPOD[room_num]]) }
-      end
-
-      def exit_energy(board)
-        ROOMS.reduce(0) do |acc, room_num|
-          acc + board[room_num].each_with_index.reduce(0) { |acm, (pod, idx)| acm + (COSTS[pod] * (1 + idx)) }
-        end
-      end
-
-      def prune(board)
-        ROOMS.each { board[_1].pop while board[_1].last == ROOM_AMPHIPOD[_1] }
-        board
       end
 
       def hall_avail(old_room, room_spot)
@@ -242,37 +183,253 @@ module AoC2021
       def eql?(other) = @board == other.board && @score == other.score
     end
 
-    attr_reader :board
+    # Encapsulates methods for a Room
+    class Room
+      attr_reader :room, :pos
 
-    def initialize(file)
-      lines  = file.readlines(chomp: true)
-      @board = Array.new(11)
-      /#([A-D.])([A-D.])\.([A-D.])\.([A-D.])\.([A-D.])\.([A-D.])([A-D.])#/.match(lines[1]) do |md|
-        @board[0]  = md[1].to_sym
-        @board[1]  = md[2].to_sym
-        @board[3]  = md[3].to_sym
-        @board[5]  = md[4].to_sym
-        @board[7]  = md[5].to_sym
-        @board[9]  = md[6].to_sym
-        @board[10] = md[7].to_sym
+      def initialize(room)
+        @room = room
       end
-      HALL_SPOTS.each { |spot| @board[spot] = nil if @board[spot] == :"." }
-      ROOMS.each { |room_num| @board[room_num] = [] }
-      (0..3).each do |room_spot|
-        /#+([A-D.])#([A-D.])#([A-D.])#([A-D.])#+/.match(lines[room_spot + 2]) do |md|
-          @board[2][room_spot] = (md[1].to_sym in AMPHIPODS) ? md[1].to_sym : nil
-          @board[4][room_spot] = (md[2].to_sym in AMPHIPODS) ? md[2].to_sym : nil
-          @board[6][room_spot] = (md[3].to_sym in AMPHIPODS) ? md[3].to_sym : nil
-          @board[8][room_spot] = (md[4].to_sym in AMPHIPODS) ? md[4].to_sym : nil
-        end
+
+      def extract
+        @room.first
       end
-      # @board     = [board, 0]
-      # @low_score = Float::INFINITY
-      # @queue     = PriorityQueue.new
-      # pp @board
+
+      def take
+        @room.shift
+      end
+
+      def empty?
+        @room.empty?
+      end
     end
 
-    # def least_energy = @low_score
+    # Encapsulates methods pertaining to a Burrow
+    class Burrow
+      attr_reader :board
+
+      def initialize(board)
+        @board = board.respond_to?(:fileno) ? Amphipod::parse_board(board) : board
+      end
+
+      def play_vodik(_queue)
+        prune
+        entry_energy + exit_energy + solve
+      end
+
+      def entry_energy
+        ROOMS.reduce(0) { |acc, room_num| acc + ((1..@board[room_num].length).sum * COSTS[ROOM_AMPHIPOD[room_num]]) }
+      end
+
+      def exit_energy
+        ROOMS.reduce(0) do |acc, room_num|
+          acc + @board[room_num].each_with_index.reduce(0) { |acm, (pod, idx)| acm + (COSTS[pod] * (1 + idx)) }
+        end
+      end
+
+      def prune
+        ROOMS.each { @board[_1].pop while @board[_1].last == ROOM_AMPHIPOD[_1] }
+        ROOMS.each { @board[_1].shift while @board[_1].first.nil? }
+        self
+      end
+
+      # In Simon's bitboard implementation, mask is a 7-bit representation
+      # of the hallway, where 1 is the leftmost spot and 64 is the rightmost.
+      # For the moment, our hallway has spots 0, 1, 3, 5, 7, 9, and 10.
+      # Switching to the bitboard might perform better.
+      def commit(pod, target, mask)
+        @board[mask] = @board[target].shift # TODO resolve inlining for Room methods
+        self
+
+        #         match pod {
+        #             Amphipod::Amber => {
+        #                 self.rooms[target].take();
+        #                 self.hallway.amber |= mask;
+        #             }
+        #             Amphipod::Bronze => {
+        #                 self.rooms[target].take();
+        #                 self.hallway.bronze |= mask;
+        #             }
+        #             Amphipod::Copper => {
+        #                 self.rooms[target].take();
+        #                 self.hallway.copper |= mask;
+        #             }
+        #             Amphipod::Desert => {
+        #                 self.rooms[target].take();
+        #                 self.hallway.desert |= mask;
+        #             }
+        #         }
+        #
+        #         if self.rooms[0].is_empty() {
+        #             self.hallway.amber = 0;
+        #         }
+        #         if self.rooms[1].is_empty() {
+        #             self.hallway.bronze = 0;
+        #         }
+        #         if self.rooms[2].is_empty() {
+        #             self.hallway.copper = 0;
+        #         }
+        #         if self.rooms[3].is_empty() {
+        #             self.hallway.desert = 0;
+        #         }
+      end
+
+      def moves(room)
+        #         let pod = self.rooms[pos].extract()?;
+        #
+        #         let energy = pod.energy();
+        #         let target = match pod {
+        #             Amphipod::Amber => 0,
+        #             Amphipod::Bronze => 1,
+        #             Amphipod::Copper => 2,
+        #             Amphipod::Desert => 3,
+        #         };
+        #
+        #         const COSTS: [usize; 7] = [2, 2, 4, 4, 4, 2, 2];
+        #         let hallway = self.hallway.flatten();
+        #         let mut moves = Vec::with_capacity(7);
+        #
+        #         let (start, end) = if pos < target {
+        #             (pos, target)
+        #         } else {
+        #             (target, pos)
+        #         };
+        #
+        #         let dist = end - start;
+        #         let basecost = dist * 2;
+        #         let has_path = self.has_path(start, dist);
+        #
+        #         if has_path && self.rooms[target].is_empty() {
+        #             moves.push((0, basecost * energy));
+        #         } else {
+        #             if has_path || pos < target {
+        #                 moves.extend(
+        #                     (0..start + 2)
+        #                         .rev()
+        #                         .map(|offset| (1 << (6 - offset), COSTS[offset]))
+        #                         .scan(0, |acc, (mask2, weight)| {
+        #                             let cost = if *acc == 0 {
+        #                                 *acc += weight;
+        #                                 2
+        #                             } else {
+        #                                 *acc += weight;
+        #                                 *acc
+        #                             };
+        #
+        #                             (mask2 & hallway == 0).then(|| (mask2, (basecost + cost) * energy))
+        #                         }),
+        #                 );
+        #             }
+        #
+        #             if has_path || target < pos {
+        #                 moves.extend(
+        #                     (end + 2..7)
+        #                         .map(|offset| (1 << (6 - offset), COSTS[offset]))
+        #                         .scan(0, |acc, (mask2, weight)| {
+        #                             let cost = if *acc == 0 {
+        #                                 *acc += weight;
+        #                                 2
+        #                             } else {
+        #                                 *acc += weight;
+        #                                 *acc
+        #                             };
+        #
+        #                             (mask2 & hallway == 0).then(|| (mask2, (basecost + cost) * energy))
+        #                         }),
+        #                 );
+        #             }
+        #         }
+        #
+        #         Some((*pod, pos, moves))
+        #     }
+      end
+
+      def solve
+        #     let mut stack = vec![(Burrow::<N>::new(rooms), 0)];  Returns a vector of (Burrow, cost) tuples.
+        # ##    [(Burrow {
+        #           rooms: [
+        #             Room { slots: [Some(Amber),  Some(Desert)], pos: 0 },
+        #             Room { slots: [Some(Copper), Some(Desert)], pos: 0 },
+        #             Room { slots: [Some(Bronze), Some(Bronze)], pos: 0 },
+        #             Room { slots: [Some(Amber),  Some(Copper)], pos: 0 }
+        #           ],
+        #           hallway: BitBoard { amber: 0, bronze: 0, copper: 0, desert: 0 }
+        #         },
+        #         0)]    this is the cost (already incurred?)
+        #     let mut min = usize::MAX;  (Essentially Float::INFINITY)
+        #
+        #     while let Some((burrow, cost)) = stack.pop() {
+        #         for t in (0..4).rev() {  (.. is non-inclusive, so start with room[3] and work down to room[0])
+        #             if let Some((pod, target, futures)) = burrow.moves(t) {
+        # ## futures is
+        # [
+        #     (
+        #         32,
+        #         8,
+        #     ),
+        #     (
+        #         64,
+        #         10,
+        #     ),
+        #     (
+        #         2,
+        #         8,
+        #     ),
+        #     (
+        #         1,
+        #         10,
+        #     ),
+        # ]
+        #                 for future in futures {
+        #                     let mut burrow = burrow;
+        #                     let cost = cost + future.1;
+        #                     if cost < min {
+        #                         burrow.commit(pod, target, future.0);
+        #
+        #                         if burrow.hallway.is_empty() {
+        #                             min = cost;
+        #                         } else {
+        #                             stack.push((burrow, cost));
+        #                         }
+        #                     }
+        #                 }
+        #             }
+        #         }
+        #     }
+        #
+        #     min
+        pp @board
+
+        6_268
+      end
+    end
+
+    attr_reader :board
+
+    def self.parse_board(file)
+      lines = file.readlines(chomp: true)
+      board = Array.new(11)
+      /#([A-D.])([A-D.])\.([A-D.])\.([A-D.])\.([A-D.])\.([A-D.])([A-D.])#/.match(lines[1]) do |md|
+        board[0]  = md[1].to_sym
+        board[1]  = md[2].to_sym
+        board[3]  = md[3].to_sym
+        board[5]  = md[4].to_sym
+        board[7]  = md[5].to_sym
+        board[9]  = md[6].to_sym
+        board[10] = md[7].to_sym
+      end
+      HALL_SPOTS.each { |spot| board[spot] = nil if board[spot] == :"." }
+      ROOMS.each { |room_num| board[room_num] = [] }
+      (0..3).each do |room_spot|
+        /#+([A-D.])#([A-D.])#([A-D.])#([A-D.])#+/.match(lines[room_spot + 2]) do |md|
+          board[2][room_spot] = (md[1].to_sym in AMPHIPODS) ? md[1].to_sym : nil
+          board[4][room_spot] = (md[2].to_sym in AMPHIPODS) ? md[2].to_sym : nil
+          board[6][room_spot] = (md[3].to_sym in AMPHIPODS) ? md[3].to_sym : nil
+          board[8][room_spot] = (md[4].to_sym in AMPHIPODS) ? md[4].to_sym : nil
+        end
+      end
+      board
+    end
 
     COSTS = { A: 1, B: 10, C: 100, D: 1000 }.freeze
 

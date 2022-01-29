@@ -294,7 +294,7 @@ RSpec.describe Amphipod do
     end
 
     context "from the initial configuration" do
-      subject { Amphipod.new StringIO.new(<<~BOARD) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
         #############
         #...........#
         ###B#C#B#D###
@@ -303,19 +303,18 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds [6, 0] -> 3 among the possible next moves" do
-        expect(Amphipod::Move.new(subject.board).next_moves)
-          .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 40)
-            #############
-            #...B.......#
-            ###B#C#.#D###
-              #A#D#C#A#
-              #########
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 40)
+          #############
+          #...B.......#
+          ###B#C#.#D###
+            #A#D#C#A#
+            #########
         BOARD
       end
     end
 
     context "from the second configuration" do
-      subject { Amphipod.new StringIO.new(<<~BOARD) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
         #############
         #...B.......#
         ###B#C#.#D###
@@ -324,19 +323,18 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds [4, 0] -> [6, 0] among the possible next moves" do
-        expect(Amphipod::Move.new(subject.board).next_moves)
-          .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 400)
-            #############
-            #...B.......#
-            ###B#.#C#D###
-              #A#D#C#A#
-              #########
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 400)
+          #############
+          #...B.......#
+          ###B#.#C#D###
+            #A#D#C#A#
+            #########
         BOARD
       end
     end
 
     context "from the third configuration" do
-      subject { Amphipod.new StringIO.new(<<~BOARD) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
         #############
         #...B.......#
         ###B#.#C#D###
@@ -345,19 +343,18 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds [4, 1] -> 5 among the possible next moves" do
-        expect(Amphipod::Move.new(subject.board).next_moves)
-          .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 3000)
-            #############
-            #...B.D.....#
-            ###B#.#C#D###
-              #A#.#C#A#
-              #########
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 3000)
+          #############
+          #...B.D.....#
+          ###B#.#C#D###
+            #A#.#C#A#
+            #########
         BOARD
       end
     end
 
     context "from the third-A configuration" do
-      subject { Amphipod.new StringIO.new(<<~BOARD) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
         #############
         #...B.D.....#
         ###B#.#C#D###
@@ -366,19 +363,18 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds 3 -> [4, 1] among the possible next moves" do
-        expect(Amphipod::Move.new(subject.board).next_moves)
-          .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 30)
-            #############
-            #.....D.....#
-            ###B#.#C#D###
-              #A#B#C#A#
-              #########
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 30)
+          #############
+          #.....D.....#
+          ###B#.#C#D###
+            #A#B#C#A#
+            #########
         BOARD
       end
     end
 
     context "from the fourth configuration" do
-      subject { Amphipod.new StringIO.new(<<~BOARD) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
         #############
         #.....D.....#
         ###B#.#C#D###
@@ -387,19 +383,18 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds [2, 0] -> [4, 0] among the possible next moves" do
-        expect(Amphipod::Move.new(subject.board).next_moves)
-          .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 40)
-            #############
-            #.....D.....#
-            ###.#B#C#D###
-              #A#B#C#A#
-              #########
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 40)
+          #############
+          #.....D.....#
+          ###.#B#C#D###
+            #A#B#C#A#
+            #########
         BOARD
       end
     end
 
     context "from the fifth configuration" do
-      subject { Amphipod.new StringIO.new(<<~BOARD) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
         #############
         #.....D.....#
         ###.#B#C#D###
@@ -408,19 +403,18 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds [8, 0] -> 7 among the possible next moves" do
-        expect(Amphipod::Move.new(subject.board).next_moves)
-          .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 2000)
-            #############
-            #.....D.D...#
-            ###.#B#C#.###
-              #A#B#C#A#
-              #########
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 2000)
+          #############
+          #.....D.D...#
+          ###.#B#C#.###
+            #A#B#C#A#
+            #########
         BOARD
       end
     end
 
     context "from the fifth-A configuration" do
-      subject { Amphipod.new StringIO.new(<<~BOARD) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
         #############
         #.....D.D...#
         ###.#B#C#.###
@@ -429,99 +423,95 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds [8, 1] -> 9 among the possible next moves" do
-        expect(Amphipod::Move.new(subject.board).next_moves)
-          .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 3)
-            #############
-            #.....D.D.A.#
-            ###.#B#C#.###
-              #A#B#C#.#
-              #########
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 3)
+          #############
+          #.....D.D.A.#
+          ###.#B#C#.###
+            #A#B#C#.#
+            #########
         BOARD
       end
     end
-  end
 
-  context "from the sixth configuration" do
-    subject { Amphipod.new StringIO.new(<<~BOARD) }
-      #############
-      #.....D.D.A.#
-      ###.#B#C#.###
-        #A#B#C#.#
-        #########
-    BOARD
+    context "from the sixth configuration" do
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
+        #############
+        #.....D.D.A.#
+        ###.#B#C#.###
+          #A#B#C#.#
+          #########
+      BOARD
 
-    it "finds [8, 1] -> 9 among the possible next moves" do
-      expect(Amphipod::Move.new(subject.board).next_moves)
-        .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 3000)
+      it "finds [8, 1] -> 9 among the possible next moves" do
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 3000)
           #############
           #.....D...A.#
           ###.#B#C#.###
             #A#B#C#D#
             #########
-      BOARD
+        BOARD
+      end
     end
-  end
 
-  context "from the sixth-A configuration" do
-    subject { Amphipod.new StringIO.new(<<~BOARD) }
-      #############
-      #.....D...A.#
-      ###.#B#C#.###
-        #A#B#C#D#
-        #########
-    BOARD
+    context "from the sixth-A configuration" do
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
+        #############
+        #.....D...A.#
+        ###.#B#C#.###
+          #A#B#C#D#
+          #########
+      BOARD
 
-    it "finds [8, 1] -> 9 among the possible next moves" do
-      expect(Amphipod::Move.new(subject.board).next_moves)
-        .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 4000)
+      it "finds [8, 1] -> 9 among the possible next moves" do
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 4000)
           #############
           #.........A.#
           ###.#B#C#D###
             #A#B#C#D#
             #########
-      BOARD
+        BOARD
+      end
     end
-  end
 
-  context "from the seventh configuration" do
-    subject { Amphipod.new StringIO.new(<<~BOARD) }
-      #############
-      #.........A.#
-      ###.#B#C#D###
-        #A#B#C#D#
-        #########
-    BOARD
+    context "from the seventh configuration" do
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
+        #############
+        #.........A.#
+        ###.#B#C#D###
+          #A#B#C#D#
+          #########
+      BOARD
 
-    it "finds [8, 1] -> 9 among the possible next moves" do
-      expect(Amphipod::Move.new(subject.board).next_moves)
-        .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 8)
+      it "finds [8, 1] -> 9 among the possible next moves" do
+        expect(subject).to include Amphipod::Move.new(StringIO.new(<<~BOARD), 8)
           #############
           #...........#
           ###A#B#C#D###
             #A#B#C#D#
             #########
-      BOARD
+        BOARD
+      end
     end
-  end
 
-  context "from this configuration" do
-    subject { Amphipod.new StringIO.new(<<~BOARD) }
-      #############
-      #...........#
-      ###B#C#B#D###
-        #A#D#C#A#
-        #########
-    BOARD
-
-    it "finds [8, 1] -> 9 among the possible next moves" do
-      expect(Amphipod::Move.new(subject.board).next_moves)
-        .to include Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board, 20)
-          #############
-          #.B.........#
-          ###.#C#B#D###
-            #A#D#C#A#
-            #########
+    context "from this configuration" do
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)).next_moves }
+        #############
+        #...........#
+        ###B#C#B#D###
+          #A#D#C#A#
+          #########
       BOARD
+
+      it "finds [8, 1] -> 9 among the possible next moves" do
+        expect(subject)
+          .to include Amphipod::Move.new(StringIO.new(<<~BOARD), 20)
+            #############
+            #.B.........#
+            ###.#C#B#D###
+              #A#D#C#A#
+              #########
+        BOARD
+      end
     end
   end
 
@@ -760,7 +750,7 @@ RSpec.describe Amphipod do
 
   describe "#exit_energy" do
     context "with the example input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###B#C#B#D###
@@ -769,14 +759,14 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a cost of 3,122 energy for all non-homed pods to leave the initial rooms" do
-        expect(subject.exit_energy(subject.prune(subject.board))).to eq 3_122
+        expect(subject.prune.exit_energy).to eq 3_122
       end
     end
   end
 
   describe "#entry_energy" do
     context "with the example input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###B#C#B#D###
@@ -785,14 +775,14 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a cost of 3,131 energy to fill all rooms from the initial state" do
-        expect(subject.entry_energy(subject.prune(subject.board))).to eq 3_131
+        expect(subject.prune.entry_energy).to eq 3_131
       end
     end
   end
 
   describe "#play_game" do
     context "with the example input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###B#C#B#D###
@@ -806,7 +796,7 @@ RSpec.describe Amphipod do
     end
 
     context "with my actual input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###A#D#A#B###
@@ -820,7 +810,7 @@ RSpec.describe Amphipod do
     end
 
     context "with vodik's input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###A#C#B#A###
@@ -834,7 +824,7 @@ RSpec.describe Amphipod do
     end
 
     context "with the unfolded example input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###B#C#B#D###
@@ -845,7 +835,7 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a cost of x to leave the rooms" do
-        expect(subject.exit_energy(subject.prune(subject.board)))
+        expect(subject.prune.exit_energy)
           .to eq 10 + 2000 + 3000 + 100 + 200 + 30 + 4000 + 10 + 20 + 3 + 1000 + 2 + 300 + 4
       end
 
@@ -855,7 +845,7 @@ RSpec.describe Amphipod do
     end
 
     context "with my actual unfolded input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###A#D#A#B###
@@ -871,7 +861,7 @@ RSpec.describe Amphipod do
     end
 
     context "with vodik's part 2 input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Move.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###A#C#B#A###
@@ -882,14 +872,14 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a least score of 50,265 energy" do
-        # expect(subject.play_game(PriorityQueue.new)).to eq 50_265
+        expect(subject.play_game(PriorityQueue.new)).to eq 50_265
       end
     end
   end
 
   describe "#play_vodik" do
     context "with the example input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###B#C#B#D###
@@ -903,7 +893,7 @@ RSpec.describe Amphipod do
     end
 
     context "with my actual input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###A#D#A#B###
@@ -917,7 +907,7 @@ RSpec.describe Amphipod do
     end
 
     context "with vodik's input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###A#C#B#A###
@@ -931,7 +921,7 @@ RSpec.describe Amphipod do
     end
 
     context "with the unfolded example input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###B#C#B#D###
@@ -942,7 +932,7 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a cost of x to leave the rooms" do
-        expect(subject.exit_energy(subject.prune(subject.board)))
+        expect(subject.prune.exit_energy)
           .to eq 10 + 2000 + 3000 + 100 + 200 + 30 + 4000 + 10 + 20 + 3 + 1000 + 2 + 300 + 4
       end
 
@@ -952,7 +942,7 @@ RSpec.describe Amphipod do
     end
 
     context "with my actual unfolded input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###A#D#A#B###
@@ -968,7 +958,7 @@ RSpec.describe Amphipod do
     end
 
     context "with vodik's part 2 input" do
-      subject { Amphipod::Move.new(Amphipod.new(StringIO.new(<<~BOARD)).board) }
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
         #############
         #...........#
         ###A#C#B#A###
@@ -980,6 +970,66 @@ RSpec.describe Amphipod do
 
       it "finds a least score of 50,265 energy" do
         expect(subject.play_vodik(PriorityQueue.new)).to eq 50_265
+      end
+    end
+  end
+
+  describe "Room#empty?" do
+    it "finds non-empty rooms" do
+      expect(Amphipod::Room.new([:A, :B]).empty?).to be false
+    end
+
+    it "finds empty rooms" do
+      expect(Amphipod::Room.new([]).empty?).to be true
+    end
+  end
+
+  describe "Room#take" do
+    it "takes the top pod from the room" do
+      room = Amphipod::Room.new([:A, :B])
+      pod  = room.take
+      expect(pod).to eq :A
+      expect(room.room).to eq [:B]
+    end
+
+    it "takes the top pod from the room with 1 pod" do
+      room = Amphipod::Room.new([:B])
+      pod  = room.take
+      expect(pod).to eq :B
+      expect(room.room).to eq []
+    end
+
+    it "takes nil from an empty room" do
+      room = Amphipod::Room.new([])
+      pod  = room.take
+      expect(pod).to eq nil
+      expect(room.room).to eq []
+    end
+  end
+
+  describe "Burrow#commit" do
+    context "with vodik's part 2 input" do
+      subject { Amphipod::Burrow.new(StringIO.new(<<~BOARD)) }
+        #############
+        #...........#
+        ###A#C#B#A###
+          #D#C#B#A#
+          #D#B#A#C#
+          #D#D#B#C#
+          #########
+      BOARD
+
+      it "commits a pod from the last room" do
+        expect(subject.commit(:A, 8, 10).board)
+          .to eq Amphipod::Burrow.new(StringIO.new(<<~BOARD)).prune.board
+            #############
+            #..........A#
+            ###A#C#B#.###
+              #D#C#B#A#
+              #D#B#A#C#
+              #D#D#B#C#
+              #########
+        BOARD
       end
     end
   end
