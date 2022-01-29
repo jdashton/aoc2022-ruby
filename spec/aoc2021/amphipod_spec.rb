@@ -769,7 +769,7 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a cost of 3,122 energy for all non-homed pods to leave the initial rooms" do
-        expect(subject.exit_energy(subject.board)).to eq 3_122
+        expect(subject.exit_energy(subject.prune(subject.board))).to eq 3_122
       end
     end
   end
@@ -785,7 +785,7 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a cost of 3,131 energy to fill all rooms from the initial state" do
-        expect(subject.entry_energy(subject.board)).to eq 3_131
+        expect(subject.entry_energy(subject.prune(subject.board))).to eq 3_131
       end
     end
   end
@@ -845,7 +845,7 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a cost of x to leave the rooms" do
-        expect(subject.exit_energy(subject.board))
+        expect(subject.exit_energy(subject.prune(subject.board)))
           .to eq 10 + 2000 + 3000 + 100 + 200 + 30 + 4000 + 10 + 20 + 3 + 1000 + 2 + 300 + 4
       end
 
@@ -942,7 +942,7 @@ RSpec.describe Amphipod do
       BOARD
 
       it "finds a cost of x to leave the rooms" do
-        expect(subject.exit_energy(subject.board))
+        expect(subject.exit_energy(subject.prune(subject.board)))
           .to eq 10 + 2000 + 3000 + 100 + 200 + 30 + 4000 + 10 + 20 + 3 + 1000 + 2 + 300 + 4
       end
 

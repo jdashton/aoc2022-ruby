@@ -45,6 +45,7 @@ module AoC2021
       end
 
       def play_vodik(_queue)
+        prune(board)
         entry_energy(board) + exit_energy(board) + solve(board)
       end
 
@@ -94,16 +95,49 @@ module AoC2021
       end
 
       def solve(board)
+        #     let mut stack = vec![(Burrow::<N>::new(rooms), 0)];  Returns a vector of (Burrow, cost) tuples.
+        # ##    [(Burrow {
+        #           rooms: [
+        #             Room { slots: [Some(Amber),  Some(Desert)], pos: 0 },
+        #             Room { slots: [Some(Copper), Some(Desert)], pos: 0 },
+        #             Room { slots: [Some(Bronze), Some(Bronze)], pos: 0 },
+        #             Room { slots: [Some(Amber),  Some(Copper)], pos: 0 }
+        #           ],
+        #           hallway: BitBoard { amber: 0, bronze: 0, copper: 0, desert: 0 }
+        #         },
+        #         0)]    this is the cost (already incurred?)
+        #     let mut min = usize::MAX;  (Essentially Float::INFINITY)
+        #
+        #     while let Some((burrow, cost)) = stack.pop() {
+        #         for t in (0..4).rev() {  (.. is non-inclusive, so start with room[3] and work down to room[0])
+        #             if let Some((pod, target, futures)) = burrow.moves(t) {
+        #                 for future in futures {
+        #                     let mut burrow = burrow;
+        #                     let cost = cost + future.1;
+        #                     if cost < min {
+        #                         burrow.commit(pod, target, future.0);
+        #
+        #                         if burrow.hallway.is_empty() {
+        #                             min = cost;
+        #                         } else {
+        #                             stack.push((burrow, cost));
+        #                         }
+        #                     }
+        #                 }
+        #             }
+        #         }
+        #     }
+        #
+        #     min
+
         6_268
       end
 
       def entry_energy(board)
-        prune(board)
         ROOMS.reduce(0) { |acc, room_num| acc + ((1..board[room_num].length).sum * COSTS[ROOM_AMPHIPOD[room_num]]) }
       end
 
       def exit_energy(board)
-        prune(board)
         ROOMS.reduce(0) do |acc, room_num|
           acc + board[room_num].each_with_index.reduce(0) { |acm, (pod, idx)| acm + (COSTS[pod] * (1 + idx)) }
         end
@@ -111,6 +145,7 @@ module AoC2021
 
       def prune(board)
         ROOMS.each { board[_1].pop while board[_1].last == ROOM_AMPHIPOD[_1] }
+        board
       end
 
       def hall_avail(old_room, room_spot)
