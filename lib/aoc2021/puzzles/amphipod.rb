@@ -185,7 +185,7 @@ module AoC2021
 
     # Encapsulates methods for a Room
     class Room
-      attr_reader :room, :pos
+      attr_reader :room
 
       def initialize(room)
         @room = room
@@ -227,9 +227,14 @@ module AoC2021
         end
       end
 
+      # Used for testing
+      def head_prune
+        ROOMS.each { @board[_1].shift while @board[_1].first.nil? }
+        self
+      end
+
       def prune
         ROOMS.each { @board[_1].pop while @board[_1].last == ROOM_AMPHIPOD[_1] }
-        ROOMS.each { @board[_1].shift while @board[_1].first.nil? }
         self
       end
 
@@ -237,10 +242,12 @@ module AoC2021
       # of the hallway, where 1 is the leftmost spot and 64 is the rightmost.
       # For the moment, our hallway has spots 0, 1, 3, 5, 7, 9, and 10.
       # Switching to the bitboard might perform better.
-      def commit(pod, target, mask)
-        @board[mask] = @board[target].shift # TODO resolve inlining for Room methods
+      def commit(from_room, hall_pos)
+        @board[hall_pos] = @board[from_room].shift
         self
 
+        # target below is the from_room parameter, and
+        # mask below is the hall_pos param
         #         match pod {
         #             Amphipod::Amber => {
         #                 self.rooms[target].take();
@@ -274,30 +281,49 @@ module AoC2021
         #         }
       end
 
+      def has_path(start_pos, dist)
+        return true if dist.zero?
+
+        # let mask = ((2 << (dist - 1)) - 1) << (5 - dist - start);
+        # self.hallway.flatten() & mask == 0
+        board[]
+      end
+
+      # returns something like [(32, 8), (64, 10), (2, 8), (1, 10)] where the first
+      # element of each tuple is the hallway position, and the second element is the cost.
       def moves(room)
+        # pos below is the room parameter
         #         let pod = self.rooms[pos].extract()?;
+        pod = @board[room].first
         #
         #         let energy = pod.energy();
+        energy = COSTS[pod]
         #         let target = match pod {
         #             Amphipod::Amber => 0,
         #             Amphipod::Bronze => 1,
         #             Amphipod::Copper => 2,
         #             Amphipod::Desert => 3,
         #         };
+        right_room = RIGHT_ROOM[pod]
         #
         #         const COSTS: [usize; 7] = [2, 2, 4, 4, 4, 2, 2];
         #         let hallway = self.hallway.flatten();
         #         let mut moves = Vec::with_capacity(7);
+        moves = []
         #
         #         let (start, end) = if pos < target {
         #             (pos, target)
         #         } else {
         #             (target, pos)
         #         };
+        start_pos, end_pos = [room, right_room].minmax
         #
         #         let dist = end - start;
+        dist = end_pos - start_pos
         #         let basecost = dist * 2;
+        basecost = dist * 2
         #         let has_path = self.has_path(start, dist);
+        has_path = has_path(start_pos, dist)
         #
         #         if has_path && self.rooms[target].is_empty() {
         #             moves.push((0, basecost * energy));
