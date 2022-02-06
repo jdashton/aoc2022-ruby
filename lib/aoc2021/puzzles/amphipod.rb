@@ -6,7 +6,7 @@ module AoC2021
   # Calculates conditions of victory for given moves and boards
   module Amphipod
     def self.day23
-      board = File.open("input/day23a.txt") { |file| Amphipod::parse_board file }
+      board = File.open("input/day23a.txt") { |file| Amphipod.parse_board file }
       # puts "Day 23, part A: #{ Move.new(amphipod.board).play_game(PriorityQueue.new) } is the least energy required to organize the amphipods."
       # puts "Day 23, part B: #{ amphipod.least_energy_unfolded }  is the least energy required to organize all the amphipods."
       puts
@@ -17,7 +17,7 @@ module AoC2021
       attr_reader :board, :score, :history
 
       def initialize(board, score = 0, history = nil)
-        @board   = board.respond_to?(:fileno) ? Amphipod::parse_board(board) : board
+        @board   = board.respond_to?(:fileno) ? Amphipod.parse_board(board) : board
         @score   = score
         @history = history
         # pp @board; exit
@@ -209,7 +209,7 @@ module AoC2021
       attr_reader :board
 
       def initialize(board)
-        @board = board.respond_to?(:fileno) ? Amphipod::parse_board(board) : board
+        @board = board.respond_to?(:fileno) ? Amphipod.parse_board(board) : board
       end
 
       def play_vodik(_queue)
@@ -229,7 +229,7 @@ module AoC2021
 
       # Used for testing
       def head_prune
-        ROOMS.each { @board[_1].shift while @board[_1].first.nil? }
+        ROOMS.each { @board[_1].shift while !@board[_1].empty? && @board[_1].first.nil? }
         self
       end
 
@@ -281,20 +281,25 @@ module AoC2021
         #         }
       end
 
-      def has_path(start_pos, dist)
+      # Focused on detecting a clear path between rooms 2, 4, 6, and 8
+      # Always pass in the left room number as start_pos, and the number
+      # of steps to check (2, 4, or 6) as dist.
+      def has_path?(start_pos, dist)
         return true if dist.zero?
 
         # let mask = ((2 << (dist - 1)) - 1) << (5 - dist - start);
         # self.hallway.flatten() & mask == 0
-        board[]
+        board[(start_pos + 1...start_pos + dist).step(2)].compact.empty?
       end
 
+      HALL_COSTS = [2, 2, nil, 4, nil, 4, nil, 4, nil, 2, 2].freeze
       # returns something like [(32, 8), (64, 10), (2, 8), (1, 10)] where the first
       # element of each tuple is the hallway position, and the second element is the cost.
       def moves(room)
         # pos below is the room parameter
         #         let pod = self.rooms[pos].extract()?;
         pod = @board[room].first
+        return nil unless pod
         #
         #         let energy = pod.energy();
         energy = COSTS[pod]
@@ -321,52 +326,85 @@ module AoC2021
         #         let dist = end - start;
         dist = end_pos - start_pos
         #         let basecost = dist * 2;
-        basecost = dist * 2
+        base_cost = dist * 2
         #         let has_path = self.has_path(start, dist);
-        has_path = has_path(start_pos, dist)
+        has_path = has_path?(start_pos, dist)
         #
         #         if has_path && self.rooms[target].is_empty() {
-        #             moves.push((0, basecost * energy));
-        #         } else {
-        #             if has_path || pos < target {
-        #                 moves.extend(
-        #                     (0..start + 2)
-        #                         .rev()
-        #                         .map(|offset| (1 << (6 - offset), COSTS[offset]))
-        #                         .scan(0, |acc, (mask2, weight)| {
-        #                             let cost = if *acc == 0 {
-        #                                 *acc += weight;
-        #                                 2
-        #                             } else {
-        #                                 *acc += weight;
-        #                                 *acc
-        #                             };
-        #
-        #                             (mask2 & hallway == 0).then(|| (mask2, (basecost + cost) * energy))
-        #                         }),
-        #                 );
-        #             }
-        #
-        #             if has_path || target < pos {
-        #                 moves.extend(
-        #                     (end + 2..7)
-        #                         .map(|offset| (1 << (6 - offset), COSTS[offset]))
-        #                         .scan(0, |acc, (mask2, weight)| {
-        #                             let cost = if *acc == 0 {
-        #                                 *acc += weight;
-        #                                 2
-        #                             } else {
-        #                                 *acc += weight;
-        #                                 *acc
-        #                             };
-        #
-        #                             (mask2 & hallway == 0).then(|| (mask2, (basecost + cost) * energy))
-        #                         }),
-        #                 );
-        #             }
+        if has_path && @board[right_room].compact.empty?
+          #             moves.push((0, base_cost * energy));
+          moves << ([0, dist * energy]) # [0 indicates that no hallway position will be occupied.
+          #         } else {
+        else
+          #             if has_path || pos < target {
+          if has_path || room < right_room
+            #                 moves.extend(
+            #                     (0..start + 2) # the +2 is because start is in terms of rooms, which are 0 to 3
+            #                         .rev()
+            #                         .map(|offset| (1 << (6 - offset), COSTS[offset]))
+            #                         .scan(0, |acc, (mask2, weight)| {
+            acc = 0
+            (0...start_pos)
+              .reverse_each
+              .map { |offset| pp offset; [offset, HALL_COSTS[offset]] }
+              .each { |hall_spot, weight|
+                next unless weight
+                break if @board[hall_spot]
+
+                cost = acc.zero? ? 2 : acc + weight
+                acc  += weight
+                moves << [hall_spot, (dist + cost) * energy]
+              }
+          end
+          #                             let cost = if *acc == 0 {
+          #                                 *acc += weight;
+          #                                 2
+          #                             } else {
+          #                                 *acc += weight;
+          #                                 *acc
+          #                             };
+          #
+          #                             (mask2 & hallway == 0).then(|| (mask2, (basecost + cost) * energy))
+          #                         }),
+          #                 );
+          #             }
+
+          #
+          #             if has_path || target < pos {
+          if has_path || right_room < room
+            acc = 0
+            (end_pos + 1...11)
+              .map { |offset| pp offset; [offset, HALL_COSTS[offset]] }
+              .each { |hall_spot, weight|
+                next unless weight
+                break if @board[hall_spot]
+
+                cost = acc.zero? ? 2 : acc + weight
+                acc  += weight
+                moves << [hall_spot, (dist + cost) * energy]
+              }
+            #                 moves.extend(
+            #                     (end + 2..7)
+            #                         .map(|offset| (1 << (6 - offset), COSTS[offset]))
+            #                         .scan(0, |acc, (mask2, weight)| {
+            #                             let cost = if *acc == 0 {
+            #                                 *acc += weight;
+            #                                 2
+            #                             } else {
+            #                                 *acc += weight;
+            #                                 *acc
+            #                             };
+            #
+            #                             (mask2 & hallway == 0).then(|| (mask2, (basecost + cost) * energy))
+            #                         }),
+            #                 );
+          end
+          #             }
+        end
         #         }
         #
         #         Some((*pod, pos, moves))
+        [pod, room, moves]
         #     }
       end
 
@@ -387,25 +425,7 @@ module AoC2021
         #     while let Some((burrow, cost)) = stack.pop() {
         #         for t in (0..4).rev() {  (.. is non-inclusive, so start with room[3] and work down to room[0])
         #             if let Some((pod, target, futures)) = burrow.moves(t) {
-        # ## futures is
-        # [
-        #     (
-        #         32,
-        #         8,
-        #     ),
-        #     (
-        #         64,
-        #         10,
-        #     ),
-        #     (
-        #         2,
-        #         8,
-        #     ),
-        #     (
-        #         1,
-        #         10,
-        #     ),
-        # ]
+        #                      ## (Amber, 3, [(32, 8), (64, 10), (2, 8), (1, 10)])
         #                 for future in futures {
         #                     let mut burrow = burrow;
         #                     let cost = cost + future.1;
