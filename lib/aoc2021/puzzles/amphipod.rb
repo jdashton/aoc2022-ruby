@@ -212,6 +212,14 @@ module AoC2021
         @board = board.respond_to?(:fileno) ? Amphipod.parse_board(board) : board
       end
 
+      def inspect
+        "Burrow: @board=#{ @board.inspect }"
+      end
+
+      def clone
+        @board.map(&:clone)
+      end
+
       def play_vodik(_queue)
         prune
         entry_energy + exit_energy + solve
@@ -238,13 +246,20 @@ module AoC2021
         self
       end
 
+      def hallway_empty?
+        @board.reject { _1.is_a? Array }.compact.empty?
+      end
+
+      TYPES     = { A: "Amber", B: "Bronze", C: "Copper", D: "Desert" }.freeze
+      ROOM_NUMS = { 0 => 64, 1 => 32, 3 => 16, 5 => 8, 7 => 4, 9 => 2, 10 => 1, nil => 0 }.freeze
+
       # In Simon's bitboard implementation, mask is a 7-bit representation
-      # of the hallway, where 1 is the leftmost spot and 64 is the rightmost.
+      # of the hallway, where 64 is the leftmost spot and 1 is the rightmost.
       # For the moment, our hallway has spots 0, 1, 3, 5, 7, 9, and 10.
       # Switching to the bitboard might perform better.
       def commit(from_room, hall_pos)
-        @board[hall_pos] = @board[from_room].shift
-        self
+        pod = @board[from_room].shift
+        @board[hall_pos] = pod if hall_pos # might be nil, indicating that this pod goes into its room
 
         # target below is the from_room parameter, and
         # mask below is the hall_pos param
@@ -279,6 +294,12 @@ module AoC2021
         #         if self.rooms[3].is_empty() {
         #             self.hallway.desert = 0;
         #         }
+        8.step(by: -2, to: 2).each do |room|
+          if @board[room].empty?
+            amph   = ROOM_AMPHIPOD[room]
+            @board = @board.map { |spot| spot == amph ? nil : spot }
+          end
+        end
       end
 
       # Focused on detecting a clear path between rooms 2, 4, 6, and 8
@@ -333,7 +354,7 @@ module AoC2021
         #         if has_path && self.rooms[target].is_empty() {
         if has_path && @board[right_room].compact.empty?
           #             moves.push((0, base_cost * energy));
-          moves << ([0, dist * energy]) # [0 indicates that no hallway position will be occupied.
+          moves << ([nil, dist * energy]) # [nil indicates that no hallway position will be occupied.
           #         } else {
         else
           #             if has_path || pos < target {
@@ -346,7 +367,7 @@ module AoC2021
             acc = 0
             (0...start_pos)
               .reverse_each
-              .map { |offset| pp offset; [offset, HALL_COSTS[offset]] }
+              .map { |offset| [offset, HALL_COSTS[offset]] }
               .each { |hall_spot, weight|
                 next unless weight
                 break if @board[hall_spot]
@@ -374,7 +395,7 @@ module AoC2021
           if has_path || right_room < room
             acc = 0
             (end_pos + 1...11)
-              .map { |offset| pp offset; [offset, HALL_COSTS[offset]] }
+              .map { |offset| [offset, HALL_COSTS[offset]] }
               .each { |hall_spot, weight|
                 next unless weight
                 break if @board[hall_spot]
@@ -404,11 +425,19 @@ module AoC2021
         #         }
         #
         #         Some((*pod, pos, moves))
+        puts "hallway: #{ @board
+                            .reject { _1.is_a? Array }
+                            .reverse
+                            .each_with_index
+                            .map { |amph, idx| amph ? (1 << idx) : 0}
+                            .reduce(:|) }"
         [pod, room, moves]
         #     }
       end
 
       def solve
+        # pp @board
+
         #     let mut stack = vec![(Burrow::<N>::new(rooms), 0)];  Returns a vector of (Burrow, cost) tuples.
         # ##    [(Burrow {
         #           rooms: [
@@ -421,32 +450,64 @@ module AoC2021
         #         },
         #         0)]    this is the cost (already incurred?)
         #     let mut min = usize::MAX;  (Essentially Float::INFINITY)
+        stack = [[self, 0]]
+        min   = Float::INFINITY
+        min   = 18446744073709551615
+
         #
         #     while let Some((burrow, cost)) = stack.pop() {
-        #         for t in (0..4).rev() {  (.. is non-inclusive, so start with room[3] and work down to room[0])
-        #             if let Some((pod, target, futures)) = burrow.moves(t) {
-        #                      ## (Amber, 3, [(32, 8), (64, 10), (2, 8), (1, 10)])
-        #                 for future in futures {
-        #                     let mut burrow = burrow;
-        #                     let cost = cost + future.1;
-        #                     if cost < min {
-        #                         burrow.commit(pod, target, future.0);
-        #
-        #                         if burrow.hallway.is_empty() {
-        #                             min = cost;
-        #                         } else {
-        #                             stack.push((burrow, cost));
-        #                         }
-        #                     }
-        #                 }
-        #             }
-        #         }
-        #     }
+        while (current_burrow, current_cost = stack.pop)
+          # pp current_burrow, current_cost
+          puts "popped a new burrow: #{ current_burrow.inspect }, #{ current_cost }"
+
+          #         for t in (0..4).rev() {  (.. is non-inclusive, so start with room[3] and work down to room[0])
+          8.step(by: -2, to: 2) do |t|
+            # pp t
+
+            #             if let Some((pod, target, futures)) = burrow.moves(t) {
+            next unless (pod, target, futures = current_burrow.moves(t))
+
+            puts "(#{ TYPES[pod] }, #{ target / 2 - 1 }, [#{ futures
+                                                               .map { |room, cost| "(#{ROOM_NUMS[room]}, #{cost})" }
+                                                               .join(", ") }])"
+            #                      ## (Amber, 3, [(32, 8), (64, 10), (2, 8), (1, 10)])
+            #                 for future in futures {
+            futures.each do |future|
+              #                     let mut burrow = burrow;
+              burrow = Burrow.new(current_burrow.clone)
+              #                     let cost = cost + future.1;
+              cost = current_cost + future[1]
+              #                     if cost < min {
+              next unless cost < min
+
+              puts "#{ cost } < #{ min }"
+              #                         burrow.commit(pod, target, future.0);
+              burrow.commit(target, future[0])
+              #
+              #                         if burrow.hallway.is_empty() {
+              if burrow.hallway_empty?
+                #                             min = cost;
+                min = cost
+                #                         } else {
+              else
+                #                             stack.push((burrow, cost));
+                stack.push [burrow, cost]
+                #                         }
+              end
+              #                     }
+              #                 }
+            end
+            #             }
+            #         }
+          end
+          #     }
+        end
         #
         #     min
-        pp @board
 
-        6_268
+        # 6_268
+        puts "Returning a min cost of #{ min }"
+        min
       end
     end
 

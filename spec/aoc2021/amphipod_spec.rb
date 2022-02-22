@@ -67,7 +67,7 @@ RSpec.describe Burrow do
       BOARD
 
       it "finds the expected moves from room 8" do
-        expect(subject.moves(8)).to eq [:A, 8, [[0, 6]]]
+        expect(subject.moves(8)).to eq [:A, 8, [[nil, 6]]]
       end
 
       it "finds the expected moves from room 6" do
@@ -106,6 +106,20 @@ RSpec.describe Burrow do
 
       it "finds the expected moves from room 2" do
         expect(subject.head_prune.moves(2)).to be_nil
+      end
+    end
+
+    context "vodik 8[1] -> 2[2]" do
+      subject { Burrow.new(StringIO.new(<<~BOARD)) }
+        #############
+        #.........D.#
+        ###.#C#B#A###
+          #.#D#B#C#
+          #########
+      BOARD
+
+      it "finds the expected moves from room 8" do
+        expect(subject.moves(8)).to eq [:A, 8, [[nil, 6]]]
       end
     end
   end
@@ -292,7 +306,7 @@ RSpec.describe Burrow do
           #########
       BOARD
 
-      it "finds a cost of x to leave the rooms" do
+      it "finds a cost of 10,679 to leave the rooms" do
         expect(subject.prune.exit_energy)
           .to eq 10 + 2000 + 3000 + 100 + 200 + 30 + 4000 + 10 + 20 + 3 + 1000 + 2 + 300 + 4
       end
