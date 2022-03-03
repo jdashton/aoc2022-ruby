@@ -46,7 +46,7 @@ module AoC2021
 
       def print_history
         brd = @board
-        pp board
+        # pp board
         puts "  #{ brd[0] || "." }#{ brd[1] || "." }.#{ brd[3] || "." }.#{ brd[5] || "." }.#{ brd[7] || "." }.#{ brd[9] || "." }#{ brd[10] || "." }"
         brd[2].each_index do |i|
           puts "    #{ brd[2][i] || "." } #{ brd[4][i] || "." } #{ brd[6][i] || "." } #{ brd[8][i] || "." }"
@@ -300,12 +300,14 @@ module AoC2021
             @board = @board.map { |spot| spot == amph ? nil : spot }
           end
         end
+
+        self
       end
 
       # Focused on detecting a clear path between rooms 2, 4, 6, and 8
       # Always pass in the left room number as start_pos, and the number
       # of steps to check (2, 4, or 6) as dist.
-      def has_path?(start_pos, dist)
+      def path?(start_pos, dist)
         return true if dist.zero?
 
         # let mask = ((2 << (dist - 1)) - 1) << (5 - dist - start);
@@ -349,7 +351,7 @@ module AoC2021
         #         let basecost = dist * 2;
         base_cost = dist * 2
         #         let has_path = self.has_path(start, dist);
-        has_path = has_path?(start_pos, dist)
+        has_path = path?(start_pos, dist)
         #
         #         if has_path && self.rooms[target].is_empty() {
         if has_path && @board[right_room].compact.empty?
@@ -425,12 +427,12 @@ module AoC2021
         #         }
         #
         #         Some((*pod, pos, moves))
-        puts "hallway: #{ @board
-                            .reject { _1.is_a? Array }
-                            .reverse
-                            .each_with_index
-                            .map { |amph, idx| amph ? (1 << idx) : 0}
-                            .reduce(:|) }"
+        # puts "hallway: #{ @board
+        #                     .reject { _1.is_a? Array }
+        #                     .reverse
+        #                     .each_with_index
+        #                     .map { |amph, idx| amph ? (1 << idx) : 0}
+        #                     .reduce(:|) }"
         [pod, room, moves]
         #     }
       end
@@ -458,7 +460,7 @@ module AoC2021
         #     while let Some((burrow, cost)) = stack.pop() {
         while (current_burrow, current_cost = stack.pop)
           # pp current_burrow, current_cost
-          puts "popped a new burrow: #{ current_burrow.inspect }, #{ current_cost }"
+          # puts "popped a new burrow: #{ current_burrow.inspect }, #{ current_cost }"
 
           #         for t in (0..4).rev() {  (.. is non-inclusive, so start with room[3] and work down to room[0])
           8.step(by: -2, to: 2) do |t|
@@ -467,9 +469,9 @@ module AoC2021
             #             if let Some((pod, target, futures)) = burrow.moves(t) {
             next unless (pod, target, futures = current_burrow.moves(t))
 
-            puts "(#{ TYPES[pod] }, #{ target / 2 - 1 }, [#{ futures
-                                                               .map { |room, cost| "(#{ROOM_NUMS[room]}, #{cost})" }
-                                                               .join(", ") }])"
+            # puts "(#{ TYPES[pod] }, #{ target / 2 - 1 }, [#{ futures
+            #                                                    .map { |room, cost| "(#{ROOM_NUMS[room]}, #{cost})" }
+            #                                                    .join(", ") }])"
             #                      ## (Amber, 3, [(32, 8), (64, 10), (2, 8), (1, 10)])
             #                 for future in futures {
             futures.each do |future|
@@ -480,7 +482,7 @@ module AoC2021
               #                     if cost < min {
               next unless cost < min
 
-              puts "#{ cost } < #{ min }"
+              # puts "#{ cost } < #{ min }"
               #                         burrow.commit(pod, target, future.0);
               burrow.commit(target, future[0])
               #
@@ -506,7 +508,7 @@ module AoC2021
         #     min
 
         # 6_268
-        puts "Returning a min cost of #{ min }"
+        # puts "Returning a min cost of #{ min }"
         min
       end
     end

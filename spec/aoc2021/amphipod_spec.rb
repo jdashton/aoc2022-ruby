@@ -132,49 +132,49 @@ RSpec.describe Burrow do
                          nil, %i[B],
                          nil, %i[C],
                          nil, %i[A],
-                         nil, nil]).has_path?(2, 6)).to be true
+                         nil, nil]).path?(2, 6)).to be true
       # clear path between room 8 and room 4
       expect(Burrow.new([nil,
                          nil, [nil],
                          nil, %i[B],
                          nil, %i[C],
                          nil, %i[A],
-                         nil, nil]).has_path?(4, 4)).to be true
+                         nil, nil]).path?(4, 4)).to be true
       # clear path between room 8 and room 6
       expect(Burrow.new([nil,
                          nil, [nil],
                          nil, %i[B],
                          nil, %i[C],
                          nil, %i[A],
-                         nil, nil]).has_path?(6, 2)).to be true
+                         nil, nil]).path?(6, 2)).to be true
       # clear path between room 2 and room 4
       expect(Burrow.new([nil,
                          nil, [nil],
                          nil, %i[B],
                          nil, %i[C],
                          nil, %i[A],
-                         nil, nil]).has_path?(2, 2)).to be true
+                         nil, nil]).path?(2, 2)).to be true
       # clear path between room 4 and room 6
       expect(Burrow.new([nil,
                          nil, [nil],
                          nil, %i[B],
                          nil, %i[C],
                          nil, %i[A],
-                         nil, nil]).has_path?(4, 2)).to be true
+                         nil, nil]).path?(4, 2)).to be true
       # clear path between room 6 and room 2
       expect(Burrow.new([nil,
                          nil, [nil],
                          nil, %i[B],
                          nil, %i[C],
                          nil, %i[A],
-                         nil, nil]).has_path?(2, 4)).to be true
+                         nil, nil]).path?(2, 4)).to be true
       # clear path between room 4 and room 6
       expect(Burrow.new([nil,
                          nil, [nil],
                          nil, %i[B],
                          nil, [nil],
                          :C, %i[A],
-                         nil, nil]).has_path?(4, 2)).to be true
+                         nil, nil]).path?(4, 2)).to be true
     end
 
     it "finds blocked paths" do
@@ -183,19 +183,19 @@ RSpec.describe Burrow do
                          nil, %i[B],
                          nil, [nil],
                          :C, %i[A],
-                         nil, nil]).has_path?(6, 2)).to be false
+                         nil, nil]).path?(6, 2)).to be false
       expect(Burrow.new([nil,
                          nil, [nil],
                          nil, %i[B],
                          nil, [nil],
                          :C, %i[A],
-                         nil, nil]).has_path?(4, 4)).to be false
+                         nil, nil]).path?(4, 4)).to be false
       expect(Burrow.new([nil,
                          nil, [nil],
                          nil, %i[B],
                          nil, [nil],
                          :C, %i[A],
-                         nil, nil]).has_path?(2, 6)).to be false
+                         nil, nil]).path?(2, 6)).to be false
     end
   end
 
