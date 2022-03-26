@@ -53,7 +53,7 @@ RSpec.describe Burrow do
       end
 
       it "finds the expected moves from room 2" do
-        expect(subject.head_prune.moves(2)).to eq [:D, 2, [[1, 8000], [0, 10000], [9, 8000]]]
+        expect(subject.head_prune.moves(2)).to eq [:D, 2, [[1, 8000], [0, 10_000], [9, 8000]]]
       end
     end
 
@@ -101,7 +101,7 @@ RSpec.describe Burrow do
       end
 
       it "finds the expected moves from room 4" do
-        expect(subject.head_prune.moves(4)).to eq [:D, 4, [[3, 6000], [1, 10000], [0, 12000]]]
+        expect(subject.head_prune.moves(4)).to eq [:D, 4, [[3, 6000], [1, 10_000], [0, 12_000]]]
       end
 
       it "finds the expected moves from room 2" do
@@ -1201,7 +1201,7 @@ RSpec.describe Move do
 
   describe "Room#empty?" do
     it "finds non-empty rooms" do
-      expect(Room.new([:A, :B]).empty?).to be false
+      expect(Room.new(%i[A B]).empty?).to be false
     end
 
     it "finds empty rooms" do
@@ -1211,7 +1211,7 @@ RSpec.describe Move do
 
   describe "Room#take" do
     it "takes the top pod from the room" do
-      room = Room.new([:A, :B])
+      room = Room.new(%i[A B])
       pod  = room.take
       expect(pod).to eq :A
       expect(room.room).to eq [:B]

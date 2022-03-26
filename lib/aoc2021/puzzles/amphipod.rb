@@ -323,6 +323,7 @@ module AoC2021
         #         let pod = self.rooms[pos].extract()?;
         pod = @board[room].first
         return nil unless pod
+
         #
         #         let energy = pod.energy();
         energy = COSTS[pod]
@@ -370,14 +371,14 @@ module AoC2021
             (0...start_pos)
               .reverse_each
               .map { |offset| [offset, HALL_COSTS[offset]] }
-              .each { |hall_spot, weight|
+              .each do |hall_spot, weight|
                 next unless weight
                 break if @board[hall_spot]
 
                 cost = acc.zero? ? 2 : acc + weight
                 acc  += weight
                 moves << [hall_spot, (dist + cost) * energy]
-              }
+              end
           end
           #                             let cost = if *acc == 0 {
           #                                 *acc += weight;
@@ -398,14 +399,14 @@ module AoC2021
             acc = 0
             (end_pos + 1...11)
               .map { |offset| [offset, HALL_COSTS[offset]] }
-              .each { |hall_spot, weight|
+              .each do |hall_spot, weight|
                 next unless weight
                 break if @board[hall_spot]
 
                 cost = acc.zero? ? 2 : acc + weight
                 acc  += weight
                 moves << [hall_spot, (dist + cost) * energy]
-              }
+              end
             #                 moves.extend(
             #                     (end + 2..7)
             #                         .map(|offset| (1 << (6 - offset), COSTS[offset]))
@@ -454,7 +455,7 @@ module AoC2021
         #     let mut min = usize::MAX;  (Essentially Float::INFINITY)
         stack = [[self, 0]]
         min   = Float::INFINITY
-        min   = 18446744073709551615
+        min   = 18_446_744_073_709_551_615
 
         #
         #     while let Some((burrow, cost)) = stack.pop() {
