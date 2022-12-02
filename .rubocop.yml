@@ -1,16 +1,15 @@
+
+require:
+  - rubocop-rake
+  - rubocop-rspec
+
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
   ExtraDetails: true
   Exclude:
     - bin/bundle
     - vendor/**/*
-    - lib/aoc2021/puzzles/arithmetic_logic_unit.rb
-    - lib/aoc2021/puzzles/chitons.rb
-    - lib/aoc2021/puzzles/packet_decoder.rb
-    - lib/aoc2021/puzzles/sea_cucumber.rb
-    - lib/aoc2021/puzzles/snailfish.rb
-    - lib/aoc2021/puzzles/trench_map.rb
 
 Layout/CaseIndentation:
   IndentOneStep: true
@@ -47,6 +46,10 @@ Naming/MethodParameterName:
     - z
     - md
 
+RSpec/FilePath:
+  CustomTransform:
+    AoC2022: aoc2022
+
 Style/BlockDelimiters:
   EnforcedStyle: braces_for_chaining
 
@@ -70,7 +73,3 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
-
-Style/TernaryParentheses:
-  Exclude:
-    - lib/aoc2021/puzzles/amphipod.rb

@@ -1,5 +1,5 @@
 ## [Unreleased]
 
-## [0.1.0] - 2021-12-01
+## [0.1.0] - 2022-12-02
 
-- Initial release
+- Initial release - empty framework waiting for puzzle implementations

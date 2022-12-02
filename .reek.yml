@@ -3,7 +3,7 @@
 detectors:
   UncommunicativeModuleName:
     exclude:
-      - AoC2021
+      - AoC2022
 
   UncommunicativeMethodName:
     exclude:
@@ -21,12 +21,5 @@ detectors:
       - y
       - _
 
-exclude_paths:
-  - lib/aoc2021/puzzles/arithmetic_logic_unit.rb
-  - lib/aoc2021/puzzles/cave_paths.rb
-  - lib/aoc2021/puzzles/chitons.rb
-  - lib/aoc2021/puzzles/packet_decoder.rb
-  - lib/aoc2021/puzzles/priority_queue.rb
-  - lib/aoc2021/puzzles/sea_cucumber.rb
-  - lib/aoc2021/puzzles/snailfish.rb
-  - lib/aoc2021/puzzles/trench_map.rb
+#exclude_paths:
+#  - lib/aoc2022/puzzles/arithmetic_logic_unit.rb
