@@ -5,7 +5,7 @@ require "aoc2022/puzzles/sonar_depth"
 RSpec.describe AoC2022::SonarDepth do
   describe "#count_increases" do
     context "with [1, 3, 2]" do
-      subject { AoC2022::SonarDepth.new StringIO.new(<<~NUMBERS) }
+      subject { described_class.new StringIO.new(<<~NUMBERS) }
         1
         3
         2
@@ -17,7 +17,7 @@ RSpec.describe AoC2022::SonarDepth do
     end
 
     context "with [1, 3, 2, 4]" do
-      subject { AoC2022::SonarDepth.new StringIO.new(<<~NUMBERS) }
+      subject { described_class.new StringIO.new(<<~NUMBERS) }
         1
         3
         2
@@ -30,7 +30,7 @@ RSpec.describe AoC2022::SonarDepth do
     end
 
     context "with provided test data" do
-      subject { AoC2022::SonarDepth.new StringIO.new(<<~NUMBERS) }
+      subject { described_class.new StringIO.new(<<~NUMBERS) }
         199
         200
         208
@@ -51,7 +51,7 @@ RSpec.describe AoC2022::SonarDepth do
 
   describe "#count_triplet_increases" do
     context "with [1, 3, 2, 4, 3, 5]" do
-      subject { AoC2022::SonarDepth.new StringIO.new(<<~NUMBERS) }
+      subject { described_class.new StringIO.new(<<~NUMBERS) }
         1
         3
         2
@@ -66,7 +66,7 @@ RSpec.describe AoC2022::SonarDepth do
     end
 
     context "with [1, 3, 2, 4, 3, 0]" do
-      subject { AoC2022::SonarDepth.new StringIO.new(<<~NUMBERS) }
+      subject { described_class.new StringIO.new(<<~NUMBERS) }
         1
         3
         2
@@ -81,7 +81,7 @@ RSpec.describe AoC2022::SonarDepth do
     end
 
     context "with [1, 3, 2, 4, 3, 5, 4]" do
-      subject { AoC2022::SonarDepth.new StringIO.new(<<~NUMBERS) }
+      subject { described_class.new StringIO.new(<<~NUMBERS) }
         1
         3
         2
@@ -97,7 +97,7 @@ RSpec.describe AoC2022::SonarDepth do
     end
 
     context "with provided test data" do
-      subject { AoC2022::SonarDepth.new StringIO.new(<<~NUMBERS) }
+      subject { described_class.new StringIO.new(<<~NUMBERS) }
         199
         200
         208
