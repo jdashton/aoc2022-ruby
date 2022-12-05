@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe AoC2022::ElfCalories do
+RSpec.describe AoC2022::CalorieCounting do
   context "with provided test data" do
     subject(:elf_calories) { described_class.new StringIO.new(<<~NUMBERS) }
       1000

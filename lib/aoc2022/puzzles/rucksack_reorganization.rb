@@ -2,9 +2,9 @@
 
 module AoC2022
   # For Day 3, we're organizing rucksacks.
-  class Rucksacks
+  class RucksackReorganization
     def self.day03
-      pri_list = File.open("input/day03.txt") { |file| Rucksacks.new file }
+      pri_list = File.open("input/day03.txt") { |file| RucksackReorganization.new file }
       puts "Day  3, part A: the sum of the priorities is #{ pri_list.priority_sum }."
       puts "Day  3, part B: the sum of the priorities is #{ pri_list.badge_sum }."
       puts
