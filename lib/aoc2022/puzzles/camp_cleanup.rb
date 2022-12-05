@@ -11,21 +11,17 @@ module AoC2022
     end
 
     def initialize(file)
-      @range_pairs = file.readlines(chomp: true)
+      @range_pairs = file.readlines(chomp: true).map { |pair| pair.split(/[,-]/).map(&:to_i) }
     end
 
     def contained_ranges
-      @range_pairs.reduce(0) do |acc, pair|
-        a_left, a_right, b_left, b_right = pair.split(/[,-]/).map(&:to_i)
+      @range_pairs.reduce(0) do |acc, (a_left, a_right, b_left, b_right)|
         acc + ((a_left >= b_left && a_right <= b_right) || (b_left >= a_left && b_right <= a_right) ? 1 : 0)
       end
     end
 
     def overlapping_ranges
-      @range_pairs.reduce(0) do |acc, pair|
-        a_left, a_right, b_left, b_right = pair.split(/[,-]/).map(&:to_i)
-        acc + (b_left > a_right || a_left > b_right ? 0 : 1)
-      end
+      @range_pairs.reduce(0) { |acc, (a_left, a_right, b_left, b_right)| acc + (b_left > a_right || a_left > b_right ? 0 : 1) }
     end
   end
 end
