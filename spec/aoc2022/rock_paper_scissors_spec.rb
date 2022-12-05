@@ -16,4 +16,16 @@ RSpec.describe AoC2022::RockPaperScissors do
       expect(rock_paper_scissors.guide_beta).to eq 12
     end
   end
+
+  context "with actual input data" do
+    subject(:rock_paper_scissors) { File.open("input/day02.txt") { |file| described_class.new file } }
+
+    it "finds 14,069 as the score" do
+      expect(rock_paper_scissors.guide_alpha).to eq 14_069
+    end
+
+    it "finds 12,411 as the score with better understanding" do
+      expect(rock_paper_scissors.guide_beta).to eq 12_411
+    end
+  end
 end

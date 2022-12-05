@@ -19,4 +19,16 @@ RSpec.describe AoC2022::Cleanup do
       expect(cleanup.overlapping_ranges).to eq 4
     end
   end
+
+  context "with actual input data" do
+    subject(:cleanup) { File.open("input/day04.txt") { |file| described_class.new file } }
+
+    it "finds 448 as the number of fully-contained ranges" do
+      expect(cleanup.contained_ranges).to eq 448
+    end
+
+    it "finds 794 as the number of overlapping ranges" do
+      expect(cleanup.overlapping_ranges).to eq 794
+    end
+  end
 end
