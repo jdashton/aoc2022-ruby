@@ -17,23 +17,27 @@ module AoC2022
     PRIORITIES = (("a".."z").zip((1..26)) + ("A".."Z").zip((27..52))).to_h
 
     def priority_sum
-      @sacks.map { |sack|
-        contents = sack.chars
-        half     = contents.length / 2
-        PRIORITIES[(contents[...half].to_set & contents[half..].to_set).first]
-      }.sum
+      @sacks.map { |sack| PRIORITIES[RucksackReorganization.find_common(sack)] }.sum
+    end
+
+    def self.find_common(sack)
+      contents = sack.chars
+      half     = contents.length / 2
+      (contents[...half].to_set & contents[half..].to_set).first
+    end
+
+    def self.find_badges(sack_list)
+      sack_list.map { |str| str.chars.to_set }.reduce(&:&)
+    end
+
+    def self.group_by_three((*ary, last), sack)
+      ary + (last.length < 3 ? [last.push(sack)] : [last, [sack]])
     end
 
     def badge_sum
       @sacks
-        .reduce([[]]) { |(*ary, last), sack| ary + (last.length < 3 ? [last.push(sack)] : [last, [sack]]) }
-        .map { |sack_list|
-          sack_list
-            .map { |str|
-              str.chars.to_set
-            }
-            .reduce(&:&)
-        }
+        .reduce([[]]) { |acc, sack| RucksackReorganization.group_by_three acc, sack }
+        .map(&RucksackReorganization.method(:find_badges))
         .map(&:first)
         .map { |char| PRIORITIES[char] }
         .sum
