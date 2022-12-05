@@ -11,17 +11,17 @@ module AoC2022
     end
 
     def initialize(file)
-      @moves = file.readlines.map(&:to_i).reduce([0]) do |(*ary, last), num|
+      @elves = file.readlines.map(&:to_i).reduce([0]) do |(*ary, last), num|
         ary + (num.zero? ? [last, 0] : [last + num])
       end
     end
 
     def most_calories
-      @moves.max
+      @elves.max
     end
 
     def top_3_total
-      @moves.sort[-3..].sum
+      @elves.sort[-3..].sum
     end
   end
 end
