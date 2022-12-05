@@ -24,7 +24,7 @@ module AoC2022
     def overlapping_ranges
       @range_pairs.reduce(0) do |acc, pair|
         a_left, a_right, b_left, b_right = pair.split(/[,-]/).map(&:to_i)
-        acc + ((b_left >= a_left && b_left <= a_right) || (b_right >= a_left && b_right <= a_right) || (a_left >= b_left && a_left <= b_right) ? 1 : 0)
+        acc + (b_left > a_right || a_left > b_right ? 0 : 1)
       end
     end
   end
