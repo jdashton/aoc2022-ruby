@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module AoC2022
-  # For Day 2, we're playing Rock-Paper-Scissors.
+  # For Day 3, we're organizing rucksacks.
   class Rucksacks
     def self.day03
       pri_list = File.open("input/day03.txt") { |file| Rucksacks.new file }
