@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "aoc2022/puzzles/elf_calories"
-
 RSpec.describe AoC2022::ElfCalories do
   context "with provided test data" do
     subject(:elf_calories) { described_class.new StringIO.new(<<~NUMBERS) }
