@@ -46,6 +46,10 @@ Naming/MethodParameterName:
     - z
     - md
 
+Naming/VariableNumber:
+  AllowedPatterns:
+    - '_9001\z'
+
 RSpec/FilePath:
   CustomTransform:
     AoC2022: aoc2022

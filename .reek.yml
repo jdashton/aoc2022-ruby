@@ -8,6 +8,7 @@ detectors:
   UncommunicativeMethodName:
     exclude:
       - /day\d\d/
+      - "/_9001$/"
 
   UncommunicativeParameterName:
     accept:
@@ -20,6 +21,7 @@ detectors:
       - x
       - y
       - _
+      - stacks2
 
 #exclude_paths:
 #  - lib/aoc2022/puzzles/arithmetic_logic_unit.rb
