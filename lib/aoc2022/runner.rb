@@ -11,12 +11,13 @@ module AoC2022
     end
 
     def self.find_day_methods
-      AoC2022.constants
-             .map { |constant| AoC2022.const_get(constant) }
-             .select { |constant| constant.is_a? Class }
-             .reduce([], &method(:pick_day_methods))
-             .sort_by { |_, method_name| method_name }
-             .each { |class_name, method_name| class_name.send method_name }
+      AoC2022::Puzzles
+        .constants
+        .map { |constant| AoC2022::Puzzles.const_get(constant) }
+        .select { |constant| constant.is_a? Class }
+        .reduce([], &method(:pick_day_methods))
+        .sort_by { |_, method_name| method_name }
+        .each { |class_name, method_name| class_name.send method_name }
     end
 
     def self.pick_day_methods(acc, class_name)
