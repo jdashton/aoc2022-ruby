@@ -36,7 +36,7 @@ module AoC2022
 
           num_crates.to_i.times { @stacks[to_stack.to_i].push(@stacks[from_stack.to_i].pop) }
         end
-        @stacks[1..]&.map(&:last).join
+        @stacks[1..].map(&:last).join
       end
 
       def top_crates_9001
@@ -45,7 +45,7 @@ module AoC2022
 
           @stacks2[to_stack.to_i].push(*@stacks2[from_stack.to_i].pop(num_crates.to_i))
         end
-        @stacks2[1..]&.map(&:last).join
+        @stacks2[1..].map(&:last).join
       end
     end
   end
