@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe AoC2022::CampCleanup do
+RSpec.describe AoC2022::Puzzles::CampCleanup do
   context "with provided test data" do
     subject(:cleanup) { described_class.new StringIO.new(<<~DATA) }
       2-4,6-8

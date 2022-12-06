@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module AoC2022
+module AoC2022::Puzzles
   # For Day 1, elves are carrying calories.
   class CalorieCounting
     def self.day01

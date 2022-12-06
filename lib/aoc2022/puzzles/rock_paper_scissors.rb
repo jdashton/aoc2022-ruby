@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module AoC2022
+module AoC2022::Puzzles
   # For Day 2, we're playing Rock-Paper-Scissors.
   class RockPaperScissors
     def self.day02

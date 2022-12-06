@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module AoC2022
+module AoC2022::Puzzles
   # For Day 3, we're organizing rucksacks.
   class RucksackReorganization
     def self.day03

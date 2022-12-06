@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe AoC2022::RockPaperScissors do
+RSpec.describe AoC2022::Puzzles::RockPaperScissors do
   context "with provided test data" do
     subject(:rock_paper_scissors) { described_class.new StringIO.new(<<~DATA) }
       A Y

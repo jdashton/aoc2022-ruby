@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe AoC2022::RucksackReorganization do
+RSpec.describe AoC2022::Puzzles::RucksackReorganization do
   context "with provided test data" do
     subject(:rucksacks) { described_class.new StringIO.new(<<~DATA) }
       vJrwpWtwJgWrhcsFMMfFFhFp

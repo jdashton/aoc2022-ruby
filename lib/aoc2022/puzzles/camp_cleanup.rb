@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module AoC2022
+module AoC2022::Puzzles
   # For Day 4, we're cleaning up the camp.
   class CampCleanup
     def self.day04
