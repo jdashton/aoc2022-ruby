@@ -2,7 +2,7 @@
 
 module AoC2022
   module Puzzles
-    # For Day 6, we're looking for message headers
+    # For Day 8, we're looking at trees.
     class TreetopTreeHouse
       def self.day08
         tree_grid = File.open("input/day08.txt") { |file| TreetopTreeHouse.new file }

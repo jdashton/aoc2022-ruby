@@ -2,12 +2,12 @@
 
 module AoC2022
   module Puzzles
-    # For Day 6, we're looking for message headers
+    # For Day 7, we're deleting files.
     class NoSpaceLeftOnDevice
       def self.day07
         dev_fs = File.open("input/day07.txt") { |file| NoSpaceLeftOnDevice.new file }
         puts "Day  7, part A: The sum of directory sizes is #{ dev_fs.small_dir_sum }."
-        # puts "Day  6, part B: The message marker ends at character #{ datastream.message_marker }."
+        puts "Day  7, part B: The size of the smallest directory that's large enough is #{ dev_fs.smallest_large_enough }."
         puts
       end
 
