@@ -60,7 +60,7 @@ module AoC2022
       def smallest_large_enough
         sum_of_directories = NoSpaceLeftOnDevice.sum_directories(@lines)
         needed             = 30000000 - (70000000 - sum_of_directories[0])
-        sum_of_directories[1].tap { |s| pp s }.sort.tap { |s| pp s }.find { |elt| elt >= needed }
+        sum_of_directories[1].sort.find { |elt| elt >= needed }
       end
     end
   end

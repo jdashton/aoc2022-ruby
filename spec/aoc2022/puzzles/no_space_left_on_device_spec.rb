@@ -45,8 +45,8 @@ RSpec.describe AoC2022::Puzzles::NoSpaceLeftOnDevice do
     end
 
     # 41,735,494 is too high
-    it "finds 24,933,642 as the size of the smallest large enough directory" do
-      expect(no_space_left_on_device.smallest_large_enough).to eq 24_933_642
+    it "finds 1,815,525 as the size of the smallest large enough directory" do
+      expect(no_space_left_on_device.smallest_large_enough).to eq 1_815_525
     end
   end
 end
