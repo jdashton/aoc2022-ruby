@@ -7,6 +7,7 @@ module AoC2022
       def self.day09
         rope_bridge = File.open("input/day09.txt") { |file| RopeBridge.new file }
         puts "Day  9, part A: The tail of the rope visits #{ rope_bridge.short_positions } positions at least once."
+        puts "Day  9, part A: The tail of the longer rope visits #{ rope_bridge.long_rope_positions } positions at least once."
         puts
       end
 

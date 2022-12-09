@@ -34,8 +34,8 @@ module AoC2022
         size = contents[0]
 
         until remainder.nil? || remainder[0].nil? || remainder[0] == ".." do
-          subdir_size, updated_list, remainder = process(*remainder, dir_size_list)
-          size                                 += subdir_size
+          subdir_size, _, remainder = process(*remainder, dir_size_list)
+          size                      += subdir_size
         end
 
         return [size, dir_size_list << size, remainder.nil? ? nil : remainder[1..]]
