@@ -18,7 +18,7 @@ RSpec.describe AoC2022::Puzzles::RopeBridge do
     end
 
     it "finds 1 as the number of positions visited by the tail at least once" do
-      expect(rope_bridge.long_rope_positions).to eq 1
+      expect(rope_bridge.long_positions).to eq 1
     end
   end
 
@@ -35,7 +35,7 @@ RSpec.describe AoC2022::Puzzles::RopeBridge do
     DATA
 
     it "finds 36 as the number of positions visited by the tail at least once" do
-      expect(rope_bridge.long_rope_positions).to eq 36
+      expect(rope_bridge.long_positions).to eq 36
     end
   end
 
@@ -48,7 +48,7 @@ RSpec.describe AoC2022::Puzzles::RopeBridge do
     end
 
     it "finds 2734 as the number of positions visited by the tail at least once" do
-      expect(rope_bridge.long_rope_positions).to eq 2734
+      expect(rope_bridge.long_positions).to eq 2734
     end
   end
 end
