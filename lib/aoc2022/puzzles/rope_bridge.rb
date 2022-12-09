@@ -13,8 +13,8 @@ module AoC2022
         puts
       end
 
-      START     = [0, 0]
-      START_STR = START.map(&:to_s).join(?,)
+      START     = [0, 0].freeze
+      START_STR = START.map(&:to_s).join(",").freeze
 
       def initialize(file)
         @lines   = file.readlines(chomp: true).map(&:split)
@@ -24,17 +24,17 @@ module AoC2022
 
       DIRECTION =
         {
-          ?R => [+1, 0],
-          ?L => [-1, 0],
-          ?U => [0, -1],
-          ?D => [0, +1]
-        }
+          "R" => [+1, 0],
+          "L" => [-1, 0],
+          "U" => [0, -1],
+          "D" => [0, +1]
+        }.freeze
 
       def move(direction, distance)
         distance.to_i.times do
           @knots[0] = @knots.first.zip(DIRECTION[direction]).map(&:sum)
           [0, 9].each_cons(2) { |a, b| @knots[b] = RopeBridge.move_tail(@knots[a], @knots[b]) }
-          @visited << @knots.last.map(&:to_s).join(?,)
+          @visited << @knots.last.map(&:to_s).join(",")
         end
       end
 
@@ -42,14 +42,14 @@ module AoC2022
         distance.to_i.times do
           @knots[0] = @knots.first.zip(DIRECTION[direction]).map(&:sum)
           (0..9).each_cons(2) { |a, b| @knots[b] = RopeBridge.move_tail(@knots[a], @knots[b]) }
-          @visited << @knots.last.map(&:to_s).join(?,)
+          @visited << @knots.last.map(&:to_s).join(",")
         end
       end
 
       def self.move_tail((head_x, head_y), (tail_x, tail_y))
         unless (head_x - tail_x).abs <= 1 && (head_y - tail_y).abs <= 1
-          tail_x += (head_x > tail_x) ? +1 : -1 unless head_x == tail_x
-          tail_y += (head_y > tail_y) ? +1 : -1 unless head_y == tail_y
+          tail_x += head_x > tail_x ? +1 : -1 unless head_x == tail_x
+          tail_y += head_y > tail_y ? +1 : -1 unless head_y == tail_y
         end
         [tail_x, tail_y]
       end

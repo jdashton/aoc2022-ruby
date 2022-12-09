@@ -22,7 +22,7 @@ RSpec.describe AoC2022::Puzzles::RopeBridge do
     end
   end
 
-  context "with provided test data" do
+  context "with provided test data version 2" do
     subject(:rope_bridge) { described_class.new StringIO.new(<<~DATA) }
       R 5
       U 8
