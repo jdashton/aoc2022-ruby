@@ -13,13 +13,12 @@ module AoC2022
         puts
       end
 
-      START     = [0, 0].freeze
-      START_STR = START.map(&:to_s).join(",").freeze
+      START = [0, 0].freeze
 
       def initialize(file)
         @lines   = file.readlines(chomp: true).map(&:split)
-        @visited = Set[START_STR]
-        @knots   = Array.new(10) { |_| Array.new(START) }
+        @visited = Set[START.map(&:to_s).join(",")]
+        @knots   = Array.new(10) { Array.new(START) }
       end
 
       DIRECTION =
@@ -30,18 +29,10 @@ module AoC2022
           "D" => [0, +1]
         }.freeze
 
-      def move(direction, distance)
+      def move(direction, distance, knots)
         distance.to_i.times do
           @knots[0] = @knots.first.zip(DIRECTION[direction]).map(&:sum)
-          [0, 9].each_cons(2) { |a, b| @knots[b] = RopeBridge.move_tail(@knots[a], @knots[b]) }
-          @visited << @knots.last.map(&:to_s).join(",")
-        end
-      end
-
-      def move_long(direction, distance)
-        distance.to_i.times do
-          @knots[0] = @knots.first.zip(DIRECTION[direction]).map(&:sum)
-          (0..9).each_cons(2) { |a, b| @knots[b] = RopeBridge.move_tail(@knots[a], @knots[b]) }
+          knots.each_cons(2) { |a, b| @knots[b] = RopeBridge.move_tail(@knots[a], @knots[b]) }
           @visited << @knots.last.map(&:to_s).join(",")
         end
       end
@@ -55,12 +46,12 @@ module AoC2022
       end
 
       def short_positions
-        @lines.each { |line| move(*line) }
+        @lines.each { |line| move(*line, [0, 9]) }
         @visited.size
       end
 
       def long_positions
-        @lines.each { |line| move_long(*line) }
+        @lines.each { |line| move(*line, (0..9)) }
         @visited.size
       end
     end
