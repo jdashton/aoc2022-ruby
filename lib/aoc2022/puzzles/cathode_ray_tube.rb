@@ -13,9 +13,9 @@ module AoC2022
       def initialize(file)
         @program_lines =
           file
-            .readlines(chomp: true)
-            .map(&:split)
-            .map { |line| (ins = line[0].to_sym) == :noop ? [ins] : [ins, line[1].to_i] }
+          .readlines(chomp: true)
+          .map(&:split)
+          .map { |line| (ins = line[0].to_sym) == :noop ? [ins] : [ins, line[1].to_i] }
       end
 
       def self.run_program(prog_lines)
@@ -37,7 +37,7 @@ module AoC2022
       end
 
       def self.render(cycle_num, x_register)
-        pos = cycle_num % 40 - 1
+        pos = (cycle_num % 40) - 1
         pos == x_register || pos - 1 == x_register || pos + 1 == x_register ? "#" : "."
       end
 
@@ -46,16 +46,15 @@ module AoC2022
         x_register = 1
         image_data = ""
         prog_lines.each do |instruction, value|
-          cycle_num += 1
+          cycle_num  += 1
           image_data += render(cycle_num, x_register)
           image_data += "\n" if (cycle_num % 40).zero?
-          # noinspection RubyCaseWithoutElseBlockInspection
-          if instruction == :addx
-            cycle_num += 1
-            image_data += render(cycle_num, x_register)
-            image_data += "\n" if (cycle_num % 40).zero?
-            x_register += value
-          end
+          next unless instruction == :addx
+
+          cycle_num  += 1
+          image_data += render(cycle_num, x_register)
+          image_data += "\n" if (cycle_num % 40).zero?
+          x_register += value
         end
         image_data
       end
