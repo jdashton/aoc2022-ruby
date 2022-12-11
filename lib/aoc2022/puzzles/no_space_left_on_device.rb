@@ -12,33 +12,29 @@ module AoC2022
       end
 
       def initialize(file)
-        @lines = file
-                   .readlines(chomp: true)
-                   .slice_before(/\A\$/)
-                   .map { |slice|
-                     # noinspection RubyEmptyElseBlockInspection
-                     case slice[0][2..3]
-                       when "cd" then slice[0][5..]
-                       when "ls" then parse_dir slice[1..]
-                       else
-                     end
-                   }
+        @lines = file.readlines(chomp: true).slice_before(/\A\$/).map do |slice|
+          if slice[0][2..3] == "cd"
+            slice[0][5..]
+          else
+            parse_dir slice[1..]
+          end
+        end
       end
 
       # Returns a list of directories in this directory, and the size of the files visible in this directory.
       def parse_dir(ary)
-        ary.reduce([0]) { |acc, entry| entry.start_with?("dir ") ? acc << entry[4..] : acc[0] += entry.to_i; acc }
+        ary.reduce([0]) { |acc, entry| entry.start_with?("dir ") ? acc << entry[4..] : [acc[0] + entry.to_i] + acc[1..] }
       end
 
       def self.process(_dir_name, contents, *remainder, dir_size_list)
         size = contents[0]
 
-        until remainder.nil? || remainder[0].nil? || remainder[0] == ".." do
+        until remainder.nil? || remainder[0].nil? || remainder[0] == ".."
           subdir_size, _, remainder = process(*remainder, dir_size_list)
           size                      += subdir_size
         end
 
-        return [size, dir_size_list << size, remainder.nil? ? nil : remainder[1..]]
+        [size, dir_size_list << size, remainder.nil? ? nil : remainder[1..]]
       end
 
       def self.sum_directories(list)
@@ -51,7 +47,7 @@ module AoC2022
 
       def smallest_large_enough
         sum_of_directories = NoSpaceLeftOnDevice.sum_directories(@lines)
-        needed             = 30000000 - (70000000 - sum_of_directories[0])
+        needed             = 30_000_000 - (70_000_000 - sum_of_directories[0])
         sum_of_directories[1].sort.find { |elt| elt >= needed }
       end
     end
