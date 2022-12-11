@@ -31,7 +31,7 @@ module AoC2022
             end
           end
 
-          #noinspection RubyCaseWithoutElseBlockInspection
+          # noinspection RubyCaseWithoutElseBlockInspection
           case direction
             when 0, 2
               grid    = grid.map(&:reverse)
