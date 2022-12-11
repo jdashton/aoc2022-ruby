@@ -16,36 +16,36 @@ module AoC2022
       end
 
       def self.count_visible(grid)
-        visible = grid.map { |line| line.map { |_| 0 } }
+        visible = grid.map { |line| line.map { 0 } }
 
-        4.times.with_index do |direction|
+        4.times do |direction|
           grid.each_with_index do |line, i|
             visible[i][0] = 1
             tallest       = line[0]
-            line.each_with_index { |tree, j|
+            line.each_with_index do |tree, j|
               next if j.zero?
               next if tree <= tallest
+
               tallest       = tree
               visible[i][j] = 1
-            }
+            end
           end
 
-          # noinspection RubyEmptyElseBlockInspection
+          #noinspection RubyCaseWithoutElseBlockInspection
           case direction
             when 0, 2
-              grid    = grid.map { |line| line.reverse }
-              visible = visible.map { |line| line.reverse }
+              grid    = grid.map(&:reverse)
+              visible = visible.map(&:reverse)
             when 1
               grid    = grid.transpose
               visible = visible.transpose
-            else
           end
         end
         visible
       end
 
       def visible
-        TreetopTreeHouse.count_visible(@tree_lines).map { |line| line.sum }.sum
+        TreetopTreeHouse.count_visible(@tree_lines).map(&:sum).sum
       end
 
       def self.find_scenic_score(grid)
@@ -63,8 +63,7 @@ module AoC2022
                count_neighbors(line[j + 1..], tree) *
                  count_neighbors(line[...j].reverse, tree) *
                  count_neighbors(grid_transposed[j][...i].reverse, tree) *
-                 count_neighbors(grid_transposed[j][i + 1..], tree)
-              ].max
+                 count_neighbors(grid_transposed[j][i + 1..], tree)].max
           end
         end
         highest_score
