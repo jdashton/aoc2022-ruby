@@ -33,7 +33,7 @@ module AoC2022
         distance.to_i.times do
           @knots[0] = @knots.first.zip(DIRECTION[direction]).map(&:sum)
           knots.each_cons(2) { |a, b| @knots[b] = RopeBridge.move_tail(@knots[a], @knots[b]) }
-          @visited << @knots[knots.last].map(&:to_s).join(",")
+          @visited << @knots[knots.last].join(",")
         end
       end
 
