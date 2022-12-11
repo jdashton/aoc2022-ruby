@@ -2,20 +2,20 @@
 
 module AoC2022
   module Puzzles
-    # For Day 8, we're looking at trees.
+    # For Day 10, we're emulating a CRT.
     class CathodeRayTube
       def self.day10
         crt_program = File.open("input/day10.txt") { |file| CathodeRayTube.new file }
         puts "Day 10, part A: #{ crt_program.sum_of_six_strengths } is the sum of these six signal strengths."
+        puts "Day 10, part B: The image looks like this:\n\n#{ crt_program.render_image }"
         puts
       end
 
       def initialize(file)
-        @program_lines =
-          file
-          .readlines(chomp: true)
-          .map(&:split)
-          .map { |line| (ins = line[0].to_sym) == :noop ? [ins] : [ins, line[1].to_i] }
+        @program_lines = file
+                         .readlines(chomp: true)
+                         .map(&:split)
+                         .map { |line| (ins = line[0].to_sym) == :noop ? [ins] : [ins, line[1].to_i] }
       end
 
       def self.run_program(prog_lines)
