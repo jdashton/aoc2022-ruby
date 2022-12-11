@@ -27,8 +27,8 @@ RSpec.describe AoC2022::Puzzles::TreetopTreeHouse do
     end
 
     # 665600 is too high
-    it "finds 496125 as the highest possible scenic score" do
-      expect(treetop_tree_house.scenic_score).to eq 496125
+    it "finds 496,125 as the highest possible scenic score" do
+      expect(treetop_tree_house.scenic_score).to eq 496_125
     end
   end
 end
