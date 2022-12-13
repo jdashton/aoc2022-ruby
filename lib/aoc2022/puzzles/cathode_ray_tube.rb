@@ -12,59 +12,41 @@ module AoC2022
       end
 
       def initialize(file)
-        @program_lines = file
-                         .readlines(chomp: true)
-                         .map(&:split)
-                         .map { |line| (ins = line[0].to_sym) == :noop ? [ins] : [ins, line[1].to_i] }
+        @program_lines = file.readlines(chomp: true)
+                             .map(&:split)
+                             .map { |ins, val| (ins = ins.to_sym) == :noop ? [ins] : [ins, val.to_i] }
       end
 
       def self.run_program(prog_lines)
-        cycle_num  = 0
-        x_register = 1
-        samples    = []
-        prog_lines.each do |instruction, value|
-          cycle_num += 1
-          samples << (cycle_num * x_register) if (cycle_num % 20).zero? && !(cycle_num % 40).zero?
-          # noinspection RubyCaseWithoutElseBlockInspection
-          if instruction == :addx
+        cycle_num = x_register = 1
+        prog_lines.each_with_object([]) do |(instruction, value), acc|
+          (instruction == :noop ? 1 : 2).times do
+            acc << yield(cycle_num, x_register)
             cycle_num += 1
-            samples << (cycle_num * x_register) if (cycle_num % 20).zero? && !(cycle_num % 40).zero?
-            x_register += value
           end
-          break if cycle_num > 220
+          instruction == :addx && x_register += value
         end
-        samples.sum
       end
 
       def self.render(cycle_num, x_register)
-        pos = (cycle_num % 40) - 1
-        pos == x_register || pos - 1 == x_register || pos + 1 == x_register ? "#" : "."
+        pos = (cycle_num - 1) % 40
+        ((pos - 1)..(pos + 1)).member?(x_register) ? "#" : "."
       end
 
-      def self.render_image(prog_lines)
-        cycle_num  = 0
-        x_register = 1
-        image_data = ""
-        prog_lines.each do |instruction, value|
-          cycle_num  += 1
-          image_data += render(cycle_num, x_register)
-          image_data += "\n" if (cycle_num % 40).zero?
-          next unless instruction == :addx
-
-          cycle_num  += 1
-          image_data += render(cycle_num, x_register)
-          image_data += "\n" if (cycle_num % 40).zero?
-          x_register += value
-        end
-        image_data
+      def self.sample_cycle(cycle_num)
+        (cycle_num % 20).zero? && (cycle_num % 40).positive?
       end
 
       def sum_of_six_strengths
-        CathodeRayTube.run_program @program_lines
+        CathodeRayTube.run_program(@program_lines) { |cycle_num, x_register|
+          CathodeRayTube.sample_cycle(cycle_num) ? (cycle_num * x_register) : nil
+        }.compact.sum
       end
 
       def render_image
-        CathodeRayTube.render_image @program_lines
+        CathodeRayTube.run_program(@program_lines) { |cycle_num, x_register|
+          (CathodeRayTube.render(cycle_num, x_register) + ((cycle_num % 40).zero? ? "\n" : ""))
+        }.join
       end
     end
   end

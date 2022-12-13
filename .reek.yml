@@ -4,6 +4,9 @@ detectors:
   LongParameterList:
     max_params: 4
 
+  TooManyStatements:
+    max_statements: 10
+
   UncommunicativeModuleName:
     exclude:
       - AoC2022
