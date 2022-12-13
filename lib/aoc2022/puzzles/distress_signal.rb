@@ -7,9 +7,9 @@ module AoC2022
     # For Day 13, we're sorting distress signals.
     class DistressSignal
       def self.day13
-        distress_signal = File.open("input/day12.txt") { |file| DistressSignal.new file }
+        distress_signal = File.open("input/day13.txt") { |file| DistressSignal.new file }
         puts "Day 13, part A: #{ distress_signal.check_order } is the sum of the indices of pairs that are in the right order."
-        # puts "Day 13, part B: #{ distress_signal.fewest_steps_downhill } is the fewest steps required."
+        puts "Day 13, part B: #{ distress_signal.decoder_key } is the fewest steps required."
         puts
       end
 
@@ -19,24 +19,38 @@ module AoC2022
       end
 
       def self.compare(left, right)
-        puts "1: comparing #{ left } <=> #{ right }"
-        diff = left <=> right
-        return diff if diff
+        # puts "1: comparing #{ left } <=> #{ right }"
+        case [left, right]
+          in [Integer, nil]
+            1
+          in [Array, nil]
+            1
+          in [nil, Integer]
+            -1
+          in [nil, Array]
+            -1
+          in [Integer, Integer]
+            # puts "comparing two integers"
+            left <=> right
+          in [Array, Array]
+            # puts "comparing two arrays"
+            diff = left.zip(right).reduce(-1) do |_, pair|
+              d = compare(*pair)
+              # puts "comparison returned #{ d.inspect }"
+              break d unless d&.zero?
 
-        left  = [left] unless left.is_a? Array
-        right = [right] unless right.is_a? Array
-        puts "2: comparing #{ left } <=> #{ right }"
-        diff = left <=> right
-        pp diff
-        return diff if diff
-
-        left.each_with_index do |ary, i|
-          return 1 unless right[i]
-
-          diff = compare(ary, right[i])
-          return diff if diff && diff != 0
+              d
+            end
+            diff.zero? && right.length > left.length ? -1 : diff
+          in [Integer, Array]
+            # puts "left was not an array: wrapping and recursing"
+            compare [left], right
+          in [Array, Integer]
+            # puts "right was not an array: wrapping and recursing"
+            compare left, [right]
+          else
+            # puts "not matched"
         end
-        0
       end
 
       def check_order
@@ -56,7 +70,7 @@ module AoC2022
         sorted =
           (@lines.filter { |line| !line.empty? }.map(&JSON.method(:parse)) + [[[2]], [[6]]])
           .sort do |left, right|
-            pp "outer: comparing #{ left } <=> #{ right }"
+            # puts "outer: comparing #{ left } <=> #{ right }"
             DistressSignal.compare(left, right)
           end
         two    = sorted.index([[2]]) + 1

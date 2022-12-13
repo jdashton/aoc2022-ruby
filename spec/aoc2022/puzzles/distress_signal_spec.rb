@@ -40,13 +40,13 @@ RSpec.describe AoC2022::Puzzles::DistressSignal do
   context "with actual input data" do
     subject(:distress_signal) { File.open("input/day13.txt") { |file| described_class.new file } }
 
-    it "finds 5393 as the sum of the indices of pairs that are in the right order" do
-      expect(distress_signal.check_order).to eq 5393
+    it "finds 5,393 as the sum of the indices of pairs that are in the right order" do
+      expect(distress_signal.check_order).to eq 5_393
     end
 
     # 27216 is too high.
-    it "finds 140 as the decoder key" do
-      expect(distress_signal.decoder_key).to eq 140
+    it "finds 26,712 as the decoder key" do
+      expect(distress_signal.decoder_key).to eq 26_712
     end
   end
 end
