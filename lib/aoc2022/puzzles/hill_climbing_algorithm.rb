@@ -17,11 +17,12 @@ module AoC2022
         @destination = [nil, nil]
         file.readlines(chomp: true).map(&:chars).each_with_index do |line_ary, y_index|
           line_ary.each_with_index do |height, x_index|
-            if height == "S"
-              @start = [x_index, y_index]
-            elsif height == "E"
-              @destination = [x_index, y_index]
-              height       = "z"
+            case height
+              when "S"
+                @start = [x_index, y_index]
+              when "E"
+                @destination = [x_index, y_index]
+                height       = "z"
             end
             @height_map[[x_index, y_index]] = height
           end
@@ -50,8 +51,10 @@ module AoC2022
       end
 
       def fewest_steps_downhill
-        dijkstra do |costs|
-          costs.map { |(x, y), v| [[x, y], (x.zero? ? 0 : v)] }.to_h
+        dijkstra do |costs, nearby|
+          nearby[0] = []
+          costs.each_key { |(x, y)| nearby[0] << [x, y] if x.zero? }
+          [costs.to_h { |(x, y), v| [[x, y], (x.zero? ? 0 : v)] }, nearby]
         end
       end
 
@@ -60,7 +63,6 @@ module AoC2022
         #
         # Our original map in @risk_map can be the unvisited. We could replace nodes with `nil` to mark them visited.
         costs = @height_map.transform_values { Float::INFINITY }
-        costs = yield(costs) if block_given?
 
         # 2. Assign to every node a tentative distance value: set it to zero for our initial node and to infinity for all other
         # nodes. The tentative distance of a node v is the length of the shortest path discovered so far between the node v and
@@ -70,6 +72,8 @@ module AoC2022
         current_node        = @start
         current_reachable   = "b"
         costs[current_node] = 0
+        nearby              = {}
+        costs, nearby       = yield(costs, nearby) if block_given?
 
         # destination                 = @risk_map.max_by { |(x, y), _| x * y }[0]
         # # puts "Setting destination to #{ destination }."
@@ -84,12 +88,17 @@ module AoC2022
           #
           neighbors(current_node).each do |neighbor|
             # pp "Unfiltered neighbor #{ neighbor } with #{ @height_map[neighbor] }"
-            next unless costs[neighbor] # This detects neighbors that are available to visit
-            next unless (next_height = @height_map[neighbor]) <= current_reachable # (current_height.ord + 1).chr
+            next unless costs[current_node] # This detects when the current node has already been processed.
+            next unless costs[neighbor] # This detects neighbors that are not available to visit, like edges.
+            next unless (@height_map[neighbor]) <= current_reachable # (current_height.ord + 1).chr
+
             # pp "  -- not off-board and not too high to reach"
 
-            new_cost        = costs[current_node] + 1
-            costs[neighbor] = new_cost if new_cost < costs[neighbor]
+            new_cost = costs[current_node] + 1
+            if new_cost < costs[neighbor]
+              costs[neighbor]  = new_cost
+              nearby[new_cost] = (nearby[new_cost] || []) << neighbor
+            end
           end
 
           # 4. When we are done considering all of the unvisited neighbors of the current node, mark the current node as visited
@@ -104,10 +113,12 @@ module AoC2022
           # has finished.
           #
 
-          # 6. Otherwise, select the unvisited node that is marked with the smallest tentative distance, set it as the new current
-          # node, and go back to step 3.
-          #
-          current_node      = costs.min_by { |_, v| v }&.first
+          # 6. Otherwise, select the unvisited node that is marked with the smallest tentative distance, set it as the new
+          # current node, and go back to step 3.
+          # pp nearby
+          nearest      = nearby.keys.min
+          current_node = nearby[nearest].shift
+          nearby.delete(nearest) if nearby[nearest].empty?
           current_reachable = (@height_map[current_node].ord + 1).chr
           if current_node == @destination
             # puts "Can reach #{ destination } with risk of #{ risks[destination] }."
