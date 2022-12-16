@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe AoC2022::Puzzles::CathodeRayTube do
-  context "with provided test data" do
+  context 'with provided test data' do
     subject(:cathode_ray_tube) { described_class.new StringIO.new(<<~DATA) }
       addx 15
       addx -11
@@ -151,11 +151,11 @@ RSpec.describe AoC2022::Puzzles::CathodeRayTube do
       noop
     DATA
 
-    it "finds 13,140 as the sum of the six signal strengths" do
+    it 'finds 13,140 as the sum of the six signal strengths' do
       expect(cathode_ray_tube.sum_of_six_strengths).to eq 13_140
     end
 
-    it "generates the expected pattern" do
+    it 'generates the expected pattern' do
       expect(cathode_ray_tube.render_image).to eq <<~IMAGE
         ##..##..##..##..##..##..##..##..##..##..
         ###...###...###...###...###...###...###.
@@ -167,15 +167,15 @@ RSpec.describe AoC2022::Puzzles::CathodeRayTube do
     end
   end
 
-  context "with actual input data" do
-    subject(:cathode_ray_tube) { File.open("input/day10.txt") { |file| described_class.new file } }
+  context 'with actual input data' do
+    subject(:cathode_ray_tube) { File.open('input/day10.txt') { |file| described_class.new file } }
 
-    it "finds 14,060 as the sum of the six signal strengths" do
+    it 'finds 14,060 as the sum of the six signal strengths' do
       expect(cathode_ray_tube.sum_of_six_strengths).to eq 14_060
     end
 
     # PAPKFKEJ
-    it "generates the expected letters" do
+    it 'generates the expected letters' do
       expect(cathode_ray_tube.render_image).to eq <<~IMAGE
         ###...##..###..#..#.####.#..#.####...##.
         #..#.#..#.#..#.#.#..#....#.#..#.......#.

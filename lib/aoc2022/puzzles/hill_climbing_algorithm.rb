@@ -5,7 +5,7 @@ module AoC2022
     # For Day 12, we're seeking a better signal.
     class HillClimbingAlgorithm
       def self.day12
-        hill_climbing_algorithm = File.open("input/day12.txt") { |file| HillClimbingAlgorithm.new file }
+        hill_climbing_algorithm = File.open('input/day12.txt') { |file| HillClimbingAlgorithm.new file }
         puts "Day 12, part A: #{ hill_climbing_algorithm.fewest_steps } is the fewest steps required."
         puts "Day 12, part B: #{ hill_climbing_algorithm.fewest_steps_downhill } is the fewest steps required."
         puts
@@ -18,11 +18,11 @@ module AoC2022
         file.readlines(chomp: true).map(&:chars).each_with_index do |line_ary, y_index|
           line_ary.each_with_index do |height, x_index|
             case height
-              when "S"
+              when 'S'
                 @start = [x_index, y_index]
-              when "E"
+              when 'E'
                 @destination = [x_index, y_index]
-                height       = "z"
+                height       = 'z'
             end
             @height_map[[x_index, y_index]] = height
           end
@@ -70,7 +70,7 @@ module AoC2022
         # length zero), all other tentative distances are initially set to infinity. Set the initial node as current.[15]
         #
         current_node        = @start
-        current_reachable   = "b"
+        current_reachable   = 'b'
         costs[current_node] = 0
         nearby              = {}
         costs, nearby       = yield(costs, nearby) if block_given?

@@ -5,7 +5,7 @@ module AoC2022
     # For Day 6, we're looking for message headers
     class TuningTrouble
       def self.day06
-        datastream = File.open("input/day06.txt") { |file| TuningTrouble.new file }
+        datastream = File.open('input/day06.txt') { |file| TuningTrouble.new file }
         puts "Day  6, part A: The packet marker ends at character #{ datastream.packet_marker }."
         puts "Day  6, part B: The message marker ends at character #{ datastream.message_marker }."
         puts

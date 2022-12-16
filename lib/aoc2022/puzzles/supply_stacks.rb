@@ -5,7 +5,7 @@ module AoC2022
     # For Day 5, we're playing Towers of Hanoi.
     class SupplyStacks
       def self.day05
-        supply_stacks = File.open("input/day05.txt") { |file| SupplyStacks.new file }
+        supply_stacks = File.open('input/day05.txt') { |file| SupplyStacks.new file }
         puts "Day  5, part A: The top crates are #{ supply_stacks.top_crates }."
         puts "Day  5, part B: The top crates are #{ supply_stacks.top_crates_9001 }."
         puts
@@ -23,7 +23,7 @@ module AoC2022
         levels
           .map(&method(:extract_crate_names))
           .transpose
-          .map { |stack| stack[...(stack.index(" "))] }
+          .map { |stack| stack[...(stack.index(' '))] }
       end
 
       def self.extract_crate_names(level)

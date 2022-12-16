@@ -5,7 +5,7 @@ module AoC2022
     # For Day 3, we're organizing rucksacks.
     class RucksackReorganization
       def self.day03
-        pri_list = File.open("input/day03.txt") { |file| RucksackReorganization.new file }
+        pri_list = File.open('input/day03.txt') { |file| RucksackReorganization.new file }
         puts "Day  3, part A: the sum of the priorities is #{ pri_list.priority_sum }."
         puts "Day  3, part B: the sum of the priorities is #{ pri_list.badge_sum }."
         puts
@@ -15,7 +15,7 @@ module AoC2022
         @sacks = file.readlines(chomp: true)
       end
 
-      PRIORITIES = (("a".."z").zip((1..26)) + ("A".."Z").zip((27..52))).to_h
+      PRIORITIES = (('a'..'z').zip((1..26)) + ('A'..'Z').zip((27..52))).to_h
 
       def priority_sum
         @sacks.map { |sack| PRIORITIES[RucksackReorganization.find_common(sack)] }.sum

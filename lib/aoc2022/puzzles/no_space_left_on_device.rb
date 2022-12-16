@@ -5,7 +5,7 @@ module AoC2022
     # For Day 7, we're deleting files.
     class NoSpaceLeftOnDevice
       def self.day07
-        dev_fs = File.open("input/day07.txt") { |file| NoSpaceLeftOnDevice.new file }
+        dev_fs = File.open('input/day07.txt') { |file| NoSpaceLeftOnDevice.new file }
         puts "Day  7, part A: The sum of directory sizes is #{ dev_fs.small_dir_sum }."
         puts "Day  7, part B: The size of the smallest directory that's large enough is #{ dev_fs.smallest_large_enough }."
         puts
@@ -13,7 +13,7 @@ module AoC2022
 
       def initialize(file)
         @lines = file.readlines(chomp: true).slice_before(/\A\$/).map do |slice|
-          if slice[0][2..3] == "cd"
+          if slice[0][2..3] == 'cd'
             slice[0][5..]
           else
             parse_dir slice[1..]
@@ -23,13 +23,13 @@ module AoC2022
 
       # Returns a list of directories in this directory, and the size of the files visible in this directory.
       def parse_dir(ary)
-        ary.reduce([0]) { |acc, entry| entry.start_with?("dir ") ? acc << entry[4..] : [acc[0] + entry.to_i] + acc[1..] }
+        ary.reduce([0]) { |acc, entry| entry.start_with?('dir ') ? acc << entry[4..] : [acc[0] + entry.to_i] + acc[1..] }
       end
 
       def self.process(_dir_name, contents, *remainder, dir_size_list)
         size = contents[0]
 
-        until remainder.nil? || remainder[0].nil? || remainder[0] == ".."
+        until remainder.nil? || remainder[0].nil? || remainder[0] == '..'
           subdir_size, _, remainder = process(*remainder, dir_size_list)
           size                      += subdir_size
         end

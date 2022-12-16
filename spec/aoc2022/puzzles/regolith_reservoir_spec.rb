@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 RSpec.describe AoC2022::Puzzles::RegolithReservoir do
-  context "with provided test data" do
+  context 'with provided test data' do
     subject(:regolith_reservoir) { described_class.new StringIO.new(<<~DATA) }
       498,4 -> 498,6 -> 496,6
       503,4 -> 502,4 -> 502,9 -> 494,9
     DATA
 
-    it "renders the expected cave diagram" do
+    it 'renders the expected cave diagram' do
       expect(regolith_reservoir.construct_board.render).to eq <<~BOARD
 
           4     5  5
@@ -26,19 +26,19 @@ RSpec.describe AoC2022::Puzzles::RegolithReservoir do
       BOARD
     end
 
-    it "finds 24 as the number of sand units that come to rest" do
+    it 'finds 24 as the number of sand units that come to rest' do
       expect(regolith_reservoir.construct_board.drop_sand).to eq 24
     end
 
-    it "finds 93 as the number of sand units that come to rest" do
+    it 'finds 93 as the number of sand units that come to rest' do
       expect(regolith_reservoir.construct_board.add_floor.drop_sand).to eq 93
     end
   end
 
-  context "with actual input data" do
-    subject(:regolith_reservoir) { File.open("input/day14.txt") { |file| described_class.new file } }
+  context 'with actual input data' do
+    subject(:regolith_reservoir) { File.open('input/day14.txt') { |file| described_class.new file } }
 
-    it "renders the expected cave diagram" do
+    it 'renders the expected cave diagram' do
       expect(regolith_reservoir.construct_board.render).to eq <<~BOARD
 
             4                                                5        5
@@ -211,14 +211,14 @@ RSpec.describe AoC2022::Puzzles::RegolithReservoir do
       BOARD
     end
 
-    it "finds 715 as the number of sand units that come to rest" do
+    it 'finds 715 as the number of sand units that come to rest' do
       expect(regolith_reservoir.construct_board.drop_sand).to eq 715
     end
 
     # 13313 is too low
     # 16457 is too low
-    it "finds 25248 as the number of sand units that come to rest" do
-      expect(regolith_reservoir.construct_board.add_floor.drop_sand).to eq 25248
+    it 'finds 25,248 as the number of sand units that come to rest' do
+      expect(regolith_reservoir.construct_board.add_floor.drop_sand).to eq 25_248
     end
   end
 end

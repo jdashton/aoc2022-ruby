@@ -5,7 +5,7 @@ module AoC2022
     # For Day 8, we're looking at trees.
     class TreetopTreeHouse
       def self.day08
-        tree_grid = File.open("input/day08.txt") { |file| TreetopTreeHouse.new file }
+        tree_grid = File.open('input/day08.txt') { |file| TreetopTreeHouse.new file }
         puts "Day  8, part A: #{ tree_grid.visible } trees are visible from outside the grid."
         puts "Day  8, part B: #{ tree_grid.scenic_score } is the highest scenic score possible for any tree."
         puts

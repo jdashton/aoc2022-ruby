@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require "json"
+require 'json'
 
 module AoC2022
   module Puzzles
     # For Day 13, we're sorting distress signals.
     class DistressSignal
       def self.day13
-        distress_signal = File.open("input/day13.txt") { |file| DistressSignal.new file }
+        distress_signal = File.open('input/day13.txt') { |file| DistressSignal.new file }
         puts "Day 13, part A: #{ distress_signal.check_order } is the sum of the indices of pairs that are in the right order."
         puts "Day 13, part B: #{ distress_signal.decoder_key } is the fewest steps required."
         puts
@@ -49,7 +49,7 @@ module AoC2022
             # puts "right was not an array: wrapping and recursing"
             compare left, [right]
           else
-            # puts "not matched"
+          # puts "not matched"
         end
       end
 

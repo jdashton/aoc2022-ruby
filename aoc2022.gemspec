@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require_relative "lib/aoc2022/version"
+require_relative 'lib/aoc2022/version'
 
 Gem::Specification.new do |spec|
-  spec.name    = "AoC2022"
+  spec.name    = 'AoC2022'
   spec.version = AoC2022::VERSION
-  spec.authors = ["J. Daniel Ashton"]
-  spec.email   = ["jdashton@ashtonfam.org"]
+  spec.authors = ['J. Daniel Ashton']
+  spec.email   = ['jdashton@ashtonfam.org']
 
-  spec.summary = "Solutions to the 2022 Advent of Code puzzles"
+  spec.summary = 'Solutions to the 2022 Advent of Code puzzles'
   # spec.description = "TODO: Write a longer description or delete this line."
   # spec.homepage = "TODO: Put your gem's website or public repo URL here."
-  spec.license               = "MIT"
-  spec.required_ruby_version = ">= 3.2.0.preview3"
+  spec.license               = 'MIT'
+  spec.required_ruby_version = '>= 3.2.0.preview3'
 
   # spec.metadata["allowed_push_host"] = "TODO: Set to your gem server 'https://example.com'"
 
@@ -27,16 +27,16 @@ Gem::Specification.new do |spec|
       (f == __FILE__) || f.match(%r{\A(?:(?:test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
     end
   end
-  spec.bindir        = "exe"
+  spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
-  spec.require_paths = ["lib"]
+  spec.require_paths = ['lib']
 
   # Uncomment to register a new dependency of your gem
-  spec.add_dependency "matrix", "~> 0.4"
+  spec.add_dependency 'matrix', '~> 0.4'
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
   spec.metadata = {
-    "rubygems_mfa_required" => "true"
+    'rubygems_mfa_required' => 'true'
   }
 end

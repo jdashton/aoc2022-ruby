@@ -5,7 +5,7 @@ module AoC2022
     # For Day 11, we're playing keep-away.
     class MonkeyInTheMiddle
       def self.day11
-        monkey_in_the_middle = File.open("input/day11.txt") { |file| MonkeyInTheMiddle.new file }
+        monkey_in_the_middle = File.open('input/day11.txt') { |file| MonkeyInTheMiddle.new file }
         puts "Day 11, part A: #{ monkey_in_the_middle.most_active_monkeys } is the level of monkey business after 20 rounds."
         puts "Day 11, part B: #{ monkey_in_the_middle.ten_thousand_monkeys } is the level of monkey business after 10k rounds."
         puts
@@ -35,7 +35,7 @@ module AoC2022
         end
 
         def fix_items(items)
-          items.split(", ").map(&:to_i)
+          items.split(', ').map(&:to_i)
         end
 
         def catch(item) = @items.push(item)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe AoC2022::Puzzles::RopeBridge do
-  context "with provided test data" do
+  context 'with provided test data' do
     subject(:rope_bridge) { described_class.new StringIO.new(<<~DATA) }
       R 4
       U 4
@@ -13,16 +13,16 @@ RSpec.describe AoC2022::Puzzles::RopeBridge do
       R 2
     DATA
 
-    it "finds 13 as the number of positions visited by the tail at least once" do
+    it 'finds 13 as the number of positions visited by the tail at least once' do
       expect(rope_bridge.short_positions).to eq 13
     end
 
-    it "finds 1 as the number of positions visited by the tail at least once" do
+    it 'finds 1 as the number of positions visited by the tail at least once' do
       expect(rope_bridge.long_positions).to eq 1
     end
   end
 
-  context "with provided test data version 2" do
+  context 'with provided test data version 2' do
     subject(:rope_bridge) { described_class.new StringIO.new(<<~DATA) }
       R 5
       U 8
@@ -34,20 +34,20 @@ RSpec.describe AoC2022::Puzzles::RopeBridge do
       U 20
     DATA
 
-    it "finds 36 as the number of positions visited by the tail at least once" do
+    it 'finds 36 as the number of positions visited by the tail at least once' do
       expect(rope_bridge.long_positions).to eq 36
     end
   end
 
-  context "with actual input data" do
-    subject(:rope_bridge) { File.open("input/day09.txt") { |file| described_class.new file } }
+  context 'with actual input data' do
+    subject(:rope_bridge) { File.open('input/day09.txt') { |file| described_class.new file } }
 
     # 6388 is too high.
-    it "finds 6384 as the number of positions visited by the tail at least once" do
+    it 'finds 6384 as the number of positions visited by the tail at least once' do
       expect(rope_bridge.short_positions).to eq 6384
     end
 
-    it "finds 2734 as the number of positions visited by the tail at least once" do
+    it 'finds 2734 as the number of positions visited by the tail at least once' do
       expect(rope_bridge.long_positions).to eq 2734
     end
   end

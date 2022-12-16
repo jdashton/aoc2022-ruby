@@ -5,7 +5,7 @@ module AoC2022
     # For Day 9, we're move the rope's tail.
     class RopeBridge
       def self.day09
-        File.open("input/day09.txt") do |file|
+        File.open('input/day09.txt') do |file|
           puts "Day  9, part A: The tail of the rope visits #{ RopeBridge.new(file).short_positions } positions at least once."
           file.rewind
           puts "Day  9, part B: The tail of the rope visits #{ RopeBridge.new(file).long_positions } positions at least once."
@@ -17,23 +17,23 @@ module AoC2022
 
       def initialize(file)
         @lines   = file.readlines(chomp: true).map(&:split)
-        @visited = Set[START.map(&:to_s).join(",")]
+        @visited = Set[START.map(&:to_s).join(',')]
         @knots   = Array.new(10) { Array.new(START) }
       end
 
       DIRECTION =
         {
-          "R" => [+1, 0],
-          "L" => [-1, 0],
-          "U" => [0, -1],
-          "D" => [0, +1]
+          'R' => [+1, 0],
+          'L' => [-1, 0],
+          'U' => [0, -1],
+          'D' => [0, +1]
         }.freeze
 
       def move(direction, distance, knots)
         distance.to_i.times do
           @knots[0] = @knots.first.zip(DIRECTION[direction]).map(&:sum)
           knots.each_cons(2) { |a, b| @knots[b] = RopeBridge.move_tail(@knots[a], @knots[b]) }
-          @visited << @knots[knots.last].join(",")
+          @visited << @knots[knots.last].join(',')
         end
       end
 

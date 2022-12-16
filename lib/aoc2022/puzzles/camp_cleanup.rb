@@ -5,7 +5,7 @@ module AoC2022
     # For Day 4, we're cleaning up the camp.
     class CampCleanup
       def self.day04
-        assigned_ranges = File.open("input/day04.txt") { |file| CampCleanup.new file }
+        assigned_ranges = File.open('input/day04.txt') { |file| CampCleanup.new file }
         puts "Day  4, part A: In #{ assigned_ranges.contained_ranges } assignment pairs one range fully contains the other."
         puts "Day  4, part B: In #{ assigned_ranges.overlapping_ranges } assignment pairs the ranges overlap."
         puts

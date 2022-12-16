@@ -5,7 +5,7 @@ module AoC2022
     # For Day 10, we're emulating a CRT.
     class CathodeRayTube
       def self.day10
-        crt_program = File.open("input/day10.txt") { |file| CathodeRayTube.new file }
+        crt_program = File.open('input/day10.txt') { |file| CathodeRayTube.new file }
         puts "Day 10, part A: #{ crt_program.sum_of_six_strengths } is the sum of these six signal strengths."
         puts "Day 10, part B: The image looks like this:\n\n#{ crt_program.render_image }"
         puts
@@ -30,7 +30,7 @@ module AoC2022
 
       def self.render(cycle_num, x_register)
         pos = (cycle_num - 1) % 40
-        ((pos - 1)..(pos + 1)).member?(x_register) ? "#" : "."
+        ((pos - 1)..(pos + 1)).member?(x_register) ? '#' : '.'
       end
 
       def self.sample_cycle(cycle_num)
@@ -45,7 +45,7 @@ module AoC2022
 
       def render_image
         CathodeRayTube.run_program(@program_lines) { |cycle_num, x_register|
-          (CathodeRayTube.render(cycle_num, x_register) + ((cycle_num % 40).zero? ? "\n" : ""))
+          (CathodeRayTube.render(cycle_num, x_register) + ((cycle_num % 40).zero? ? "\n" : ''))
         }.join
       end
     end

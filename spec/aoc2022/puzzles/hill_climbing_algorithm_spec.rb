@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe AoC2022::Puzzles::HillClimbingAlgorithm do
-  context "with provided test data" do
+  context 'with provided test data' do
     subject(:hill_climbing_algorithm) { described_class.new StringIO.new(<<~DATA) }
       Sabqponm
       abcryxxl
@@ -10,7 +10,7 @@ RSpec.describe AoC2022::Puzzles::HillClimbingAlgorithm do
       abdefghi
     DATA
 
-    it "finds 31 as the fewest steps required" do
+    it 'finds 31 as the fewest steps required' do
       expect(hill_climbing_algorithm.fewest_steps).to eq 31
     end
 
@@ -19,10 +19,10 @@ RSpec.describe AoC2022::Puzzles::HillClimbingAlgorithm do
     end
   end
 
-  context "with actual input data" do
-    subject(:hill_climbing_algorithm) { File.open("input/day12.txt") { |file| described_class.new file } }
+  context 'with actual input data' do
+    subject(:hill_climbing_algorithm) { File.open('input/day12.txt') { |file| described_class.new file } }
 
-    it "finds 534 as the fewest steps required" do
+    it 'finds 534 as the fewest steps required' do
       expect(hill_climbing_algorithm.fewest_steps).to eq 534
     end
 

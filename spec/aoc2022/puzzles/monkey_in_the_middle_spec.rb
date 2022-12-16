@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe AoC2022::Puzzles::MonkeyInTheMiddle do
-  context "with provided test data" do
+  context 'with provided test data' do
     subject(:monkey_in_the_middle) { described_class.new StringIO.new(<<~DATA) }
       Monkey 0:
         Starting items: 79, 98
@@ -32,23 +32,23 @@ RSpec.describe AoC2022::Puzzles::MonkeyInTheMiddle do
           If false: throw to monkey 1
     DATA
 
-    it "finds 10,605 as the level of monkey business" do
+    it 'finds 10,605 as the level of monkey business' do
       expect(monkey_in_the_middle.most_active_monkeys).to eq 10_605
     end
 
-    it "finds 2,713,310,158 as the level of monkey business" do
+    it 'finds 2,713,310,158 as the level of monkey business' do
       expect(monkey_in_the_middle.ten_thousand_monkeys).to eq 2_713_310_158
     end
   end
 
-  context "with actual input data" do
-    subject(:monkey_in_the_middle) { File.open("input/day11.txt") { |file| described_class.new file } }
+  context 'with actual input data' do
+    subject(:monkey_in_the_middle) { File.open('input/day11.txt') { |file| described_class.new file } }
 
-    it "finds 61,005 as the level of monkey business" do
+    it 'finds 61,005 as the level of monkey business' do
       expect(monkey_in_the_middle.most_active_monkeys).to eq 61_005
     end
 
-    it "finds 20,567,144,694 as the level of monkey business" do
+    it 'finds 20,567,144,694 as the level of monkey business' do
       expect(monkey_in_the_middle.ten_thousand_monkeys).to eq 20_567_144_694
     end
   end
