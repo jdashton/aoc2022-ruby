@@ -50,8 +50,7 @@ module AoC2022
           merged = false
           acc    = acc.map do |r_acc|
             if r.min <= (r_acc.max + 1)
-              merged = true
-              r_acc.min..[r_acc.max, r.max].max
+              merged = r_acc.min..[r_acc.max, r.max].max
             else
               r_acc
             end
