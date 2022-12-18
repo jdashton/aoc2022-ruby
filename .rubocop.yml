@@ -72,6 +72,9 @@ Style/MixinUsage:
   Exclude:
     - spec/**/*
 
+Style/SpecialGlobalVars:
+  EnforcedStyle: use_perl_names
+
 Style/StringLiterals:
   Enabled: true
   EnforcedStyle: single_quotes
