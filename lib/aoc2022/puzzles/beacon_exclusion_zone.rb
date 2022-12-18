@@ -2,7 +2,7 @@
 
 module AoC2022
   module Puzzles
-    # For Day 14, we're scanning falling sand.
+    # For Day 15, we're looking for the missing beacon.
     class BeaconExclusionZone
       def self.day15
         beacon_exclusion_zone = File.open('input/day15.txt') { |file| BeaconExclusionZone.new file }
