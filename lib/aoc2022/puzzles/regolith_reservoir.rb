@@ -6,9 +6,9 @@ module AoC2022
     class RegolithReservoir
       def self.day14
         regolith_reservoir = File.open('input/day14.txt') { |file| RegolithReservoir.new file }
-        puts "Day 14, part A: #{ regolith_reservoir.construct_board.drop_sand } units of sand come to rest before sand " \
+        puts "Day 14, Part One: #{ regolith_reservoir.construct_board.drop_sand } units of sand come to rest before sand " \
              'starts flowing into the abyss below.'
-        puts "Day 14, part B: #{ regolith_reservoir.construct_board.add_floor.drop_sand } units of sand come to rest."
+        puts "Day 14, Part Two: #{ regolith_reservoir.construct_board.add_floor.drop_sand } units of sand come to rest."
         puts
       end
 

@@ -6,8 +6,8 @@ module AoC2022
     class SupplyStacks
       def self.day05
         supply_stacks = File.open('input/day05.txt') { |file| SupplyStacks.new file }
-        puts "Day  5, part A: The top crates are #{ supply_stacks.top_crates }."
-        puts "Day  5, part B: The top crates are #{ supply_stacks.top_crates_9001 }."
+        puts "Day  5, Part One: The top crates are #{ supply_stacks.top_crates }."
+        puts "Day  5, Part Two: The top crates are #{ supply_stacks.top_crates_9001 }."
         puts
       end
 

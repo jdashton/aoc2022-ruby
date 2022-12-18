@@ -6,8 +6,8 @@ module AoC2022
     class NoSpaceLeftOnDevice
       def self.day07
         dev_fs = File.open('input/day07.txt') { |file| NoSpaceLeftOnDevice.new file }
-        puts "Day  7, part A: The sum of directory sizes is #{ dev_fs.small_dir_sum }."
-        puts "Day  7, part B: The size of the smallest directory that's large enough is #{ dev_fs.smallest_large_enough }."
+        puts "Day  7, Part One: The sum of directory sizes is #{ dev_fs.small_dir_sum }."
+        puts "Day  7, Part Two: The size of the smallest directory that's large enough is #{ dev_fs.smallest_large_enough }."
         puts
       end
 

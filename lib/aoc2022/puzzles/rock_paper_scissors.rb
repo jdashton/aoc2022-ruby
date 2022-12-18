@@ -6,8 +6,8 @@ module AoC2022
     class RockPaperScissors
       def self.day02
         game = File.open('input/day02.txt') { |file| RockPaperScissors.new file }
-        puts "Day  2, part A: the score will be #{ game.guide_alpha } if everything goes according to the strategy guide."
-        puts "Day  2, part B: the score will be #{ game.guide_beta } if everything goes according to the strategy guide."
+        puts "Day  2, Part One: the score will be #{ game.guide_alpha } if everything goes according to the strategy guide."
+        puts "Day  2, Part Two: the score will be #{ game.guide_beta } if everything goes according to the strategy guide."
         puts
       end
 

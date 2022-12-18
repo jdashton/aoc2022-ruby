@@ -8,8 +8,8 @@ module AoC2022
     class DistressSignal
       def self.day13
         distress_signal = File.open('input/day13.txt') { |file| DistressSignal.new file }
-        puts "Day 13, part A: #{ distress_signal.check_order } is the sum of the indices of pairs that are in the right order."
-        puts "Day 13, part B: #{ distress_signal.decoder_key } is the fewest steps required."
+        puts "Day 13, Part One: #{ distress_signal.check_order } is the sum of the indices of pairs that are in the right order."
+        puts "Day 13, Part Two: #{ distress_signal.decoder_key } is the fewest steps required."
         puts
       end
 

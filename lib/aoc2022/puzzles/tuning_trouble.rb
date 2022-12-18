@@ -6,8 +6,8 @@ module AoC2022
     class TuningTrouble
       def self.day06
         datastream = File.open('input/day06.txt') { |file| TuningTrouble.new file }
-        puts "Day  6, part A: The packet marker ends at character #{ datastream.packet_marker }."
-        puts "Day  6, part B: The message marker ends at character #{ datastream.message_marker }."
+        puts "Day  6, Part One: The packet marker ends at character #{ datastream.packet_marker }."
+        puts "Day  6, Part Two: The message marker ends at character #{ datastream.message_marker }."
         puts
       end
 

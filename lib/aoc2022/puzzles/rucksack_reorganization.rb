@@ -6,8 +6,8 @@ module AoC2022
     class RucksackReorganization
       def self.day03
         pri_list = File.open('input/day03.txt') { |file| RucksackReorganization.new file }
-        puts "Day  3, part A: the sum of the priorities is #{ pri_list.priority_sum }."
-        puts "Day  3, part B: the sum of the priorities is #{ pri_list.badge_sum }."
+        puts "Day  3, Part One: the sum of the priorities is #{ pri_list.priority_sum }."
+        puts "Day  3, Part Two: the sum of the priorities is #{ pri_list.badge_sum }."
         puts
       end
 

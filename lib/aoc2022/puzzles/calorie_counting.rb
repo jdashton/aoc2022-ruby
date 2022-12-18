@@ -6,8 +6,8 @@ module AoC2022
     class CalorieCounting
       def self.day01
         elves = File.open('input/day01.txt') { |file| CalorieCounting.new file }
-        puts "Day  1, part A: the Elf carrying the most Calories is carrying #{ elves.most_calories } calories."
-        puts "Day  1, part B: top three Elves carrying the most Calories are carrying #{ elves.top_3_total } calories in total."
+        puts "Day  1, Part One: the Elf carrying the most Calories is carrying #{ elves.most_calories } calories."
+        puts "Day  1, Part Two: top three Elves carrying the most Calories are carrying #{ elves.top_3_total } calories in total."
         puts
       end
 

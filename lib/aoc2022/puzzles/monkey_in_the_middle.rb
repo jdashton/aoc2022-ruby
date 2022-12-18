@@ -6,8 +6,8 @@ module AoC2022
     class MonkeyInTheMiddle
       def self.day11
         monkey_in_the_middle = File.open('input/day11.txt') { |file| MonkeyInTheMiddle.new file }
-        puts "Day 11, part A: #{ monkey_in_the_middle.most_active_monkeys } is the level of monkey business after 20 rounds."
-        puts "Day 11, part B: #{ monkey_in_the_middle.ten_thousand_monkeys } is the level of monkey business after 10k rounds."
+        puts "Day 11, Part One: #{ monkey_in_the_middle.most_active_monkeys } is the level of monkey business after 20 rounds."
+        puts "Day 11, Part Two: #{ monkey_in_the_middle.ten_thousand_monkeys } is the level of monkey business after 10k rounds."
         puts
       end
 

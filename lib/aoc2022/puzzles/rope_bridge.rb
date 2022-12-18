@@ -6,9 +6,9 @@ module AoC2022
     class RopeBridge
       def self.day09
         File.open('input/day09.txt') do |file|
-          puts "Day  9, part A: The tail of the rope visits #{ RopeBridge.new(file).short_positions } positions at least once."
+          puts "Day  9, Part One: The tail of the rope visits #{ RopeBridge.new(file).short_positions } positions at least once."
           file.rewind
-          puts "Day  9, part B: The tail of the rope visits #{ RopeBridge.new(file).long_positions } positions at least once."
+          puts "Day  9, Part Two: The tail of the rope visits #{ RopeBridge.new(file).long_positions } positions at least once."
         end
         puts
       end

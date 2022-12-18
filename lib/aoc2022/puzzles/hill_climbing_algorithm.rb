@@ -6,8 +6,8 @@ module AoC2022
     class HillClimbingAlgorithm
       def self.day12
         hill_climbing_algorithm = File.open('input/day12.txt') { |file| HillClimbingAlgorithm.new file }
-        puts "Day 12, part A: #{ hill_climbing_algorithm.fewest_steps } is the fewest steps required."
-        puts "Day 12, part B: #{ hill_climbing_algorithm.fewest_steps_downhill } is the fewest steps required."
+        puts "Day 12, Part One: #{ hill_climbing_algorithm.fewest_steps } is the fewest steps required."
+        puts "Day 12, Part Two: #{ hill_climbing_algorithm.fewest_steps_downhill } is the fewest steps required."
         puts
       end
 
