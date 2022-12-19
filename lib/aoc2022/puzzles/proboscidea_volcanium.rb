@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'forwardable'
+
 module AoC2022
   module Puzzles
     # For Day 16, we're opening valves.
@@ -11,51 +13,27 @@ module AoC2022
         puts
       end
 
+      extend Forwardable
+      def_instance_delegators 'self.class', :parse
+
       def initialize(file)
-        @valves = file.readlines(chomp: true).to_h do |line|
-          v = Valve.new(line)
-          [v.valve_name, v]
-        end
-        # pp @valves
+        @valves = file.readlines(chomp: true).to_h { |line| parse(line) }
       end
 
-      # This lets us handle valve parsing.
-      class Valve
-        attr_reader :valve_name, :flow_rate, :valve_list
-
-        def initialize(line)
-          /\AValve (?<valve_name>..) has flow rate=(?<flow_rate>\d+); tunnels? leads? to valves? (?<valve_list>.+)\z/ =~ line
-          # pp $~
-          @valve_name = valve_name.to_sym
-          @flow_rate  = (f = flow_rate.to_i).positive? ? f : nil
-          @valve_list = valve_list.split(', ').map(&:to_sym)
-          # pp self
-        end
-
-        def details = [@valve_list, @flow_rate]
-
-        def inspect
-          "Valve #{ @valve_name }: rate #{ @flow_rate }, tunnels to #{ @valve_list }"
-        end
+      def self.parse(line)
+        /\AValve (?<valve_name>..) has flow rate=(?<flow_rate>\d+); tunnels? leads? to valves? (?<valve_list>.+)\z/ =~ line
+        [valve_name.to_sym, [valve_list.split(', ').map(&:to_sym), (fr = flow_rate.to_i).positive? ? fr : nil]]
       end
 
-      def take_action(node, time_remaining, opened_list = [], prefix = '')
-        # puts "#{prefix}Visiting #{ node } with #{ time_remaining } minutes and #{ opened_list }"
-        # prefix  += "#{ node }::"
-        current_valve         = @valves[node] # Current Valve
-        valve_list, flow_rate = current_valve.details
-        time_remaining        -= 1
+      def take_action(node, time_remaining, opened_list = [])
+        valve_list, flow_rate = @valves[node]
 
-        actions = time_remaining > 1 ? valve_list.map { |v| take_action(v, time_remaining, opened_list.dup, prefix) } : []
+        actions = (time_remaining -= 1) > 1 ? valve_list.map { take_action(_1, time_remaining, opened_list.dup) } : []
         if flow_rate && !opened_list.include?(node)
           actions << (flow_this_valve = time_remaining * flow_rate)
-          if (time_remaining -= 1) > 1
-            actions += valve_list.map { |v| flow_this_valve + take_action(v, time_remaining, opened_list.dup << node, prefix) }
-          end
+          actions << (flow_this_valve + take_action(node, time_remaining, opened_list << node))
         end
 
-        # puts "#{ prefix}#{actions}" " -- done at #{ prefix[..-3] }"
-        # print '.'
         actions.max || 0
       end
 
