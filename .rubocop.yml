@@ -72,6 +72,9 @@ Style/MixinUsage:
   Exclude:
     - spec/**/*
 
+Style/PerlBackrefs:
+  Enabled: false
+
 Style/SpecialGlobalVars:
   EnforcedStyle: use_perl_names
 
