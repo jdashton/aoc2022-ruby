@@ -6,9 +6,9 @@ module AoC2022
   module Puzzles
     # For Day 16, we're opening valves.
     class ProboscideaVolcanium
-      def self.day15
-        proboscidea_volcanium = File.open('input/day16.txt') { |file| BeaconExclusionZone.new file }
-        puts "Day 16, Part One: #{ proboscidea_volcanium.check_row(2_000_000) } is the most pressure you can release."
+      def self.day16
+        proboscidea_volcanium = File.open('input/day16.txt') { |file| ProboscideaVolcanium.new file }
+        puts "Day 16, Part One: #{ proboscidea_volcanium.max_release(5) } is the most pressure you can release in 5 minutes."
         # puts "Day 16, Part Two: #{ proboscidea_volcanium.tuning_frequency(4_000_000) } is the tuning frequency."
         puts
       end
