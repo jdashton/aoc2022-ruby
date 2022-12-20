@@ -15,10 +15,12 @@ module AoC2022
         puts
       end
 
+      extend Forwardable
+      def_instance_delegators 'self.class', :find_sum
+
       def initialize(file)
-        @numbers     = file.readlines(chomp: true).map(&:to_i)
-        @length      = @numbers.length - 1 # We use this at a time when one node has been removed from the list.
-        @half_length = @length / 2
+        @numbers = file.readlines(chomp: true).map(&:to_i)
+        @list    = @zero = nil
         prep_list
         # pp @numbers
         # pp @numbers.length
@@ -29,7 +31,8 @@ module AoC2022
 
       def prep_list
         @list = Array.new(@numbers.length) { |i| Node.new(@numbers[i]) }
-        @list.each_with_index { |n, i| n.prev, n.next = [@list[i - 1], @list[i + 1] || @list.first] }
+        # noinspection RubyNilAnalysis
+        @list&.each_with_index { |node, i| node.prev, node.next = [@list[i - 1], @list[i + 1] || @list.first] }
         @zero = @list[@numbers.index 0]
       end
 
@@ -55,6 +58,29 @@ module AoC2022
           @next_node = node
         end
 
+        def insert_after(other_node)
+          @prev_node      = other_node
+          @next_node      = new_next = other_node.next
+          other_node.next = new_next.prev = self
+        end
+
+        def unlink
+          @prev_node&.next = @next_node
+          [@next_node&.prev = @prev_node, @num]
+        end
+
+        def walk_forward(num_steps)
+          node = self
+          num_steps.times { node = node.next }
+          node
+        end
+
+        def walk_backward(num_steps)
+          node = self
+          num_steps.times { node = node.prev }
+          node
+        end
+
         def to_s = "<_#{ @num }_>"
 
         def inspect
@@ -62,63 +88,26 @@ module AoC2022
         end
       end
 
-      def walk
-        # puts 'walking'
-        n      = @list.first
-        result = []
-        loop do
-          result << n.num
-          n = n.next
-          break if n == @list.first
-        end
-        result
-      end
-
-      def walk_in_reverse
-        n      = @list.first
-        result = []
-        loop do
-          n = n.prev
-          result << n.num
-          break if n == @list.first
-        end
-        result.reverse
-      end
-
       def mix
-        @list.each do |n|
-          # Unlink n from the list
-          n.prev.next, n.next.prev, ptr = [n.next, n.prev, n.prev]
+        half_length = (length = @numbers.length - 1) / 2
 
-          if (num = n.num).positive?
-            num = num % @length
-            num = -@length + num if num > @half_length
-          else
-            num = num % -@length
-            num = @length + num if -num > @half_length
-          end
+        @list&.each do |node|
+          ptr, num = node.unlink # returns the node that had been node's previous neighbor, and the value in the current node
 
-          if num.positive?
-            num.times { ptr = ptr.next }
-          else
-            (-num).times { ptr = ptr.prev }
-          end
-
-          ptr.next, n.prev, n.next, ptr.next.prev = [n, ptr, ptr.next, n]
+          node.insert_after(if (num %= length) > half_length
+                              num = length - num
+                              ptr.walk_backward(num)
+                            else
+                              ptr.walk_forward(num)
+                            end)
         end
       end
 
-      def find_sum
-        ptr = @zero
-        Array.new(3).map {
-          1000.times { ptr = ptr.next }
-          ptr.num
-        }.sum
-      end
+      def self.find_sum(ptr) = Array.new(3).map { (ptr = ptr.walk_forward(1000)).num }.sum
 
       def part_one
         mix
-        find_sum
+        find_sum(@zero)
       end
 
       MAGIC_NUM = 811_589_153
@@ -127,7 +116,7 @@ module AoC2022
         @numbers = @numbers.map { _1 * MAGIC_NUM }
         prep_list
         10.times { mix }
-        find_sum
+        find_sum(@zero)
       end
     end
   end
