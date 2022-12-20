@@ -8,15 +8,16 @@ module AoC2022
     class GrovePositioningSystem
       def self.day20
         grove_positioning_system = File.open('input/day20.txt') { |file| GrovePositioningSystem.new file }
-        puts "Day 20, Part One: #{ grove_positioning_system.mix } is the sum of the three numbers " \
+        puts "Day 20, Part One: #{ grove_positioning_system.part_one } is the sum of the three numbers " \
              'that form the grove coordinates.'
-        # puts "Day 20, Part Two: #{ grove_positioning_system.tuning_frequency(4_000_000) } is the tuning frequency."
+        puts "Day 20, Part Two: #{ grove_positioning_system.part_two } is the sum of the three numbers " \
+             'that form the grove coordinates.'
         puts
       end
 
       def initialize(file)
         @numbers     = file.readlines(chomp: true).map(&:to_i)
-        @length      = @numbers.length - 1
+        @length      = @numbers.length - 1 # We use this at a time when one node has been removed from the list.
         @half_length = @length / 2
         prep_list
         # pp @numbers
@@ -28,9 +29,8 @@ module AoC2022
 
       def prep_list
         @list = Array.new(@numbers.length) { |i| Node.new(@numbers[i]) }
-        @list.each_with_index { |n, i| n.prev, n.next = [@list[i - 1], @list[i + 1]] }
-        @list[-1].next = @list[0]
-        @zero          = @list[@numbers.index 0]
+        @list.each_with_index { |n, i| n.prev, n.next = [@list[i - 1], @list[i + 1] || @list.first] }
+        @zero = @list[@numbers.index 0]
       end
 
       # Fundamental data structure for a doubly-linked list
@@ -87,53 +87,47 @@ module AoC2022
 
       def mix
         @list.each do |n|
-          # pp walk
-          # pp walk_in_reverse
-          # next if n.num.zero?
-          ptr = n
-
           # Unlink n from the list
-          n.prev.next, n.next.prev = [n.next, n.prev]
-          # pp @list
+          n.prev.next, n.next.prev, ptr = [n.next, n.prev, n.prev]
 
           if (num = n.num).positive?
             num = num % @length
             num = -@length + num if num > @half_length
           else
             num = num % -@length
-            num = @length - num if num > @half_length
+            num = @length + num if -num > @half_length
           end
 
-          # pp "-- differs: #{ num }, #{ n.num }" if num != n.num
-          # pp "-- #{ @list.length }"
           if num.positive?
-            # puts "Moving #{ num } to the right: positive"
             num.times { ptr = ptr.next }
           else
-            # puts "Moving #{ num.abs } to the left: negative"
-            (num.abs + 1).times { ptr = ptr.prev }
+            (-num).times { ptr = ptr.prev }
           end
-          # puts " -- done moving, about to insert between #{ ptr } and #{ ptr.next }"
 
           ptr.next, n.prev, n.next, ptr.next.prev = [n, ptr, ptr.next, n]
-          # pp @list
         end
-        # pp walk
-        # pp walk_in_reverse
+      end
+
+      def find_sum
         ptr = @zero
         Array.new(3).map {
           1000.times { ptr = ptr.next }
-          pp ptr.num
+          ptr.num
         }.sum
       end
 
-      MAGIC_NUM = 811589153
+      def part_one
+        mix
+        find_sum
+      end
+
+      MAGIC_NUM = 811_589_153
 
       def part_two
         @numbers = @numbers.map { _1 * MAGIC_NUM }
         prep_list
-        9.times { mix }
-        mix
+        10.times { mix }
+        find_sum
       end
     end
   end
