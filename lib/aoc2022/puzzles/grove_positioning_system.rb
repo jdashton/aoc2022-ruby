@@ -18,15 +18,19 @@ module AoC2022
         @numbers     = file.readlines(chomp: true).map(&:to_i)
         @length      = @numbers.length - 1
         @half_length = @length / 2
-        @list        = Array.new(@numbers.length) { |i| Node.new(@numbers[i]) }
-        @list.each_with_index { |n, i| n.prev, n.next = [@list[i - 1], @list[i + 1]] }
-        @list[-1].next = @list[0]
-        @zero          = @list[@numbers.index 0]
+        prep_list
         # pp @numbers
         # pp @numbers.length
         # pp @list
         # pp @zero
         # puts "#{ @list[0].to_s }"
+      end
+
+      def prep_list
+        @list = Array.new(@numbers.length) { |i| Node.new(@numbers[i]) }
+        @list.each_with_index { |n, i| n.prev, n.next = [@list[i - 1], @list[i + 1]] }
+        @list[-1].next = @list[0]
+        @zero          = @list[@numbers.index 0]
       end
 
       # Fundamental data structure for a doubly-linked list
@@ -70,7 +74,7 @@ module AoC2022
         result
       end
 
-      def walk_back
+      def walk_in_reverse
         n      = @list.first
         result = []
         loop do
@@ -84,7 +88,7 @@ module AoC2022
       def mix
         @list.each do |n|
           # pp walk
-          # pp walk_back
+          # pp walk_in_reverse
           # next if n.num.zero?
           ptr = n
 
@@ -115,12 +119,21 @@ module AoC2022
           # pp @list
         end
         # pp walk
-        # pp walk_back
+        # pp walk_in_reverse
         ptr = @zero
         Array.new(3).map {
           1000.times { ptr = ptr.next }
           pp ptr.num
         }.sum
+      end
+
+      MAGIC_NUM = 811589153
+
+      def part_two
+        @numbers = @numbers.map { _1 * MAGIC_NUM }
+        prep_list
+        9.times { mix }
+        mix
       end
     end
   end

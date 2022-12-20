@@ -15,6 +15,10 @@ RSpec.describe AoC2022::Puzzles::GrovePositioningSystem do
     it 'finds 3 as the sum of the three numbers that form the grove coordinates' do
       expect(grove_positioning_system.mix).to eq 3
     end
+
+    it 'finds 1623178306 as the sum of the three numbers that form the grove coordinates' do
+      expect(grove_positioning_system.part_two).to eq 1623178306
+    end
   end
 
   context 'with actual input data' do
@@ -22,6 +26,10 @@ RSpec.describe AoC2022::Puzzles::GrovePositioningSystem do
 
     it 'finds 23321 as the sum of the three numbers that form the grove coordinates' do
       expect(grove_positioning_system.mix).to eq 23321
+    end
+
+    it 'finds 1428396909280 as the sum of the three numbers that form the grove coordinates' do
+      expect(grove_positioning_system.part_two).to eq 1428396909280
     end
   end
 end
