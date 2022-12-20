@@ -7,7 +7,7 @@ module AoC2022
     # For Day 17, we're playing Tetris.
     class PyroclasticFlow
       def self.day17
-        pyroclastic_flow = File.open('input/day17.txt') { |file| NotEnoughMinerals.new file }
+        pyroclastic_flow = File.open('input/day17.txt') { |file| PyroclasticFlow.new file }
         puts "Day 17, Part One: #{ pyroclastic_flow.drop_rocks } is the height after 2022 rocks."
         # puts "Day 17, Part Two: #{ pyroclastic_flow.tuning_frequency(4_000_000) } is the tuning frequency."
         puts
