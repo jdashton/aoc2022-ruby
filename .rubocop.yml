@@ -72,6 +72,9 @@ Style/MixinUsage:
   Exclude:
     - spec/**/*
 
+Style/ParallelAssignment:
+  Enabled: false
+
 Style/PerlBackrefs:
   Enabled: false
 
