@@ -8,7 +8,7 @@ module AoC2022
     class NotEnoughMinerals
       def self.day19
         not_enough_minerals = File.open('input/day19.txt') { |file| NotEnoughMinerals.new file }
-        puts "Day 19, Part One: #{ not_enough_minerals.max_release(5) } is the most pressure you can release in 5 minutes."
+        puts "Day 19, Part One: #{ not_enough_minerals.quality_levels } is the most pressure you can release in 5 minutes."
         # puts "Day 19, Part Two: #{ not_enough_minerals.tuning_frequency(4_000_000) } is the tuning frequency."
         puts
       end
@@ -46,8 +46,8 @@ module AoC2022
             blueprint.each.with_index do |costs, robot_type|
               _resources = resources.zip(costs).map(&:sum)
               if _resources.none?(&:negative?)
-                _resources = _resources.zip(robots).map(&:sum)
-                _robots = robots.clone
+                _resources          = _resources.zip(robots).map(&:sum)
+                _robots             = robots.clone
                 _robots[robot_type] += 1
                 children.push [_resources, _robots]
               end

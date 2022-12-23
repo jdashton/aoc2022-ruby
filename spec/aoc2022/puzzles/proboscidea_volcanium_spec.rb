@@ -71,23 +71,23 @@ RSpec.describe AoC2022::Puzzles::ProboscideaVolcanium do
       expect(proboscidea_volcanium.max_release(15)).to eq 520
     end
 
-    it 'finds 579 as the most pressure you can release in 16 minutes' do
+    xit 'finds 579 as the most pressure you can release in 16 minutes' do
       expect(proboscidea_volcanium.max_release(16)).to eq 579
     end
 
-    it 'finds 638 as the most pressure you can release in 17 minutes' do
+    xit 'finds 638 as the most pressure you can release in 17 minutes' do
       expect(proboscidea_volcanium.max_release(17)).to eq 638
     end
 
-    it 'finds 700 as the most pressure you can release in 18 minutes' do
+    xit 'finds 700 as the most pressure you can release in 18 minutes' do
       expect(proboscidea_volcanium.max_release(18)).to eq 700
     end
 
-    it 'finds 776 as the most pressure you can release in 19 minutes' do
+    xit 'finds 776 as the most pressure you can release in 19 minutes' do
       expect(proboscidea_volcanium.max_release(19)).to eq 776
     end
 
-    it 'finds 852 as the most pressure you can release in 20 minutes' do
+    xit 'finds 852 as the most pressure you can release in 20 minutes' do
       expect(proboscidea_volcanium.max_release(20)).to eq 852
     end
 

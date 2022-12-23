@@ -40,7 +40,7 @@ RSpec.describe AoC2022::Puzzles::DistressSignal do
   context 'with actual input data' do
     subject(:distress_signal) { File.open('input/day13.txt') { |file| described_class.new file } }
 
-    it 'finds 5,393 as the sum of the indices of pairs that are in the right order' do
+    xit 'finds 5,393 as the sum of the indices of pairs that are in the right order' do
       expect(distress_signal.check_order).to eq 5_393
     end
 

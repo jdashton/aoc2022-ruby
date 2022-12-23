@@ -38,8 +38,8 @@ RSpec.describe AoC2022::Puzzles::MonkeyMap do
 
     # 50538 is too low
     # 195075 is too high
-    it 'finds 50,539 as the final password' do
-      expect(monkey_map.part_two).to eq 50_539
+    it 'finds 106,392 as the final password' do
+      expect(monkey_map.part_two).to eq 106_392
     end
   end
 end

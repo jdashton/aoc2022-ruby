@@ -6,7 +6,7 @@ module AoC2022
     class MonkeyMath
       def self.day21
         monkey_math = File.open('input/day21.txt') { |file| MonkeyMath.new file }
-        puts "Day 21, Part One: the monkey named root will yell #{ monkey_math.part_one }."
+        puts "Day 21, Part One: the monkey named root will yell #{ monkey_math.find_advanced(:root) }."
         puts "Day 21, Part Two: #{ monkey_math.part_two } is the number I yell."
         puts
       end

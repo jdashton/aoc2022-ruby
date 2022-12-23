@@ -7,7 +7,7 @@ module AoC2022
       def self.day22
         monkey_map = File.open('input/day22.txt') { |file| MonkeyMap.new file }
         puts "Day 22, Part One: #{ monkey_map.part_one } is the final password."
-        # puts "Day 22, Part Two: #{ monkey_map.part_two } is the final password."
+        puts "Day 22, Part Two: #{ monkey_map.part_two } is the final password."
         puts
       end
 
@@ -121,7 +121,7 @@ module AoC2022
       def east_cube((x, y), distance)
         return [x, y, :east] if distance.zero?
 
-        puts " -- at [#{ x }, #{ y }] heading east for #{ distance }"
+        # puts " -- at [#{ x }, #{ y }] heading east for #{ distance }"
         next_x, next_y, next_heading = (x < @x_ranges[y].last) ? x + 1 : @wrapping[:"y#{ y - y % @board_size}_east"].call(y)
 
         next_pos = @board[next_y || y][next_x]
@@ -135,7 +135,7 @@ module AoC2022
       def west_cube((x, y), distance)
         return [x, y, :west] if distance.zero?
 
-        puts " -- at [#{ x }, #{ y }] heading west for #{ distance }"
+        # puts " -- at [#{ x }, #{ y }] heading west for #{ distance }"
         next_x, next_y, next_heading = (x > @x_ranges[y].first) ? x - 1 : @wrapping[:"y#{ y - y % @board_size}_west"].call(y)
 
         next_pos = @board[next_y || y][next_x]
@@ -149,7 +149,7 @@ module AoC2022
       def south_cube((x, y), distance)
         return [x, y, :south] if distance.zero?
 
-        puts " -- at [#{ x }, #{ y }] heading south for #{ distance }"
+        # puts " -- at [#{ x }, #{ y }] heading south for #{ distance }"
         next_x, next_y, next_heading = (y < @y_ranges[x].last) ? [x, y + 1] : @wrapping[:"x#{ x - x % @board_size}_south"].call(x)
         next_pos                     = @board[next_y][next_x]
         # pp [next_x, next_y, next_heading, next_pos]
@@ -163,7 +163,7 @@ module AoC2022
       def north_cube((x, y), distance)
         return [x, y, :north] if distance.zero?
 
-        puts " -- at [#{ x }, #{ y }] heading north for #{ distance }"
+        # puts " -- at [#{ x }, #{ y }] heading north for #{ distance }"
         next_x, next_y, next_heading = (y > @y_ranges[x].first) ? [x, y - 1] : @wrapping[:"x#{ x - x % @board_size}_north"].call(x)
         next_pos                     = @board[next_y][next_x]
         # pp [next_x, next_y, next_heading, next_pos]
@@ -261,8 +261,8 @@ module AoC2022
         pos           = [@x_ranges.first.first, 0]
         heading       = :east
         x, y, heading = @path.reduce([]) { |_, op| pos, heading = walk_cube(pos, heading, op) }.flatten
-        pp [x, y, heading]
-        pp (y + 1) * 1000 + (x + 1) * 4 + (heading == :east ? 0 : heading == :south ? 1 : heading == :west ? 2 : 3)
+        # pp [x, y, heading]
+        (y + 1) * 1000 + (x + 1) * 4 + (heading == :east ? 0 : heading == :south ? 1 : heading == :west ? 2 : 3)
         # 5031
       end
     end
