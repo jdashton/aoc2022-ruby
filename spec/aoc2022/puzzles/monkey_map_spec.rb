@@ -32,8 +32,8 @@ RSpec.describe AoC2022::Puzzles::MonkeyMap do
     subject(:monkey_map) { File.open('input/day22.txt') { |file| described_class.new file } }
 
     # 4346 is (far) too low
-    it 'finds 73346 as the final password' do
-      expect(monkey_map.part_one).to eq 73346
+    it 'finds 73,346 as the final password' do
+      expect(monkey_map.part_one).to eq 73_346
     end
 
     # 50538 is too low
