@@ -27,23 +27,15 @@ CHARS = { 3 => '=', 4 => '-', 5 => '0', '=' => -2, '-' => -1 }.freeze
 
 # Monkey-patching into Ruby's Integer class
 class Integer
-  def to_snafu
-    carry = false
-    digits(5).map { |d|
-      d += 1 if carry
-      (carry = d > 2 ? CHARS[d] : false) || d
-    }.reverse.join.prepend(carry ? '1' : '')
+  def to_snafu = digits(5).each_with_index.reduce([]) { |acc, (digit, i)| Integer.snafu_digit(acc, digit, i) }.reverse.join
+
+  def self.snafu_digit(acc, digit, index)
+    digit += 1 if acc[index]
+    acc[...index] + [CHARS[digit] || digit] + (digit > 2 ? [1] : [])
   end
 end
 
 # Monkey-patching into Ruby's String class
 class String
-  def to_snafu_i
-    borrow = false
-    chars.reverse.map.with_index { |c, i|
-      d      = (CHARS[c] || c.to_i) - (borrow ? 1 : 0)
-      borrow = d > 2
-      d * (5 ** i)
-    }.sum
-  end
+  def to_snafu_i = chars.reverse.map.with_index { |character, i| (CHARS[character] || character.to_i) * (5 ** i) }.sum
 end
