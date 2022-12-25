@@ -32,7 +32,7 @@ class Integer
     digits(5).map { |d|
       d += 1 if carry
       (carry = d > 2 ? CHARS[d] : false) || d
-    }.tap { |ary| ary << 1 if carry }.reverse.join
+    }.reverse.join.prepend(carry ? '1' : '')
   end
 end
 
@@ -40,10 +40,10 @@ end
 class String
   def to_snafu_i
     borrow = false
-    chars.reverse.map { |c|
+    chars.reverse.map.with_index { |c, i|
       d      = (CHARS[c] || c.to_i) - (borrow ? 1 : 0)
       borrow = d > 2
-      d
-    }.map.with_index { |d, i| d * (5 ** i) }.sum
+      d * (5 ** i)
+    }.sum
   end
 end
