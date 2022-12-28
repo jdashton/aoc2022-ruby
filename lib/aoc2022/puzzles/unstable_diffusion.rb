@@ -21,16 +21,8 @@ module AoC2022
       # :reek:FeatureEnvy
       def initialize(file)
         @dirs  = DIRS.keys
-        @board = file
-                   .readlines(chomp: true)
-                   .each_with_index
-                   .reduce(Set.new) do |line_acc, (line, y)|
-          line
-            .chars
-            .each_with_index
-            .reduce(line_acc) do |acc, (char, x)|
-            acc.merge(char == '#' ? [[x, y]] : [])
-          end
+        @board = file.readlines(chomp: true).each_with_index.reduce(Set.new) do |line_acc, (line, y)|
+          line.chars.each_with_index.reduce(line_acc) { |acc, (char, x)| char == '#' ? acc << [x, y] : acc }
         end
       end
 
@@ -71,51 +63,51 @@ module AoC2022
 
       def empty_dir?((x, y), dir)
         new_x, new_y = DIRS[dir].call(x, y)
-        if dir in :north | :south
-          [[x - 1, new_y], [x, new_y], [x + 1, new_y]]
-        else
-          [[new_x, y - 1], [new_x, y], [new_x, y + 1]]
-        end.none? { |pos| @board.include?(pos) }
+        (if dir in :north | :south
+           [[x - 1, new_y], [x, new_y], [x + 1, new_y]]
+         else
+           [[new_x, y - 1], [new_x, y], [new_x, y + 1]]
+         end.none? { |pos| @board.include?(pos) }) ?
+          [new_x, new_y] :
+          false
       end
 
       def propose_moves
         num_moves = 0
+        new_board = @board.dup
         @proposed = @board.reduce({}) do |acc, elf|
+          # pp [acc, elf]
           if lonely?(elf)
-            acc.merge({ elf => '#' })
+            acc
           else
             @dirs.reduce(acc) do |dir_acc, dir|
-              if empty_dir?(elf, dir)
-                new_pos   = DIRS[dir].call(*elf)
+              if (new_pos = empty_dir?(elf, dir))
                 num_moves += 1
-                break dir_acc.merge({ new_pos => ((dir_acc[new_pos] || []) << elf) })
-              elsif dir == @dirs.last
-                dir_acc.merge({ elf => '#' })
+                if @board.include?(DIRS[dir].call(*new_pos))
+                  # puts "Possible conflict, proposing move from #{ elf } to #{ new_pos }"
+                  dir_acc.merge!({ new_pos => ((dir_acc[new_pos] || []) << elf) })
+                else
+                  # puts "No conflict, moving elf from #{ elf } to #{ new_pos }"
+                  new_board.delete(elf) << new_pos
+                end
+                break dir_acc
               else
                 dir_acc
               end
             end
           end
         end
+
+        @board = new_board
         num_moves
       end
 
       def actuate_moves
-        @board = Set.new
-        # pp @proposed  # TODO: Use a Set for @board: only @proposed needs the values, not @board.
-        @proposed.each do |key, props|
-          # noinspection RubyCaseWithoutElseBlockInspection
-          case props
-            in '#'
-              @board.merge([key])
-            in Array
-              if props.length == 1
-                @board.merge([key])
-              else
-                props.each { |pos| @board.merge([pos]) }
-              end
-          end
-        end
+        # @board contains all the elves that could not move or did not need to move.
+        # Using the list of proposed moves, update @board by deleting those
+        # that can move and adding them in their new spot.
+
+        @proposed.each { |key, props| @board.delete(props[0]) << key if props.length == 1 }
       end
 
       def spread_out(max_rounds = 10)

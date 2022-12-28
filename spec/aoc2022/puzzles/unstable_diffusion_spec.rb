@@ -79,7 +79,7 @@ RSpec.describe AoC2022::Puzzles::UnstableDiffusion do
       expect(unstable_diffusion.part_one).to eq 4116
     end
 
-    xit 'finds 984 as the first round with no moves' do
+    it 'finds 984 as the first round with no moves' do
       expect(unstable_diffusion.part_two).to eq 984
     end
   end
