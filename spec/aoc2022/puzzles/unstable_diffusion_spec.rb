@@ -67,7 +67,7 @@ RSpec.describe AoC2022::Puzzles::UnstableDiffusion do
       DATA
     end
 
-    it "finds 25 as the number of spaces in the final state" do
+    it 'finds 25 as the number of spaces in the final state' do
       expect(unstable_diffusion.spread_out.count_spaces).to eq 25
     end
   end
