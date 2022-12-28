@@ -62,13 +62,11 @@ module AoC2022
       end
 
       def lonely?((x, y))
-        ((y - 1)..(y + 1)).map { |y_prime|
-          ((x - 1)..(x + 1)).map do |x_prime|
-            next nil if x_prime == x && y_prime == y
-
-            @board.include?([x_prime, y_prime])
-          end
-        }.flatten.none?
+        [
+          [x - 1, y - 1], [x, y - 1], [x + 1, y - 1],
+          [x - 1, y], [x + 1, y],
+          [x - 1, y + 1], [x, y + 1], [x + 1, y + 1]
+        ].none? { |pos| @board.include?(pos) }
       end
 
       def empty_dir?((x, y), dir)
