@@ -22,14 +22,14 @@ module AoC2022
       def initialize(file)
         @dirs  = DIRS.keys
         @board = file
-                 .readlines(chomp: true)
-                 .each_with_index
-                 .reduce({}) do |line_acc, (line, y)|
+                   .readlines(chomp: true)
+                   .each_with_index
+                   .reduce(Set.new) do |line_acc, (line, y)|
           line
             .chars
             .each_with_index
             .reduce(line_acc) do |acc, (char, x)|
-            acc.merge(char == '#' ? { [x, y] => '#' } : {})
+            acc.merge(char == '#' ? [[x, y]] : [])
           end
         end
       end
@@ -52,15 +52,11 @@ module AoC2022
       #   directions = [:north, :south, :west, :east].rotate
 
       def render
-        xs, ys = [[], []]
-        @board.each do |(x, y), _|
-          xs << x
-          ys << y
-        end
+        xs, ys = @board.to_a.transpose.map(&:minmax)
 
-        Range.new(*ys.minmax).map { |y|
-          Range.new(*xs.minmax).map { |x|
-            @board[[x, y]] || '.'
+        Range.new(*ys).map { |y|
+          Range.new(*xs).map { |x|
+            @board.include?([x, y]) ? '#' : '.'
           }.join
         }.join("\n") + "\n"
       end
@@ -70,9 +66,9 @@ module AoC2022
           ((x - 1)..(x + 1)).map do |x_prime|
             next nil if x_prime == x && y_prime == y
 
-            @board[[x_prime, y_prime]]
+            @board.include?([x_prime, y_prime])
           end
-        }.flatten.all?(&:nil?)
+        }.flatten.none?
       end
 
       def empty_dir?((x, y), dir)
@@ -81,14 +77,14 @@ module AoC2022
           [[x - 1, new_y], [x, new_y], [x + 1, new_y]]
         else
           [[new_x, y - 1], [new_x, y], [new_x, y + 1]]
-        end.all? { |pos| @board[pos].nil? }
+        end.none? { |pos| @board.include?(pos) }
       end
 
       def propose_moves
         num_moves = 0
-        @proposed = @board.reduce({}) do |acc, (elf, val)|
+        @proposed = @board.reduce({}) do |acc, elf|
           if lonely?(elf)
-            acc.merge({ elf => val })
+            acc.merge({ elf => '#' })
           else
             @dirs.reduce(acc) do |dir_acc, dir|
               if empty_dir?(elf, dir)
@@ -96,7 +92,7 @@ module AoC2022
                 num_moves += 1
                 break dir_acc.merge({ new_pos => ((dir_acc[new_pos] || []) << elf) })
               elsif dir == @dirs.last
-                dir_acc.merge({ elf => val })
+                dir_acc.merge({ elf => '#' })
               else
                 dir_acc
               end
@@ -107,18 +103,18 @@ module AoC2022
       end
 
       def actuate_moves
-        @board = {}
+        @board = Set.new
         # pp @proposed  # TODO: Use a Set for @board: only @proposed needs the values, not @board.
         @proposed.each do |key, props|
           # noinspection RubyCaseWithoutElseBlockInspection
           case props
             in '#'
-              @board[key] = props
+              @board.merge([key])
             in Array
               if props.length == 1
-                @board[key] = '#'
+                @board.merge([key])
               else
-                props.each { |pos| @board[pos] = '#' }
+                props.each { |pos| @board.merge([pos]) }
               end
           end
         end
@@ -128,7 +124,7 @@ module AoC2022
         @rounds = 1
         while propose_moves.positive?
           actuate_moves
-          @dirs = @dirs.rotate
+          @dirs   = @dirs.rotate
           @rounds += 1
           break if @rounds > max_rounds
         end
@@ -136,7 +132,7 @@ module AoC2022
       end
 
       def count_spaces
-        xs, ys = @board.keys.transpose.map(&:minmax)
+        xs, ys = @board.to_a.transpose.map(&:minmax)
         ((1 + xs[1] - xs[0]) * (1 + ys[1] - ys[0])) - @board.size
       end
 
