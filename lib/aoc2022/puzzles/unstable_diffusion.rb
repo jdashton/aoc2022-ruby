@@ -11,17 +11,11 @@ module AoC2022
         puts
       end
 
-      DIRS = {
-        north: ->(x, y) { [x, y - 1] },
-        south: ->(x, y) { [x, y + 1] },
-        west:  ->(x, y) { [x - 1, y] },
-        east:  ->(x, y) { [x + 1, y] }
-      }.freeze
-
       # :reek:FeatureEnvy
       def initialize(file)
-        @dirs  = DIRS.keys
-        @board = file.readlines(chomp: true).each_with_index.reduce(Set.new) do |line_acc, (line, y)|
+        @directions = %i[north south west east]
+        @rounds     = 1
+        @board      = file.readlines(chomp: true).each_with_index.reduce(Set.new) do |line_acc, (line, y)|
           line.chars.each_with_index.reduce(line_acc) { |acc, (char, x)| char == '#' ? acc << [x, y] : acc }
         end
       end
@@ -53,70 +47,77 @@ module AoC2022
         }.join("\n") + "\n"
       end
 
-      def lonely?((x, y))
-        [
-          [x - 1, y - 1], [x, y - 1], [x + 1, y - 1],
-          [x - 1, y], [x + 1, y],
-          [x - 1, y + 1], [x, y + 1], [x + 1, y + 1]
-        ].none? { |pos| @board.include?(pos) }
-      end
+      def propose_moves = @candidates.each_with_object({}) { |elf, proposed_moves| propose_elf_move(proposed_moves, elf) }
 
-      def empty_dir?((x, y), dir)
-        new_x, new_y = DIRS[dir].call(x, y)
-        (if dir in :north | :south
-           [[x - 1, new_y], [x, new_y], [x + 1, new_y]]
-         else
-           [[new_x, y - 1], [new_x, y], [new_x, y + 1]]
-         end.none? { |pos| @board.include?(pos) }) ?
-          [new_x, new_y] :
-          false
-      end
+      def propose_elf_move(proposed_moves, elf)
+        # return unless @board.member?(elf)
 
-      def propose_moves
-        num_moves = 0
-        new_board = @board.dup
-        @proposed = @board.reduce({}) do |acc, elf|
-          # pp [acc, elf]
-          if lonely?(elf)
-            acc
+        x, y    = elf
+        left_x  = x - 1
+        right_x = x + 1
+        up_y    = y - 1
+        down_y  = y + 1
+
+        neighbor_positions = [
+          [left_x, up_y], [x, up_y], [right_x, up_y],
+          [left_x, y], [right_x, y],
+          [left_x, down_y], [x, down_y], [right_x, down_y]
+        ]
+        return if (empty = neighbor_positions.map { |pos| !@board.include?(pos) }).all?
+
+        if @directions.any? do |direction|
+          # noinspection RubyCaseWithoutElseBlockInspection
+          next unless (new_pos = case direction
+                                   when :north then empty[0] && empty[1] && empty[2] && neighbor_positions[1]
+                                   when :south then empty[5] && empty[6] && empty[7] && neighbor_positions[6]
+                                   when :west then empty[0] && empty[3] && empty[5] && neighbor_positions[3]
+                                   when :east then empty[2] && empty[4] && empty[7] && neighbor_positions[4]
+                                 end)
+
+          if ((other_elf, _) = proposed_moves[new_pos])
+            @new_candidates << other_elf
+            @new_candidates << elf
+            proposed_moves.delete(new_pos)
           else
-            @dirs.reduce(acc) do |dir_acc, dir|
-              if (new_pos = empty_dir?(elf, dir))
-                num_moves += 1
-                if @board.include?(DIRS[dir].call(*new_pos))
-                  # puts "Possible conflict, proposing move from #{ elf } to #{ new_pos }"
-                  dir_acc.merge!({ new_pos => ((dir_acc[new_pos] || []) << elf) })
-                else
-                  # puts "No conflict, moving elf from #{ elf } to #{ new_pos }"
-                  new_board.delete(elf) << new_pos
-                end
-                break dir_acc
-              else
-                dir_acc
-              end
-            end
+            proposed_moves[new_pos] = [elf, direction]
           end
         end
-
-        @board = new_board
-        num_moves
-      end
-
-      def actuate_moves
-        # @board contains all the elves that could not move or did not need to move.
-        # Using the list of proposed moves, update @board by deleting those
-        # that can move and adding them in their new spot.
-
-        @proposed.each { |key, props| @board.delete(props[0]) << key if props.length == 1 }
+        else
+          @new_candidates << elf # Elf could not move
+        end
       end
 
       def spread_out(max_rounds = 10)
-        @rounds = 1
-        while propose_moves.positive?
-          actuate_moves
-          @dirs   = @dirs.rotate
-          @rounds += 1
+        @candidates     = @board.to_a
+        @new_candidates = Array.new
+        while (proposed = propose_moves).length.positive?
+          # pp [@candidates.size, @board.size]
+          # @board contains all the elves that could not move or did not need to move.
+          # Using the list of proposed moves, update @board by deleting those
+          # that can move and adding them in their new spot.
+
+          # pp @new_candidates
+          proposed.each do |new_pos, (old_pos, _)|
+            @board.delete(old_pos) << new_pos
+            @new_candidates << new_pos
+          end
+          proposed.each do |new_pos, (_, direction)|
+            @new_candidates.push(*
+                                 # noinspection RubyCaseWithoutElseBlockInspection
+                                 case direction
+                                   when :north then ((new_pos[0] - 1)..(new_pos[0] + 1)).reduce([]) { |acc, x| @board.include?((pos = [x, new_pos[1] - 1])) ? acc << pos : acc }
+                                   when :south then ((new_pos[0] - 1)..(new_pos[0] + 1)).reduce([]) { |acc, x| @board.include?((pos = [x, new_pos[1] + 1])) ? acc << pos : acc }
+                                   when :west then ((new_pos[1] - 1)..(new_pos[1] + 1)).reduce([]) { |acc, y| @board.include?((pos = [new_pos[0] - 1, y])) ? acc << pos : acc }
+                                   when :east then ((new_pos[1] - 1)..(new_pos[1] + 1)).reduce([]) { |acc, y| @board.include?((pos = [new_pos[0] + 1, y])) ? acc << pos : acc }
+                                 end
+            )
+            # pp @new_candidates
+          end
+          @directions = @directions.rotate
+          @rounds     += 1
           break if @rounds > max_rounds
+          @candidates     = @new_candidates.uniq
+          @new_candidates = Array.new
         end
         self
       end
