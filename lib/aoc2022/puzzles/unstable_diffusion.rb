@@ -54,30 +54,73 @@ module AoC2022
       #
       def propose_and_move
         # Expand board as needed
-        @board = @board.map { _1 << 1 } while @board.any? { _1 & 1 == 1 }
+        @board = @board.map { _1 << 1 } if @board.any? { _1 & 1 == 1 }
         @board.unshift(0) unless @board.first.zero?
-        @board.push(0) unless @board.last.zero?
-        @board.push(0) unless @board[-2].zero?
+        @board.push(0) until @board.last.zero? && @board[-2].zero?
 
         any_elf_moved       = false
         two_prev_prop_south = prev_prop_stay = prev_prop_south = prev_prop_west = prev_prop_east = 0
 
         # In each iteration we propose moves for the middle row in the cons(3) window,
         # but actualize moves for the top row in that window.
-        @board.each_cons(3).with_index do |rows, north_index|
-          # Propose moves in and from rows[1]
-          curr_prop_stay, curr_prop_north, curr_prop_south, curr_prop_west, curr_prop_east = propose_row_moves(rows)
+        @board.each_cons(3).with_index do |(north, current, south), north_index|
+          # Propose moves within and from rows[1]
+          curr_prop_north = curr_prop_south = curr_prop_west = curr_prop_east = 0
+          if current.zero?
+            curr_prop_stay = 0
+          else
+            north_west = north << 1
+            north_east = north >> 1
+            south_west = south << 1
+            south_east = south >> 1
+            not_above3 = ~(north_west | north | north_east)
+            not_below3 = ~(south_west | south | south_east)
+            not_west   = ~(current << 1)
+            not_east   = ~(current >> 1)
+            happy      = current & not_above3 & not_below3 & not_west & not_east
+            unhappy    = current & ~happy
+            @directions.each do |direction|
+              # noinspection RubyCaseWithoutElseBlockInspection
+              case direction
+                when :north
+                  curr_prop_north = unhappy & not_above3
+                  unhappy         &= ~curr_prop_north
+                when :south
+                  curr_prop_south = unhappy & not_below3
+                  unhappy         &= ~curr_prop_south
+                when :west # comparing to shadow in the opposite direction
+                  from           = unhappy & not_east & ~north_east & ~south_east
+                  curr_prop_west = from << 1
+                  unhappy        &= ~from
+                when :east
+                  from           = unhappy & not_west & ~north_west & ~south_west
+                  curr_prop_east = from >> 1
+                  unhappy        &= ~from
+              end
+              break if unhappy.zero?
+            end
 
-          # Actualize proposed moves for rows[0]. These were proposed in the previous iteration.
-          # East-west collisions are detected and resolved in propose_row_moves().
-          # Detect and resolve north-south collisions.
-          if (blocked = two_prev_prop_south & curr_prop_north).positive?
-            two_prev_prop_south     &= ~blocked
-            curr_prop_north         &= ~blocked
-            @board[north_index - 1] |= blocked
-            curr_prop_stay          |= blocked
+            # Detect and resolve east-west collisions
+            if (w_e_blocked = curr_prop_west & curr_prop_east).positive?
+              unhappy        |= (w_e_blocked << 1) | (w_e_blocked >> 1)
+              w_e_blocked    = ~w_e_blocked
+              curr_prop_west &= w_e_blocked
+              curr_prop_east &= w_e_blocked
+            end
+
+            curr_prop_stay = happy | unhappy
+
+            # Detect and resolve north-south collisions.
+            if (n_s_blocked = two_prev_prop_south & curr_prop_north).positive?
+              @board[north_index - 1] |= n_s_blocked
+              curr_prop_stay          |= n_s_blocked
+              n_s_blocked             = ~n_s_blocked
+              two_prev_prop_south     &= n_s_blocked
+              curr_prop_north         &= n_s_blocked
+            end
           end
 
+          # Actualize proposed moves for rows[0]. These were proposed in the previous two iterations.
           arrived       = curr_prop_north | two_prev_prop_south | prev_prop_west | prev_prop_east
           any_elf_moved ||= arrived.positive?
 
@@ -97,52 +140,6 @@ module AoC2022
         @directions = @directions.rotate
 
         any_elf_moved
-      end
-
-      NO_PROPOSAL = [0, 0, 0, 0, 0].freeze
-
-      def propose_row_moves((north, current, south))
-        # proposal positions are these, in this order:
-        # stay [0], north [1], south [2], west [3], east [4]
-        return NO_PROPOSAL if current.zero?
-
-        north_west = north << 1
-        north_east = north >> 1
-        south_west = south << 1
-        south_east = south >> 1
-        above3     = ~(north_west | north | north_east)
-        below3     = ~(south_west | south | south_east)
-        west       = ~(current << 1)
-        east       = ~(current >> 1)
-        happy      = current & above3 & below3 & west & east
-        unhappy    = current & ~happy
-        north_prop = south_prop = west_prop = east_prop = 0
-        @directions.each do |direction|
-          # noinspection RubyCaseWithoutElseBlockInspection
-          case direction
-            when :north
-              north_prop = unhappy & above3
-              unhappy    &= ~north_prop
-            when :south
-              south_prop = unhappy & below3
-              unhappy    &= ~south_prop
-            when :west # comparing to shadow in the opposite direction
-              from      = unhappy & east & ~north_east & ~south_east
-              west_prop = from << 1
-              unhappy   &= ~from
-            when :east
-              from      = unhappy & west & ~north_west & ~south_west
-              east_prop = from >> 1
-              unhappy   &= ~from
-          end
-          break if unhappy.zero?
-        end
-        if (east_west_blocked = west_prop & east_prop).positive?
-          west_prop &= ~east_west_blocked
-          east_prop &= ~east_west_blocked
-          unhappy   |= (east_west_blocked << 1) | (east_west_blocked >> 1)
-        end
-        [happy | unhappy, north_prop, south_prop, west_prop, east_prop]
       end
 
       def spread_out(max_rounds = 10)

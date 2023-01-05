@@ -85,7 +85,7 @@ module AoC2022
       def tuning_frequency(max_coord)
         (0..max_coord).each do |i|
           rs = merge_ranges(find_ranges(i).map { |r| (r.begin.clamp(0..max_coord))..(r.end.clamp(0..max_coord)) })
-          break (4_000_000 * (rs.first.end + 1)) + i if rs.length > 1
+          break ((rs.first.end + 1) * 4_000_000) + i if rs.length > 1
         end
       end
     end
