@@ -11,20 +11,35 @@ module AoC2022
         puts
       end
 
+      Point = Data.define(:x, :y, :z, :hash)
+
+      def Point.eql?(other)
+        puts "Testing equality: #{ self } vs #{ other }"
+        if x == other.x && y == other.y && z == other.z && id != other.id
+          puts "Strange coincidence #{ self } vs #{ other }"
+        end
+        x == other.x && y == other.y && z == other.z
+      end
+
+      def gen_hash(x, y, z) = (x << 20) + (y << 10) + z
+
       # :reek:FeatureEnvy
       def initialize(file)
-        @cubes = file.readlines(chomp: true).reduce(Set.new) { |acc, line| acc << line.split(',').map(&:to_i) }
+        @cubes = file.readlines(chomp: true).reduce(Set.new) do |acc, line|
+          x, y, z = line.split(',').map(&:to_i)
+          acc << Point.new(x, y, z, gen_hash(x, y, z))
+        end
         # pp @cubes
       end
 
       def neighbors(cube)
         s = Set.new
-        s << [cube[0] - 1, cube[1], cube[2]]
-        s << [cube[0] + 1, cube[1], cube[2]]
-        s << [cube[0], cube[1] - 1, cube[2]]
-        s << [cube[0], cube[1] + 1, cube[2]]
-        s << [cube[0], cube[1], cube[2] - 1]
-        s << [cube[0], cube[1], cube[2] + 1]
+        s << cube.with(x: cube.x - 1, hash: gen_hash(cube.x - 1, cube.y, cube.z))
+        s << cube.with(x: cube.x + 1, hash: gen_hash(cube.x + 1, cube.y, cube.z))
+        s << cube.with(y: cube.y - 1, hash: gen_hash(cube.x, cube.y - 1, cube.z))
+        s << cube.with(y: cube.y + 1, hash: gen_hash(cube.x, cube.y + 1, cube.z))
+        s << cube.with(z: cube.z - 1, hash: gen_hash(cube.x, cube.y, cube.z - 1))
+        s << cube.with(z: cube.z + 1, hash: gen_hash(cube.x, cube.y, cube.z + 1))
       end
 
       def count_faces
@@ -33,7 +48,7 @@ module AoC2022
 
       def remove_external_space(container, position)
         # print container.size
-        ns = neighbors(position) & container - @cubes
+        ns        = (neighbors(position) & container) - @cubes
         container -= ns
         ns.each do |cube|
           # pp cube
@@ -49,16 +64,20 @@ module AoC2022
 
       def part_two
         container  = Set.new
-        xs, ys, zs = @cubes.to_a.transpose.map(&:minmax)
-        ((zs.first - 1)..(zs.last + 1)).each do |z|
-          ((ys.first - 1)..(ys.last + 1)).each do |y|
-            ((xs.first - 1)..(xs.last + 1)).each do |x|
-              container << [x, y, z]
+        xs, ys, zs = @cubes.to_a.map { [_1.x, _1.y, _1.z] }.transpose.map(&:minmax)
+        # pp [xs, ys, zs]
+        x_min = xs.first - 1
+        y_min = ys.first - 1
+        z_min = zs.first - 1
+        ((z_min)..(zs.last + 1)).each do |z|
+          ((y_min)..(ys.last + 1)).each do |y|
+            ((x_min)..(xs.last + 1)).each do |x|
+              container << Point.new(x, y, z, gen_hash(x, y, z))
             end
           end
         end
 
-        position = [xs.first - 1, ys.first - 1, zs.first - 1]
+        position = Point.new(x_min, y_min, z_min, gen_hash(x_min, y_min, z_min))
         container.delete(position)
         @cubes = remove_external_space(container, position)
         # puts "Calling count_faces"
