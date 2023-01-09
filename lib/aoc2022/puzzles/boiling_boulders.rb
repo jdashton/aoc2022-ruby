@@ -13,15 +13,7 @@ module AoC2022
 
       Point = Data.define(:x, :y, :z, :hash)
 
-      def Point.eql?(other)
-        puts "Testing equality: #{ self } vs #{ other }"
-        if x == other.x && y == other.y && z == other.z && id != other.id
-          puts "Strange coincidence #{ self } vs #{ other }"
-        end
-        x == other.x && y == other.y && z == other.z
-      end
-
-      def gen_hash(x, y, z) = (x << 20) + (y << 10) + z
+      def gen_hash(x, y, z) = (x << 10) + (y << 5) + z
 
       # :reek:FeatureEnvy
       def initialize(file)
@@ -64,15 +56,23 @@ module AoC2022
 
       def part_two
         container  = Set.new
+        # hashes = Set.new
         xs, ys, zs = @cubes.to_a.map { [_1.x, _1.y, _1.z] }.transpose.map(&:minmax)
         # pp [xs, ys, zs]
         x_min = xs.first - 1
         y_min = ys.first - 1
         z_min = zs.first - 1
-        ((z_min)..(zs.last + 1)).each do |z|
-          ((y_min)..(ys.last + 1)).each do |y|
-            ((x_min)..(xs.last + 1)).each do |x|
-              container << Point.new(x, y, z, gen_hash(x, y, z))
+        (z_min..(zs.last + 1)).each do |z|
+          (y_min..(ys.last + 1)).each do |y|
+            (x_min..(xs.last + 1)).each do |x|
+              # Generate the hash, check to see if it already exists in a local Set, squawk if yes
+              gen_hash = gen_hash(x, y, z)
+              # if hashes.member?(gen_hash)
+              #   puts " -- Hash collision at #{ [x, y, z] } with #{ gen_hash }"
+              # end
+              # hashes << gen_hash
+
+              container << Point.new(x, y, z, gen_hash)
             end
           end
         end
