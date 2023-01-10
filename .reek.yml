@@ -20,6 +20,7 @@ detectors:
     accept:
       - x
       - y
+      - z
 
   UncommunicativeVariableName:
     accept:
@@ -28,6 +29,7 @@ detectors:
       - i
       - x
       - y
+      - z
       - _
       - stacks2
 
