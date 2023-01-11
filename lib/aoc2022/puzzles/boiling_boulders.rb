@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'forwardable'
-
 module AoC2022
   module Puzzles
     # For Day 18, we're counting cubes' surfaces.
@@ -13,9 +11,6 @@ module AoC2022
         puts
       end
 
-      extend Forwardable
-      def_instance_delegators 'self.class', :neighbors, :dimensions
-
       # Modules always have to have a description
       module PointExtensions
         def with(**kwargs)
@@ -25,6 +20,7 @@ module AoC2022
 
       AXES = %i[x y z].freeze
       OPS  = %i[- +].freeze
+
       # noinspection RubyConstantNamingConvention
       Point = Data.define(*AXES, :hash) do
         prepend PointExtensions
@@ -34,32 +30,35 @@ module AoC2022
 
       # You can't get away without describing each class.
       class Point
-        def self.hash_of_coords(x, y, z) = (x << 10) + (y << 5) + z
+        class << self
+          alias super_new new
 
-        def self.new_from_array(ary) = new(*ary, hash_of_coords(*ary))
+          # Override `new` because we always want to pass in an Array of [x, y, z].
+          def new(ary) = super_new(*ary, hash_of_coords(*ary))
+
+          def hash_of_coords(x, y, z) = (x << 10) + (y << 5) + z
+        end
       end
 
-      # :reek:FeatureEnvy
       def initialize(file)
-        @cubes = Set.new file.readlines(chomp: true).map { Point.new_from_array(_1.split(',').map(&:to_i)) }
+        @cubes = Set.new file.readlines(chomp: true).map(&BoilingBoulders.method(:point_from_text))
       end
+
+      def self.point_from_text(text_coords)
+        Point.new(text_coords.split(',').map(&:to_i))
+      end
+
+      AXES_PRODUCT_OPS = AXES.product(OPS).freeze # [[:x, :-], [:x, :+], [:y, :-], [:y, :+], [:z, :-], [:z, :+]]
 
       def self.neighbors(cube)
-        # [[:x, :-], [:x, :+], [:y, :-], [:y, :+], [:z, :-], [:z, :+]]
-        Set.new(AXES.product(OPS).map { |(attr, op)| cube.with(attr => cube.send(attr).send(op, 1)) })
+        Set.new(AXES_PRODUCT_OPS.map { |(attr, op)| cube.with(attr => cube.send(attr).send(op, 1)) })
       end
 
-      def count_faces = @cubes.reduce(0) { |acc, cube| acc + (neighbors(cube) - @cubes).size }
+      def count_faces = @cubes.reduce(0) { |acc, cube| acc + (BoilingBoulders.neighbors(cube) - @cubes).size }
 
       def remove_external_space(container, position)
-        # print container.size
-
-        container -= (ns = (neighbors(position) & container) - @cubes)
-        ns.each do |cube|
-          # pp cube
-          container = remove_external_space(container, cube)
-        end
-        # puts " -- #{container.size}"
+        container -= (ns = (BoilingBoulders.neighbors(position) & container) - @cubes)
+        ns.each { |cube| container = remove_external_space(container, cube) }
         container
       end
 
@@ -68,14 +67,14 @@ module AoC2022
       end
 
       def part_two
-        xs, ys, zs = dimensions(@cubes.to_a)
+        xs, ys, zs = BoilingBoulders.dimensions(@cubes.to_a)
 
-        container = Set.new xs.product(ys, zs).map { Point.new_from_array(_1) }
+        container = Set.new xs.product(ys, zs).map(&Point.method(:new))
 
-        container.delete(position = Point.new_from_array([xs, ys, zs].map(&:first)))
+        container.delete(position = Point.new([xs, ys, zs].map(&:first)))
         @cubes = remove_external_space(container, position)
 
-        count_faces
+        part_one
       end
 
       def self.dimensions(cubes_array)
