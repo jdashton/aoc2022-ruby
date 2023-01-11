@@ -26,6 +26,8 @@ module AoC2022
         prepend PointExtensions
 
         def to_a = [x, y, z]
+
+        def [](atr) = send(atr)
       end
 
       # You can't get away without describing each class.
@@ -51,7 +53,7 @@ module AoC2022
       AXES_PRODUCT_OPS = AXES.product(OPS).freeze # [[:x, :-], [:x, :+], [:y, :-], [:y, :+], [:z, :-], [:z, :+]]
 
       def self.neighbors(cube)
-        Set.new(AXES_PRODUCT_OPS.map { |(attr, op)| cube.with(attr => cube.send(attr).send(op, 1)) })
+        Set.new(AXES_PRODUCT_OPS.map { |(atr, op)| cube.with(atr => cube[atr].send(op, 1)) })
       end
 
       def count_faces = @cubes.reduce(0) { |acc, cube| acc + (BoilingBoulders.neighbors(cube) - @cubes).size }
