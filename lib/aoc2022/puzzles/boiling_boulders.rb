@@ -22,12 +22,18 @@ module AoC2022
       OPS  = %i[- +].freeze
 
       # noinspection RubyConstantNamingConvention
-      Point = Data.define(*AXES, :hash) do
+      Point = Data.define(:hash) do
         prepend PointExtensions
 
-        def to_a = [x, y, z]
+        # def to_a = [x, y, z]
 
-        def [](atr) = send(atr)
+        def [](atr)
+          case atr
+            when :x then hash & 0b1
+            when :y then
+            when :z then
+          end
+        end
       end
 
       # You can't get away without describing each class.
@@ -36,18 +42,20 @@ module AoC2022
           alias super_new new
 
           # Override `new` because we always want to pass in an Array of [x, y, z].
-          def new(ary) = super_new(*ary, hash_of_coords(*ary))
+          def new(ary) = super_new(hash_of_coords(*ary))
 
           def hash_of_coords(x, y, z) = (x << 10) + (y << 5) + z
         end
       end
 
       def initialize(file)
-        @cubes = Set.new file.readlines(chomp: true).map(&BoilingBoulders.method(:point_from_text))
+        @points = []
+        @cubes  = Set.new file.readlines(chomp: true).map(&method(:point_from_text))
       end
 
-      def self.point_from_text(text_coords)
-        Point.new(text_coords.split(',').map(&:to_i))
+      def point_from_text(text_coords)
+        @points << (text_coords_split_map = text_coords.split(',').map(&:to_i))
+        Point.new(text_coords_split_map)
       end
 
       AXES_PRODUCT_OPS = AXES.product(OPS).freeze # [[:x, :-], [:x, :+], [:y, :-], [:y, :+], [:z, :-], [:z, :+]]
@@ -69,7 +77,7 @@ module AoC2022
       end
 
       def part_two
-        xs, ys, zs = BoilingBoulders.dimensions(@cubes.to_a)
+        xs, ys, zs = BoilingBoulders.dimensions(@points)
 
         container = Set.new xs.product(ys, zs).map(&Point.method(:new))
 
